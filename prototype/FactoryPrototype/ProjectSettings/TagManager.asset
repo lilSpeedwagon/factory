@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - grid
+  - object
+  - detail
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - floor
+  - objects
+  - details
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: floor
+    uniqueID: 3530470253
+    locked: 0
+  - name: objects
+    uniqueID: 3073178057
+    locked: 0
+  - name: details
+    uniqueID: 3545020615
+    locked: 0
+  - name: shadow
+    uniqueID: 573397833
+    locked: 0
+  - name: UI
+    uniqueID: 3241108617
+    locked: 0
