@@ -72,5 +72,15 @@ public class Range
     {
         return from <= value && value < to;
     }
+
+    public bool Less(float value)
+    {
+        return value < from;
+    }
+
+    public bool More(float value)
+    {
+        return value >= to;
+    }
 }
 
