@@ -12,8 +12,6 @@ public class objectBuilder : MonoBehaviour
     GameObject grid;
     GridLayout gridLayout;
     GameObject shadow;
-   
-    ContactFilter2D filter;
         
     bool isActive = false;
 
@@ -24,7 +22,7 @@ public class objectBuilder : MonoBehaviour
             if (!isActive)
                 return false;
 
-             return tileManager.IsEmpty(MouseUtils.MouseCellPosition());
+             return tileManager.IsEmpty(TileUtils.MouseCellPosition());
 
             /*var collisions = new List<Collider2D>();
             var collider = shadow.GetComponent<PolygonCollider2D>();
@@ -59,7 +57,7 @@ public class objectBuilder : MonoBehaviour
                 Destroy(shadow);
             }
 
-            shadow = Instantiate(prefabToCreate, MouseUtils.MouseCellPosition(), TileUtils.qInitRotation);
+            shadow = Instantiate(prefabToCreate, TileUtils.MouseCellPosition(), TileUtils.qInitRotation);
             shadow.GetComponent<SpriteRenderer>().color = ColorUtils.colorTransparentGreen;
             shadow.GetComponent<SpriteRenderer>().sortingLayerName = "shadow";
             shadow.GetComponent<PolygonCollider2D>().isTrigger = true;
@@ -71,7 +69,7 @@ public class objectBuilder : MonoBehaviour
     {
         if (isActive && prefabToCreate != null)
         {
-            GameObject newObj = tileManager.InstantiateObject(prefabToCreate, MouseUtils.MouseCellPosition());
+            GameObject newObj = tileManager.InstantiateObject(prefabToCreate, TileUtils.MouseCellPosition());
             newObj.GetComponent<tileObjectScript>().direction = shadow.GetComponent<tileObjectScript>().direction;
         }
     }
@@ -95,8 +93,6 @@ public class objectBuilder : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        filter = new ContactFilter2D();
-
         grid = GameObject.FindWithTag("grid");
         if (grid != null)
         {
@@ -113,7 +109,7 @@ public class objectBuilder : MonoBehaviour
 
             if (shadow != null)
             {
-                shadow.transform.position = MouseUtils.MouseCellPosition();
+                shadow.transform.position = TileUtils.MouseCellPosition();
                 shadow.GetComponent<SpriteRenderer>().color = bIsPossibleToCreate ? ColorUtils.colorTransparentGreen : ColorUtils.colorTransparentRed;
             }
 

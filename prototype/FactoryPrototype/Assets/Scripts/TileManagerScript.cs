@@ -26,10 +26,31 @@ public class TileManagerScript : MonoBehaviour
     private static Vector2Int TILES_PER_CELL = new Vector2Int(2, 4);    // no idea wtf is going on here (something related to Unity Grid cells)
     private Vector2Int m_worldGridStart;
 
+    private enum TileType { Undefined, Conveer, Machine };
+
     private class TileHolder
     {        
-        public GameObject m_gameObject = null;
+        public GameObject Object
+        {
+            get => m_gameObject;
+            set
+            {
+                m_gameObject = value;
+                try
+                {
+                    if (m_gameObject.GetComponent<conveyerScript>().enabled)
+                    {
+                        type = TileType.Conveer;
+                    }
+                }
+                catch (System.NullReferenceException) { }
+                /* to do */
+            }
+        }
         public bool m_bExists = false;
+        public TileType type;
+
+        private GameObject m_gameObject;
     }
 
     TileHolder[,] m_tiles;
@@ -57,7 +78,7 @@ public class TileManagerScript : MonoBehaviour
         ValidateCoords(localPos);
         if (m_tiles[localPos.x, localPos.y].m_bExists)
         {
-            Destroy(m_tiles[localPos.x, localPos.y].m_gameObject);
+            Destroy(m_tiles[localPos.x, localPos.y].Object);
             m_tiles[localPos.x, localPos.y].m_bExists = false;
         }
     }
@@ -75,7 +96,7 @@ public class TileManagerScript : MonoBehaviour
         }
 
         GameObject createdObject = Instantiate(instance, position, TileUtils.qInitRotation);
-        m_tiles[localPos.x, localPos.y].m_gameObject = createdObject;
+        m_tiles[localPos.x, localPos.y].Object = createdObject;
         m_tiles[localPos.x, localPos.y].m_bExists = true;
 
         return createdObject;
@@ -106,7 +127,7 @@ public class TileManagerScript : MonoBehaviour
         {
             return null;
         }
-        return m_tiles[localPos.x, localPos.y].m_gameObject;
+        return m_tiles[localPos.x, localPos.y].Object;
     }
 
     // Start is called before the first frame update

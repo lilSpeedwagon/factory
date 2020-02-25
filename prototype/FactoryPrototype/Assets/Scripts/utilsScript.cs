@@ -4,21 +4,12 @@ using UnityEngine;
 
 public class TileUtils
 {
-    public enum Direction { UpLeft, UpRight, DownRight, DownLeft };
-    public const int DIRECTION_COUNT = 4;
-    public static Quaternion qInitRotation = new Quaternion();
-}
-
-public class InputUtils
-{
-    public const string buttonRotateObject = "RotateObject";
-}
-
-public class MouseUtils
-{
     private static GridLayout gridLayout = GameObject.FindWithTag("grid").GetComponent<GridLayout>();
 
-    public const int PRIMARY_MOUSE_BUTTON = 0;
+    public enum Direction { UpLeft, UpRight, DownRight, DownLeft };
+    public const int DIRECTION_COUNT = 4;
+    public static readonly Quaternion qInitRotation = new Quaternion();
+    public static readonly float tileSize = Mathf.Sqrt(Mathf.Pow(gridLayout.cellSize.x / 2, 2) + Mathf.Pow(gridLayout.cellSize.y / 2, 2));
 
     public static Vector2 MouseCellPosition()
     {
@@ -32,6 +23,18 @@ public class MouseUtils
         }
         return new Vector2();
     }
+
+}
+
+public class InputUtils
+{
+    public const string buttonRotateObject = "RotateObject";
+}
+
+public class MouseUtils
+{
+
+    public const int PRIMARY_MOUSE_BUTTON = 0;
 }
 
 public class ColorUtils

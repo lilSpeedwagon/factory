@@ -6,6 +6,7 @@ public class tileObjectScript : MonoBehaviour
 {
     public bool isShadow = false;
 
+
     public TileUtils.Direction direction
     {
         get
@@ -76,6 +77,5 @@ public class tileObjectScript : MonoBehaviour
         direction = newDir;
     }
 
-    protected TileUtils.Direction m_dir = TileUtils.Direction.DownRight;
-    
+    protected TileUtils.Direction m_dir = TileUtils.Direction.DownRight;    
 }

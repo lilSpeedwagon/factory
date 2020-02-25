@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class conveyerScript : tileObjectScript
 {
-    public float fConvSpeed = 0.2f;
+    public float Speed = 0.2f;
 
-    ContactFilter2D m_filter = new ContactFilter2D();
-    Vector2 m_vDirection;
+
 
     // Start is called before the first frame update
     void Start()
     {
-        m_vDirection = GetVector();   
+        m_vDirection = GetVector();
+    }
+
+    private void UpdateLine()
+    {
+        
     }
 
     // Update is called once per frame
@@ -28,12 +32,28 @@ public class conveyerScript : tileObjectScript
             {
                 if (collision.gameObject.tag.Equals("detail"))
                 {
-                    var detailSpeed = fConvSpeed * m_vDirection;
-                    collision.transform.Translate(detailSpeed);
+                    try
+                    {
+                        var motion = collision.GetComponent<MotionScript>();
+                        if (motion.IsFinished)
+                        {
+                            Vector2 target = m_vDirection * TileUtils.tileSize + (Vector2)transform.position;
+                            motion.StartMotion(target, Speed);
+                        }
+                    }
+                    catch (System.NullReferenceException e)
+                    {
+                        Debug.LogError(e.Message);
+                    }
+                    //collision.transform.Translate(detailSpeed * Time.fixedDeltaTime);
                 }
             }
         }
 
         
     }
+
+    private conveyerScript m_prev, m_next;
+    private ContactFilter2D m_filter = new ContactFilter2D();
+    private Vector2 m_vDirection;
 }

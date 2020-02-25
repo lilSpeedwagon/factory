@@ -24,7 +24,7 @@ public class ObjectRemoverScript : MonoBehaviour
         {
             if (shadow != null)
             {
-                shadow.transform.position = MouseUtils.MouseCellPosition();
+                shadow.transform.position = TileUtils.MouseCellPosition();
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -66,7 +66,7 @@ public class ObjectRemoverScript : MonoBehaviour
                 Destroy(shadow);
             }
 
-            shadow = Instantiate(shadowPrefab, MouseUtils.MouseCellPosition(), TileUtils.qInitRotation);
+            shadow = Instantiate(shadowPrefab, TileUtils.MouseCellPosition(), TileUtils.qInitRotation);
         }
     }
 
