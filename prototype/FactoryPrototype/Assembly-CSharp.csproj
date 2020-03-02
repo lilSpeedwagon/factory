@@ -62,12 +62,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\IProcessorScript.cs" />
+    <Compile Include="Assets\Scripts\MaterialScript.cs" />
     <Compile Include="Assets\Scripts\MotionScript.cs" />
     <Compile Include="Assets\Scripts\ObjectRemoverScript.cs" />
+    <Compile Include="Assets\Scripts\RecipeManager.cs" />
     <Compile Include="Assets\Scripts\TileManagerScript.cs" />
     <Compile Include="Assets\Scripts\cameraScript.cs" />
     <Compile Include="Assets\Scripts\conveyerScript.cs" />
+    <Compile Include="Assets\Scripts\interfaces\IProcessable.cs" />
+    <Compile Include="Assets\Scripts\interfaces\IProcessor.cs" />
     <Compile Include="Assets\Scripts\objectBuilder.cs" />
+    <Compile Include="Assets\Scripts\processorScript.cs" />
     <Compile Include="Assets\Scripts\tileObjectScript.cs" />
     <Compile Include="Assets\Scripts\utilsScript.cs" />
     <Reference Include="Unity.Timeline.Editor">

@@ -5,7 +5,8 @@ using UnityEngine;
 public class tileObjectScript : MonoBehaviour
 {
     public bool isShadow = false;
-
+    public int ZPosition = 1;
+    public bool OnlyXFlip = false;
 
     public TileUtils.Direction direction
     {
@@ -18,24 +19,31 @@ public class tileObjectScript : MonoBehaviour
             m_dir = value;
             SpriteRenderer sprite = GetComponent<SpriteRenderer>();
 
-            switch (m_dir)
+            if (!OnlyXFlip)
             {
-                case TileUtils.Direction.DownLeft:
-                    sprite.flipX = true;
-                    sprite.flipY = false;
-                    break;
-                case TileUtils.Direction.DownRight:
-                    sprite.flipX = false;
-                    sprite.flipY = false;
-                    break;
-                case TileUtils.Direction.UpLeft:
-                    sprite.flipX = true;
-                    sprite.flipY = true;
-                    break;
-                case TileUtils.Direction.UpRight:
-                    sprite.flipX = false;
-                    sprite.flipY = true;
-                    break;
+                switch (m_dir)
+                {
+                    case TileUtils.Direction.DownLeft:
+                        sprite.flipX = true;
+                        sprite.flipY = false;
+                        break;
+                    case TileUtils.Direction.DownRight:
+                        sprite.flipX = false;
+                        sprite.flipY = false;
+                        break;
+                    case TileUtils.Direction.UpLeft:
+                        sprite.flipX = true;
+                        sprite.flipY = true;
+                        break;
+                    case TileUtils.Direction.UpRight:
+                        sprite.flipX = false;
+                        sprite.flipY = true;
+                        break;
+                }
+            }
+            else
+            {
+                sprite.flipX = m_dir == TileUtils.Direction.DownLeft || m_dir == TileUtils.Direction.UpRight;                
             }
         }
     }
@@ -77,5 +85,6 @@ public class tileObjectScript : MonoBehaviour
         direction = newDir;
     }
 
-    protected TileUtils.Direction m_dir = TileUtils.Direction.DownRight;    
+    protected TileUtils.Direction m_dir = TileUtils.Direction.DownRight;
+    protected ContactFilter2D m_filter = new ContactFilter2D();
 }

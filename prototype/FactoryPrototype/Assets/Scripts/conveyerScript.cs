@@ -54,6 +54,5 @@ public class conveyerScript : tileObjectScript
     }
 
     private conveyerScript m_prev, m_next;
-    private ContactFilter2D m_filter = new ContactFilter2D();
     private Vector2 m_vDirection;
 }

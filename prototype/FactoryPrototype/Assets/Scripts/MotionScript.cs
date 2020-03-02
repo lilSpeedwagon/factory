@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MotionScript : MonoBehaviour
 {
-    public bool IsFinished { get; private set; }
+    public bool IsFinished { get; private set; } = true;
 
     public void StartMotion(Vector2 to, float speed)
     {
@@ -19,7 +19,7 @@ public class MotionScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        IsFinished = true;
+
     }
 
     // Update is called once per frame

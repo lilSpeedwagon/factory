@@ -4,16 +4,9 @@ using UnityEngine;
 
 public class objectBuilder : MonoBehaviour
 {
-    public List<GameObject> prefabs;
     public GameObject prefabToCreate = null;
     public GameObject builderPanel;
     public TileManagerScript tileManager;
-
-    GameObject grid;
-    GridLayout gridLayout;
-    GameObject shadow;
-        
-    bool isActive = false;
 
     bool IsPossibleToCreate
     {
@@ -23,20 +16,6 @@ public class objectBuilder : MonoBehaviour
                 return false;
 
              return tileManager.IsEmpty(TileUtils.MouseCellPosition());
-
-            /*var collisions = new List<Collider2D>();
-            var collider = shadow.GetComponent<PolygonCollider2D>();
-            collider.OverlapCollider(filter, collisions);
-
-            foreach (var collision in collisions)
-            {
-                if (!collision.gameObject.Equals(collider.gameObject) && collision.gameObject.tag == "object")
-                {
-                    return false;
-                }
-            }
-
-            return true;*/
         }
     }
 
@@ -57,7 +36,7 @@ public class objectBuilder : MonoBehaviour
                 Destroy(shadow);
             }
 
-            shadow = Instantiate(prefabToCreate, TileUtils.MouseCellPosition(), TileUtils.qInitRotation);
+            shadow = Instantiate(prefabToCreate, TileUtils.MouseCellPosition() + TileUtils.LevelOffset(m_currentZlevel), TileUtils.qInitRotation);
             shadow.GetComponent<SpriteRenderer>().color = ColorUtils.colorTransparentGreen;
             shadow.GetComponent<SpriteRenderer>().sortingLayerName = "shadow";
             shadow.GetComponent<PolygonCollider2D>().isTrigger = true;
@@ -71,6 +50,7 @@ public class objectBuilder : MonoBehaviour
         {
             GameObject newObj = tileManager.InstantiateObject(prefabToCreate, TileUtils.MouseCellPosition());
             newObj.GetComponent<tileObjectScript>().direction = shadow.GetComponent<tileObjectScript>().direction;
+            newObj.transform.position += (Vector3) TileUtils.LevelOffset(m_currentZlevel);
         }
     }
 
@@ -109,7 +89,7 @@ public class objectBuilder : MonoBehaviour
 
             if (shadow != null)
             {
-                shadow.transform.position = TileUtils.MouseCellPosition();
+                shadow.transform.position = TileUtils.MouseCellPosition() + TileUtils.LevelOffset(m_currentZlevel);
                 shadow.GetComponent<SpriteRenderer>().color = bIsPossibleToCreate ? ColorUtils.colorTransparentGreen : ColorUtils.colorTransparentRed;
             }
 
@@ -136,7 +116,7 @@ public class objectBuilder : MonoBehaviour
         }        
     }
 
-    public void Pick(int prefabId)
+    /*public void Pick(int prefabId)
     {
         var prefab = prefabs[prefabId];
 
@@ -145,5 +125,27 @@ public class objectBuilder : MonoBehaviour
             ChangePrefab(prefab);
             builderPanel.SetActive(false);
         }
+    }*/
+
+    public void Pick(GameObject prefab)
+    {
+        ChangePrefab(prefab);
+        builderPanel.SetActive(false);
+        try
+        {
+            m_currentZlevel = prefab.GetComponent<tileObjectScript>().ZPosition;
+        }
+        catch (System.NullReferenceException e)
+        {
+            Debug.LogWarning(e);
+        }
     }
+
+
+    GameObject grid;
+    GridLayout gridLayout;
+    GameObject shadow;
+
+    bool isActive = false;
+    private int m_currentZlevel = 0;
 }
