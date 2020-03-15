@@ -2,30 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class processorScript : tileObjectScript, IProcessor
+public class processorScript : tileObjectScript, IProcessor, IMover
 {
     public ProcessorType Type;
     public float ConveerSpeed = 0.2f;
     public float ProcessTriggerOffset = 0.3f;
 
     // IProcessor implementation
-    public GameObject Process(IProcessable obj)
+    public GameObject Process(IProcessable processableObj)
     {
-        if (!CanProcess(obj.Type))
-            throw new System.InvalidOperationException("cannot process the material of type " + obj.Type.ToString());
+        if (!CanProcess(processableObj.Type))
+            throw new System.InvalidOperationException("cannot process the material of type " + processableObj.Type.ToString());
         
-        Destroy(obj.gameObject);
+        Destroy(processableObj.gameObject);
         TimeUtils.Delay(ProcessingTimeSec); // coroutine delay  
-        GameObject newInstance = Instantiate(RecipeManager.FindPrefab(Type, obj.Type), transform.position, TileUtils.qInitRotation);
+        GameObject newInstance = Instantiate(RecipeManager.FindPrefab(Type, processableObj.Type), GetPosition(), TileUtils.qInitRotation);
 
         try
         {
-            var motion = newInstance.GetComponent<MotionScript>();
-            if (motion.IsFinished)
-            {
-                Vector2 target = GetVector() * TileUtils.tileSize + (Vector2)transform.position;
-                motion.StartMotion(target, ConveerSpeed);
-            }
+            var obj = newInstance.GetComponent<MotionScript>();
+            if (obj != null)
+                Move(obj);
         }
         catch (System.NullReferenceException e)
         {
@@ -40,6 +37,26 @@ public class processorScript : tileObjectScript, IProcessor
         return RecipeManager.CanBeProcessed(Type, type);
     }
     // IProcessor implementation end
+
+    // IMover implementation
+    public void Move(MotionScript motionObject)
+    {
+        if (motionObject.IsFinished)
+        {   
+            motionObject.StartMotion(GetNextPostion(), ConveerSpeed);
+        }
+    }
+
+    public bool IsAbleToMove()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public bool IsDirectionAllowed(TileUtils.Direction direction)
+    {
+        return direction == m_dir;
+    }
+    // IMover implementation end
 
     public float ProcessingTimeSec;
 
@@ -62,16 +79,9 @@ public class processorScript : tileObjectScript, IProcessor
             {
                 if (collision.gameObject.tag.Equals("detail"))
                 {
-                    Vector2 pos = collision.transform.position;
-                    var obj = collision.GetComponent<IProcessable>();
-                    Vector2 input = (Vector2)transform.position - GetVector() * TileUtils.tileSize / 2;
-                    if (obj != null && Vector2.Distance(pos, input) <= ProcessTriggerOffset)
-                    {                  
-                        Process(obj);
-                    }
-                    else
+                    if (collision.GetComponent<IProcessable>() != null && collision.GetComponent<MotionScript>().IsFinished)
                     {
-                        Debug.LogWarning("material without IProcessable detected and cannot be processed");
+                        Process(collision.GetComponent<IProcessable>());
                     }
                 }
             }

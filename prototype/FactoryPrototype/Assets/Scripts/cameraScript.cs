@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,31 +20,41 @@ public class cameraScript : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        var vCursorCoords = Input.mousePosition;
-        var vCurrentCameraPos = gameObject.transform.position;
+        Vector3 mousePos = Input.mousePosition;
         
-        if (vCursorCoords.x <= CursorOffsetToMoveScreen)
+        if (mousePos.x <= CursorOffsetToMoveScreen)
         {
             gameObject.transform.position -= CameraSpeed;
         }
-        if (vCursorCoords.x >= Screen.width - CursorOffsetToMoveScreen)
+        if (mousePos.x >= Screen.width - CursorOffsetToMoveScreen)
         {
             gameObject.transform.position += CameraSpeed;
         }
-        if (vCursorCoords.y <= CursorOffsetToMoveScreen)
+        if (mousePos.y <= CursorOffsetToMoveScreen)
         {
             gameObject.transform.position -= QuaternionUtils.qRotate90 * CameraSpeed;
         }
-        if (vCursorCoords.y >= Screen.height - CursorOffsetToMoveScreen)
+        if (mousePos.y >= Screen.height - CursorOffsetToMoveScreen)
         {
             gameObject.transform.position += QuaternionUtils.qRotate90 * CameraSpeed;
         }
 
-        zoomCamera(Input.mouseScrollDelta.y);
-        //m_camera.orthographicSize += Input.mouseScrollDelta.y;
+        if (Input.GetKey(KeyCode.Mouse2))
+        {
+            var mouseMovement = mousePos - m_prevMousePos;
+            gameObject.transform.position += mouseMovement * CameraSpeed.magnitude;
+        }
+        m_prevMousePos = mousePos;
     }
 
-    void zoomCamera(float delta)
+    void Update()
+    {
+        var scroll = Input.mouseScrollDelta.y;
+        if (Math.Abs(scroll) > 0.1f)
+            ZoomCamera(scroll);
+    }
+
+    void ZoomCamera(float delta)
     {
         m_camera.orthographicSize -= delta;
 
@@ -60,4 +71,5 @@ public class cameraScript : MonoBehaviour
     
     private Camera m_camera;
     private Range m_zoomRange;
+    private Vector3 m_prevMousePos;
 }

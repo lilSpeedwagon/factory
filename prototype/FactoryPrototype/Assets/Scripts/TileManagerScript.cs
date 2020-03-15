@@ -4,7 +4,16 @@ using UnityEngine;
 
 public class TileManagerScript : MonoBehaviour
 {
-    public Grid m_worldGrid;
+    private static TileManagerScript m_instance;
+    public static TileManagerScript TileManager
+    {
+        get
+        {
+            if (m_instance == null)
+                m_instance = GameObject.FindWithTag("TileManager").GetComponent<TileManagerScript>();
+            return m_instance;
+        }
+    }
 
     public int Width
     {
@@ -25,6 +34,7 @@ public class TileManagerScript : MonoBehaviour
     private static int BASE_WIDTH = 50, BASE_HEIGHT = 50;
     private static Vector2Int TILES_PER_CELL = new Vector2Int(2, 4);    // no idea wtf is going on here (something related to Unity Grid cells)
     private Vector2Int m_worldGridStart;
+    private Grid m_worldGrid;
 
     private enum TileType { Undefined, Conveer, Machine };
 
@@ -130,12 +140,13 @@ public class TileManagerScript : MonoBehaviour
         return m_tiles[localPos.x, localPos.y].Object;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
+        m_worldGrid = GameObject.FindWithTag("grid").GetComponent<Grid>();
+
         m_width = BASE_WIDTH;
         m_height = BASE_HEIGHT;
-        
+
         m_worldGridStart = new Vector2Int(-m_width / 2, -m_height / 2);
 
         m_tiles = new TileHolder[m_width, m_height];
@@ -149,8 +160,7 @@ public class TileManagerScript : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    TileManagerScript()
     {
         
     }

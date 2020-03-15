@@ -99,7 +99,7 @@ MonoBehaviour:
   ZPosition: 1
   OnlyXFlip: 1
   Type: 1
-  ConveerSpeed: 0.2
+  ConveerSpeed: 0.6
   ProcessTriggerOffset: 0.5
   ProcessingTimeSec: 1
 --- !u!60 &6907948641447400956

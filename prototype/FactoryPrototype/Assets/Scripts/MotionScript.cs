@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public interface IMover
+{
+    void Move(MotionScript motionObject);
+    bool IsAbleToMove();
+    bool IsDirectionAllowed(TileUtils.Direction direction);
+}
+
 public class MotionScript : MonoBehaviour
 {
     public bool IsFinished { get; private set; } = true;

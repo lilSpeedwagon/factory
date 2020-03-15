@@ -125,4 +125,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isShadow: 0
+  ZPosition: 0
+  OnlyXFlip: 0
   Speed: 0.6

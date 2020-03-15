@@ -65,6 +65,21 @@ public class tileObjectScript : MonoBehaviour
         }
     }
 
+    public Vector2 GetPosition()
+    {
+        return (Vector2)transform.position - TileUtils.LevelOffset(ZPosition);
+    }
+
+    public Vector2 GetNextPostion()
+    {
+        return GetPosition() + GetVector() * TileUtils.tileSize;
+    }
+
+    public Vector2 GetPrevPostion()
+    {
+        return GetPosition() - GetVector() * TileUtils.tileSize;
+    }
+
     public void Rotate(bool bClockwise = true)
     {
         TileUtils.Direction newDir;

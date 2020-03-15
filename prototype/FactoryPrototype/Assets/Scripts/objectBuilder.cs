@@ -1,96 +1,128 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
+
+[System.Serializable]
+public class BuildableObject
+{
+    public int Cost;
+    public GameObject Prefab;
+    public Sprite Image;
+}
 
 public class objectBuilder : MonoBehaviour
 {
-    public GameObject prefabToCreate = null;
-    public GameObject builderPanel;
-    public TileManagerScript tileManager;
+    public List<BuildableObject> Objects;
 
-    bool IsPossibleToCreate
-    {
-        get
-        {
-            if (!isActive)
-                return false;
+    public GameObject PrefabToCreate = null;
+    public GameObject BuilderPanel;
+    public GameObject ButtonPrefab;
+    public int ButtonsMargin = 15;
 
-             return tileManager.IsEmpty(TileUtils.MouseCellPosition());
-        }
-    }
+    bool IsPossibleToCreate => m_isActive && m_tileManager.IsEmpty(TileUtils.MouseCellPosition());
 
     void RotateShadow(bool bClockwise = true)
     {
-        if (shadow == null)
+        if (m_shadow == null)
             return;
 
-        shadow.GetComponent<tileObjectScript>().Rotate(bClockwise);
+        m_shadow.GetComponent<tileObjectScript>().Rotate(bClockwise);
     }
 
     void CreateShadow()
     {
-        if (prefabToCreate != null)
+        if (PrefabToCreate != null)
         {
-            if (shadow != null)
+            if (m_shadow != null)
             {
-                Destroy(shadow);
+                Destroy(m_shadow);
             }
 
-            shadow = Instantiate(prefabToCreate, TileUtils.MouseCellPosition() + TileUtils.LevelOffset(m_currentZlevel), TileUtils.qInitRotation);
-            shadow.GetComponent<SpriteRenderer>().color = ColorUtils.colorTransparentGreen;
-            shadow.GetComponent<SpriteRenderer>().sortingLayerName = "shadow";
-            shadow.GetComponent<PolygonCollider2D>().isTrigger = true;
-            shadow.GetComponent<tileObjectScript>().isShadow = true;
+            m_shadow = Instantiate(PrefabToCreate, TileUtils.MouseCellPosition() + TileUtils.LevelOffset(m_currentZlevel), TileUtils.qInitRotation);
+            m_shadow.GetComponent<SpriteRenderer>().color = ColorUtils.colorTransparentGreen;
+            m_shadow.GetComponent<SpriteRenderer>().sortingLayerName = "shadow";
+            m_shadow.GetComponent<PolygonCollider2D>().isTrigger = true;
+            m_shadow.GetComponent<tileObjectScript>().isShadow = true;
         }
     }
 
     void CreateObject()
     {
-        if (isActive && prefabToCreate != null)
+        if (m_isActive && PrefabToCreate != null)
         {
-            GameObject newObj = tileManager.InstantiateObject(prefabToCreate, TileUtils.MouseCellPosition());
-            newObj.GetComponent<tileObjectScript>().direction = shadow.GetComponent<tileObjectScript>().direction;
+            GameObject newObj = m_tileManager.InstantiateObject(PrefabToCreate, TileUtils.MouseCellPosition());
+            newObj.GetComponent<tileObjectScript>().direction = m_shadow.GetComponent<tileObjectScript>().direction;
             newObj.transform.position += (Vector3) TileUtils.LevelOffset(m_currentZlevel);
         }
     }
 
     void ChangePrefab(GameObject p)
     {
-        isActive = true;
-        prefabToCreate = p;
+        m_isActive = true;
+        PrefabToCreate = p;
         CreateShadow();
     }
 
     void Disable()
     {
-        isActive = false;
-        prefabToCreate = null;
-        Destroy(shadow);
-        shadow = null;
-        builderPanel.SetActive(true);
+        m_isActive = false;
+        PrefabToCreate = null;
+        Destroy(m_shadow);
+        m_shadow = null;
+        BuilderPanel.SetActive(true);
+    }
+
+    void InitBuilderPanel()
+    {
+        Vector3 position = BuilderPanel.transform.position + new Vector3(ButtonsMargin, ButtonsMargin);
+        GameObject viewPort = BuilderPanel.transform.FindChild("Viewport").gameObject;
+        GameObject content = viewPort.transform.FindChild("Content").gameObject;
+
+        // clear panel
+        for (var i = 0; i < content.transform.childCount; i++)
+        {
+            Destroy(content.transform.GetChild(i).gameObject);
+        }
+
+        foreach (var obj in Objects)
+        {
+            // todo init panel buttons according to specified objects
+            Sprite img = (obj.Image != null) ? obj.Image : obj.Prefab.GetComponent<SpriteRenderer>().sprite;
+            GameObject button = Instantiate(ButtonPrefab);
+            button.transform.parent = content.transform;
+            button.transform.position = position;
+            button.GetComponent<Image>().sprite = img;
+            button.GetComponent<Button>().onClick.AddListener(call: delegate() { Pick(obj.Prefab); });
+            position += new Vector3(0, ButtonsMargin);
+        }
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        grid = GameObject.FindWithTag("grid");
-        if (grid != null)
+        InitBuilderPanel();
+
+        m_tileManager = TileManagerScript.TileManager;
+        m_grid = GameObject.FindWithTag("grid");
+        if (m_grid != null)
         {
-            gridLayout = grid.GetComponent<GridLayout>();
+            m_gridLayout = m_grid.GetComponent<GridLayout>();
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isActive)
+        if (m_isActive)
         {
             bool bIsPossibleToCreate = IsPossibleToCreate;
 
-            if (shadow != null)
+            if (m_shadow != null)
             {
-                shadow.transform.position = TileUtils.MouseCellPosition() + TileUtils.LevelOffset(m_currentZlevel);
-                shadow.GetComponent<SpriteRenderer>().color = bIsPossibleToCreate ? ColorUtils.colorTransparentGreen : ColorUtils.colorTransparentRed;
+                m_shadow.transform.position = TileUtils.MouseCellPosition() + TileUtils.LevelOffset(m_currentZlevel);
+                m_shadow.GetComponent<SpriteRenderer>().color = bIsPossibleToCreate ? ColorUtils.colorTransparentGreen : ColorUtils.colorTransparentRed;
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -116,21 +148,10 @@ public class objectBuilder : MonoBehaviour
         }        
     }
 
-    /*public void Pick(int prefabId)
-    {
-        var prefab = prefabs[prefabId];
-
-        if (prefab != null)
-        {
-            ChangePrefab(prefab);
-            builderPanel.SetActive(false);
-        }
-    }*/
-
     public void Pick(GameObject prefab)
     {
         ChangePrefab(prefab);
-        builderPanel.SetActive(false);
+        BuilderPanel.SetActive(false);
         try
         {
             m_currentZlevel = prefab.GetComponent<tileObjectScript>().ZPosition;
@@ -141,11 +162,11 @@ public class objectBuilder : MonoBehaviour
         }
     }
 
+    private TileManagerScript m_tileManager;
+    private GameObject m_grid;
+    private GridLayout m_gridLayout;
+    private GameObject m_shadow;
 
-    GameObject grid;
-    GridLayout gridLayout;
-    GameObject shadow;
-
-    bool isActive = false;
+    private bool m_isActive = false;
     private int m_currentZlevel = 0;
 }

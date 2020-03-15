@@ -12,7 +12,7 @@ public class ObjectRemoverScript : MonoBehaviour
     GameObject shadow;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         
     }
