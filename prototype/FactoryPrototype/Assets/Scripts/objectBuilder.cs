@@ -19,7 +19,8 @@ public class objectBuilder : MonoBehaviour
     public GameObject PrefabToCreate = null;
     public GameObject BuilderPanel;
     public GameObject ButtonPrefab;
-    public int ButtonsMargin = 15;
+    public GameObject RemoverPrefab;
+    public int ButtonsMargin = 10;
 
     bool IsPossibleToCreate => m_isActive && m_tileManager.IsEmpty(TileUtils.MouseCellPosition());
 
@@ -48,6 +49,16 @@ public class objectBuilder : MonoBehaviour
         }
     }
 
+    void CreateRemoverShadow()
+    {
+        if (m_shadow != null)
+        {
+            Destroy(m_shadow);
+        }
+
+        m_shadow = Instantiate(RemoverPrefab, TileUtils.MouseCellPosition(), TileUtils.qInitRotation);
+    }
+
     void CreateObject()
     {
         if (m_isActive && PrefabToCreate != null)
@@ -61,6 +72,7 @@ public class objectBuilder : MonoBehaviour
     void ChangePrefab(GameObject p)
     {
         m_isActive = true;
+        m_isRemoverActive = false;
         PrefabToCreate = p;
         CreateShadow();
     }
@@ -68,34 +80,49 @@ public class objectBuilder : MonoBehaviour
     void Disable()
     {
         m_isActive = false;
+        m_isRemoverActive = false;
         PrefabToCreate = null;
         Destroy(m_shadow);
         m_shadow = null;
         BuilderPanel.SetActive(true);
     }
 
+    void InitButton(BuildableObject obj, ref Vector3 position)
+    {
+        Sprite img = (obj.Image != null) ? obj.Image : obj.Prefab.GetComponent<SpriteRenderer>().sprite;
+        GameObject button = Instantiate(ButtonPrefab, m_builderPanelContent.transform);
+        RectTransform rectTransform = button.GetComponent<RectTransform>();
+        rectTransform.localPosition = position;
+        rectTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        button.GetComponent<RawImage>().texture = img.texture;
+        button.GetComponent<Button>().onClick.AddListener(call: delegate () { Pick(obj.Prefab); });
+        position -= new Vector3(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height);
+    }
+
     void InitBuilderPanel()
     {
-        Vector3 position = BuilderPanel.transform.position + new Vector3(ButtonsMargin, ButtonsMargin);
-        GameObject viewPort = BuilderPanel.transform.FindChild("Viewport").gameObject;
-        GameObject content = viewPort.transform.FindChild("Content").gameObject;
+        Vector3 localPos = new Vector3(BuilderPanel.GetComponent<RectTransform>().rect.width / 2, 0.0f);
+        GameObject viewPort = BuilderPanel.transform.Find("Viewport").gameObject;
+        m_builderPanelContent = viewPort.transform.Find("Content").gameObject;
 
         // clear panel
-        for (var i = 0; i < content.transform.childCount; i++)
+        for (var i = 0; i < m_builderPanelContent.transform.childCount; i++)
         {
-            Destroy(content.transform.GetChild(i).gameObject);
+            Destroy(m_builderPanelContent.transform.GetChild(i).gameObject);
         }
+        
+        GameObject button = Instantiate(ButtonPrefab, m_builderPanelContent.transform);
+        localPos -= new Vector3(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height / 2);
+        RectTransform rectTransform = button.GetComponent<RectTransform>();
+        rectTransform.localPosition = localPos;
+        rectTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        button.GetComponent<RawImage>().texture = RemoverPrefab.GetComponent<SpriteRenderer>().sprite.texture;
+        button.GetComponent<Button>().onClick.AddListener(call: PickRemover);
+        localPos -= new Vector3(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height);
 
         foreach (var obj in Objects)
         {
-            // todo init panel buttons according to specified objects
-            Sprite img = (obj.Image != null) ? obj.Image : obj.Prefab.GetComponent<SpriteRenderer>().sprite;
-            GameObject button = Instantiate(ButtonPrefab);
-            button.transform.parent = content.transform;
-            button.transform.position = position;
-            button.GetComponent<Image>().sprite = img;
-            button.GetComponent<Button>().onClick.AddListener(call: delegate() { Pick(obj.Prefab); });
-            position += new Vector3(0, ButtonsMargin);
+            InitButton(obj, ref localPos);
         }
     }
 
@@ -115,37 +142,53 @@ public class objectBuilder : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (m_isActive)
+        if (m_isActive && m_shadow != null)
         {
-            bool bIsPossibleToCreate = IsPossibleToCreate;
-
-            if (m_shadow != null)
-            {
-                m_shadow.transform.position = TileUtils.MouseCellPosition() + TileUtils.LevelOffset(m_currentZlevel);
-                m_shadow.GetComponent<SpriteRenderer>().color = bIsPossibleToCreate ? ColorUtils.colorTransparentGreen : ColorUtils.colorTransparentRed;
-            }
-
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 Disable();
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.E))
+            if (!m_isRemoverActive)
             {
-                RotateShadow(true);
-            }
+                bool bIsPossibleToCreate = IsPossibleToCreate;
 
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                RotateShadow(false);
-            }                   
+                m_shadow.transform.position = TileUtils.MouseCellPosition() + TileUtils.LevelOffset(m_currentZlevel);
+                m_shadow.GetComponent<SpriteRenderer>().color = bIsPossibleToCreate ? ColorUtils.colorTransparentGreen : ColorUtils.colorTransparentRed;
 
-            if (Input.GetMouseButton(MouseUtils.PRIMARY_MOUSE_BUTTON) && bIsPossibleToCreate)
-            {
-                CreateObject();
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    RotateShadow(true);
+                }
+
+                if (Input.GetKeyDown(KeyCode.Q))
+                {
+                    RotateShadow(false);
+                }
+
+                if (Input.GetMouseButton(MouseUtils.PRIMARY_MOUSE_BUTTON) && bIsPossibleToCreate)
+                {
+                    CreateObject();
+                }
             }
-        }        
+            else
+            {
+                m_shadow.transform.position = TileUtils.MouseCellPosition();
+
+                if (Input.GetMouseButton(MouseUtils.PRIMARY_MOUSE_BUTTON))
+                {
+                    try
+                    {
+                        m_tileManager.RemoveObject(m_shadow.transform.position);
+                    }
+                    catch (System.Exception)
+                    {
+                        Debug.Log("Nothing to remove");
+                    }
+                }
+            }
+        }
     }
 
     public void Pick(GameObject prefab)
@@ -162,11 +205,21 @@ public class objectBuilder : MonoBehaviour
         }
     }
 
+    public void PickRemover()
+    {
+        BuilderPanel.SetActive(false);
+        m_isActive = true;
+        m_isRemoverActive = true;
+        CreateRemoverShadow();
+    }
+
     private TileManagerScript m_tileManager;
     private GameObject m_grid;
     private GridLayout m_gridLayout;
     private GameObject m_shadow;
+    private GameObject m_builderPanelContent;
 
     private bool m_isActive = false;
+    private bool m_isRemoverActive = false;
     private int m_currentZlevel = 0;
 }
