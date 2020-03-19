@@ -62,9 +62,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\BuildableObjectScript.cs" />
     <Compile Include="Assets\Scripts\IProcessorScript.cs" />
     <Compile Include="Assets\Scripts\MaterialScript.cs" />
     <Compile Include="Assets\Scripts\MotionScript.cs" />
+    <Compile Include="Assets\Scripts\ObjectInfoHolderScript.cs" />
     <Compile Include="Assets\Scripts\ObjectRemoverScript.cs" />
     <Compile Include="Assets\Scripts\RecipeManager.cs" />
     <Compile Include="Assets\Scripts\ResoucesScript.cs" />

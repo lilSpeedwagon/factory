@@ -15,20 +15,8 @@ public class TileManagerScript : MonoBehaviour
         }
     }
 
-    public int Width
-    {
-        get
-        {
-            return m_width;
-        }
-    }
-    public int Height
-    {
-        get
-        {
-            return m_height;
-        }
-    }
+    public int Width => m_width;
+    public int Height => m_height;
 
     private int m_width, m_height;
     private static int BASE_WIDTH = 50, BASE_HEIGHT = 50;

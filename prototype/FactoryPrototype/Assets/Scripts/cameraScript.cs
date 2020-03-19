@@ -42,7 +42,7 @@ public class cameraScript : MonoBehaviour
         if (Input.GetKey(KeyCode.Mouse2))
         {
             var mouseMovement = mousePos - m_prevMousePos;
-            gameObject.transform.position += mouseMovement * CameraSpeed.magnitude;
+            gameObject.transform.position -= mouseMovement * CameraSpeed.magnitude;
         }
         m_prevMousePos = mousePos;
     }

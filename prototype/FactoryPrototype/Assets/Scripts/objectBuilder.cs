@@ -4,17 +4,11 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-[System.Serializable]
-public class BuildableObject
-{
-    public int Cost;
-    public GameObject Prefab;
-    public Sprite Image;
-}
+
 
 public class objectBuilder : MonoBehaviour
 {
-    public List<BuildableObject> Objects;
+    public List<BuildableObjectScript> Objects;
 
     public GameObject PrefabToCreate = null;
     public GameObject BuilderPanel;
@@ -22,7 +16,10 @@ public class objectBuilder : MonoBehaviour
     public GameObject RemoverPrefab;
     public int ButtonsMargin = 10;
 
-    bool IsPossibleToCreate => m_isActive && m_tileManager.IsEmpty(TileUtils.MouseCellPosition());
+    delegate void OnBuildSignal(BuildableObjectScript obj);
+
+    bool IsPossibleToCreate => m_isActive && m_tileManager.IsEmpty(TileUtils.MouseCellPosition()) && 
+                               ResoucesScript.instance.CanBeBuilt(PrefabToCreate.GetComponent<BuildableObjectScript>());
 
     void RotateShadow(bool bClockwise = true)
     {
@@ -66,6 +63,8 @@ public class objectBuilder : MonoBehaviour
             GameObject newObj = m_tileManager.InstantiateObject(PrefabToCreate, TileUtils.MouseCellPosition());
             newObj.GetComponent<tileObjectScript>().direction = m_shadow.GetComponent<tileObjectScript>().direction;
             newObj.transform.position += (Vector3) TileUtils.LevelOffset(m_currentZlevel);
+
+            m_onBuildSignal(newObj.GetComponent<BuildableObjectScript>());
         }
     }
 
@@ -87,7 +86,7 @@ public class objectBuilder : MonoBehaviour
         BuilderPanel.SetActive(true);
     }
 
-    void InitButton(BuildableObject obj, ref Vector3 position)
+    void InitButton(BuildableObjectScript obj, ref Vector2 position)
     {
         Sprite img = (obj.Image != null) ? obj.Image : obj.Prefab.GetComponent<SpriteRenderer>().sprite;
         GameObject button = Instantiate(ButtonPrefab, m_builderPanelContent.transform);
@@ -96,12 +95,12 @@ public class objectBuilder : MonoBehaviour
         rectTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
         button.GetComponent<RawImage>().texture = img.texture;
         button.GetComponent<Button>().onClick.AddListener(call: delegate () { Pick(obj.Prefab); });
-        position -= new Vector3(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height);
+        position -= new Vector2(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height);
     }
 
     void InitBuilderPanel()
     {
-        Vector3 localPos = new Vector3(BuilderPanel.GetComponent<RectTransform>().rect.width / 2, 0.0f);
+        Vector2 localPos = new Vector3(BuilderPanel.GetComponent<RectTransform>().rect.width / 2, 0.0f);
         GameObject viewPort = BuilderPanel.transform.Find("Viewport").gameObject;
         m_builderPanelContent = viewPort.transform.Find("Content").gameObject;
 
@@ -110,16 +109,20 @@ public class objectBuilder : MonoBehaviour
         {
             Destroy(m_builderPanelContent.transform.GetChild(i).gameObject);
         }
-        
+
+        float buttonHeight = ButtonPrefab.GetComponent<RectTransform>().rect.height;
+        float height = (ButtonsMargin + buttonHeight) * (Objects.Count + 1) + ButtonsMargin;
+        m_builderPanelContent.GetComponent<RectTransform>().sizeDelta = new Vector2(m_builderPanelContent.GetComponent<RectTransform>().sizeDelta.x, height);
+
         GameObject button = Instantiate(ButtonPrefab, m_builderPanelContent.transform);
-        localPos -= new Vector3(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height / 2);
+        localPos -= new Vector2(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height / 2);
         RectTransform rectTransform = button.GetComponent<RectTransform>();
         rectTransform.localPosition = localPos;
         rectTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
         button.GetComponent<RawImage>().texture = RemoverPrefab.GetComponent<SpriteRenderer>().sprite.texture;
         button.GetComponent<Button>().onClick.AddListener(call: PickRemover);
-        localPos -= new Vector3(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height);
 
+        localPos -= new Vector2(0, ButtonsMargin + buttonHeight);
         foreach (var obj in Objects)
         {
             InitButton(obj, ref localPos);
@@ -137,6 +140,8 @@ public class objectBuilder : MonoBehaviour
         {
             m_gridLayout = m_grid.GetComponent<GridLayout>();
         }
+
+        m_onBuildSignal = delegate(BuildableObjectScript obj) { ResoucesScript.instance.OnBuild(obj); };
     }
 
     // Update is called once per frame
@@ -218,6 +223,8 @@ public class objectBuilder : MonoBehaviour
     private GridLayout m_gridLayout;
     private GameObject m_shadow;
     private GameObject m_builderPanelContent;
+
+    private OnBuildSignal m_onBuildSignal;
 
     private bool m_isActive = false;
     private bool m_isRemoverActive = false;

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ResoucesScript : MonoBehaviour
 {
+    public static ResoucesScript instance;
+
     public int Money
     {
         get => m_money;
@@ -20,6 +22,8 @@ public class ResoucesScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (instance == null)
+            instance = this;
         m_recipeManager = GetComponent<RecipeManager>();
         Money = StartMoney;
     }
@@ -27,6 +31,21 @@ public class ResoucesScript : MonoBehaviour
     public void Spend(int cost)
     {
         Money -= cost;
+    }
+
+    public void OnSpend(int cost)
+    {
+        Spend(cost);
+    }
+
+    public void OnBuild(BuildableObjectScript obj)
+    {
+        Spend(obj.Cost);
+    }
+
+    public bool CanBeBuilt(BuildableObjectScript obj)
+    {
+        return Money >= obj.Cost;
     }
 
     private void UpdateValue()
