@@ -43,6 +43,11 @@ public class ResoucesScript : MonoBehaviour
         Spend(obj.Cost);
     }
 
+    public void OnSell(int sellCost)
+    {
+        Spend(-sellCost);
+    }
+
     public bool CanBeBuilt(BuildableObjectScript obj)
     {
         return Money >= obj.Cost;

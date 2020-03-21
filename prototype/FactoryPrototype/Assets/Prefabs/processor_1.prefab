@@ -145,5 +145,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Cost: 25
+  SellCost: 10
   Prefab: {fileID: 2533812369414984692}
   Image: {fileID: 21300000, guid: abeefcbfe4b02aa43b6defc4ad8debd1, type: 3}

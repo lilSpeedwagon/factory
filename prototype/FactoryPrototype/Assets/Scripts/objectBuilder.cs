@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -17,6 +18,7 @@ public class objectBuilder : MonoBehaviour
     public int ButtonsMargin = 10;
 
     delegate void OnBuildSignal(BuildableObjectScript obj);
+    delegate void OnRemoveSignal(int sellCost);
 
     bool IsPossibleToCreate => m_isActive && m_tileManager.IsEmpty(TileUtils.MouseCellPosition()) && 
                                ResoucesScript.instance.CanBeBuilt(PrefabToCreate.GetComponent<BuildableObjectScript>());
@@ -65,6 +67,28 @@ public class objectBuilder : MonoBehaviour
             newObj.transform.position += (Vector3) TileUtils.LevelOffset(m_currentZlevel);
 
             m_onBuildSignal(newObj.GetComponent<BuildableObjectScript>());
+        }
+    }
+
+    int GetSellCost()
+    {
+        int cost = 0;
+        try { cost = m_tileManager.GetGameObject(m_shadow.transform.position).GetComponent<BuildableObjectScript>().Cost; }
+        catch (Exception) { /* ignored */ }
+        return cost;
+    }
+
+    void RemoveObject()
+    {
+        try
+        {
+            int cost = GetSellCost();
+            m_tileManager.RemoveObject(m_shadow.transform.position);
+            m_onRemoveSignal(cost);
+        }
+        catch (System.Exception)
+        {
+            Debug.Log("Nothing to remove");
         }
     }
 
@@ -142,6 +166,7 @@ public class objectBuilder : MonoBehaviour
         }
 
         m_onBuildSignal = delegate(BuildableObjectScript obj) { ResoucesScript.instance.OnBuild(obj); };
+        m_onRemoveSignal = delegate (int sellCost) { ResoucesScript.instance.OnSell(sellCost); };
     }
 
     // Update is called once per frame
@@ -183,14 +208,7 @@ public class objectBuilder : MonoBehaviour
 
                 if (Input.GetMouseButton(MouseUtils.PRIMARY_MOUSE_BUTTON))
                 {
-                    try
-                    {
-                        m_tileManager.RemoveObject(m_shadow.transform.position);
-                    }
-                    catch (System.Exception)
-                    {
-                        Debug.Log("Nothing to remove");
-                    }
+                    RemoveObject();
                 }
             }
         }
@@ -225,6 +243,7 @@ public class objectBuilder : MonoBehaviour
     private GameObject m_builderPanelContent;
 
     private OnBuildSignal m_onBuildSignal;
+    private OnRemoveSignal m_onRemoveSignal;
 
     private bool m_isActive = false;
     private bool m_isRemoverActive = false;
