@@ -18,40 +18,11 @@ public class TileManagerScript : MonoBehaviour
     public int Width => m_width;
     public int Height => m_height;
 
-    private int m_width, m_height;
-    private static int BASE_WIDTH = 50, BASE_HEIGHT = 50;
-    private static Vector2Int TILES_PER_CELL = new Vector2Int(2, 4);    // no idea wtf is going on here (something related to Unity Grid cells)
-    private Vector2Int m_worldGridStart;
-    private Grid m_worldGrid;
-
-    private enum TileType { Undefined, Conveer, Machine };
-
     private class TileHolder
     {        
-        public GameObject Object
-        {
-            get => m_gameObject;
-            set
-            {
-                m_gameObject = value;
-                try
-                {
-                    if (m_gameObject.GetComponent<conveyerScript>().enabled)
-                    {
-                        type = TileType.Conveer;
-                    }
-                }
-                catch (System.NullReferenceException) { }
-                /* to do */
-            }
-        }
-        public bool m_bExists = false;
-        public TileType type;
-
-        private GameObject m_gameObject;
+        public GameObject Object { get; set; }
+        public bool IsExist = false;
     }
-
-    TileHolder[,] m_tiles;
 
     private Vector2Int WorldToLocal(Vector2 worldCoords)
     {
@@ -74,10 +45,10 @@ public class TileManagerScript : MonoBehaviour
     {
         Vector2Int localPos = WorldToLocal(position);
         ValidateCoords(localPos);
-        if (m_tiles[localPos.x, localPos.y].m_bExists)
+        if (m_tiles[localPos.x, localPos.y].IsExist)
         {
             Destroy(m_tiles[localPos.x, localPos.y].Object);
-            m_tiles[localPos.x, localPos.y].m_bExists = false;
+            m_tiles[localPos.x, localPos.y].IsExist = false;
         }
     }
 
@@ -88,14 +59,14 @@ public class TileManagerScript : MonoBehaviour
 
         ValidateCoords(localPos);
 
-        if (m_tiles[localPos.x, localPos.y].m_bExists)
+        if (m_tiles[localPos.x, localPos.y].IsExist)
         {
             throw new System.Exception("Cannot create object in pos " + localPos.x + " : " + localPos.y + ". Tile is not vacant.");
         }
 
         GameObject createdObject = Instantiate(instance, position, TileUtils.qInitRotation);
         m_tiles[localPos.x, localPos.y].Object = createdObject;
-        m_tiles[localPos.x, localPos.y].m_bExists = true;
+        m_tiles[localPos.x, localPos.y].IsExist = true;
 
         return createdObject;
     }
@@ -111,7 +82,7 @@ public class TileManagerScript : MonoBehaviour
         {
             return false;
         }
-        return !m_tiles[localPos.x, localPos.y].m_bExists;        
+        return !m_tiles[localPos.x, localPos.y].IsExist;        
     }
 
     public GameObject GetGameObject(Vector2 position)
@@ -125,7 +96,7 @@ public class TileManagerScript : MonoBehaviour
         {
             return null;
         }
-        return m_tiles[localPos.x, localPos.y].Object;
+        return m_tiles[localPos.x, localPos.y].IsExist ? m_tiles[localPos.x, localPos.y].Object : null;
     }
 
     private void Awake()
@@ -148,8 +119,10 @@ public class TileManagerScript : MonoBehaviour
         }
     }
 
-    TileManagerScript()
-    {
-        
-    }
+    private TileHolder[,] m_tiles;
+    private int m_width, m_height;
+    private static int BASE_WIDTH = 50, BASE_HEIGHT = 50;
+    private static Vector2Int TILES_PER_CELL = new Vector2Int(2, 4);    // no idea wtf is going on here (something related to Unity Grid cells)
+    private Vector2Int m_worldGridStart;
+    private Grid m_worldGrid;
 }

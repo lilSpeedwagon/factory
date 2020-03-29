@@ -1,10 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using UnityEngine;
 
 public class RecipeManager : MonoBehaviour
 {
     public List<Recipe> Recipes;
+
+    public float ProcessingTime(IProcessable obj, ProcessorType proc)
+    {
+        foreach (var r in Recipes)
+        {
+            if (obj.Type == r.From && proc == r.Processor)
+                return r.ProcessingTime;
+        }
+
+        throw new InvalidExpressionException();
+    }
 
     public bool CanBeProcessed(ProcessorType proc, MaterialType mat)
     {
@@ -29,6 +41,7 @@ public class Recipe
     public MaterialType From, To;
     public ProcessorType Processor;
     public GameObject Prefab;
+    public float ProcessingTime;
 }
 
 public enum MaterialType

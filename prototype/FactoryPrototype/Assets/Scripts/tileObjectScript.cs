@@ -10,10 +10,7 @@ public class tileObjectScript : MonoBehaviour
 
     public TileUtils.Direction direction
     {
-        get
-        {
-            return m_dir;
-        }
+        get => m_dir;
         set
         {
             m_dir = value;

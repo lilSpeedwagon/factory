@@ -2,13 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IMover
-{
-    void Move(MotionScript motionObject);
-    bool IsAbleToMove();
-    bool IsDirectionAllowed(TileUtils.Direction direction);
-}
-
 public class MotionScript : MonoBehaviour
 {
     public bool IsFinished { get; private set; } = true;
@@ -18,7 +11,7 @@ public class MotionScript : MonoBehaviour
         m_startTime = Time.time;
         m_from = transform.position;
         m_to = to;
-        m_distantion = Vector2.Distance(to, transform.position);
+        m_distance = Vector2.Distance(to, transform.position);
         m_speed = speed;
         IsFinished = false;
     }
@@ -35,7 +28,7 @@ public class MotionScript : MonoBehaviour
         if (!IsFinished)
         {
             float distCovered = (Time.time - m_startTime) * m_speed;
-            transform.position = Vector2.Lerp(m_from, m_to, distCovered / m_distantion);
+            transform.position = Vector2.Lerp(m_from, m_to, distCovered / m_distance);
             if (transform.position.Equals(m_to))
             {
                 IsFinished = true;
@@ -45,6 +38,6 @@ public class MotionScript : MonoBehaviour
 
     private Vector2 m_from, m_to;
     private float m_startTime;
-    private float m_distantion;
+    private float m_distance;
     private float m_speed;
 }

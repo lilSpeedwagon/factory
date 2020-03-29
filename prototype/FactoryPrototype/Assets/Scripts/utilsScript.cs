@@ -61,7 +61,7 @@ public class TileUtils
 
 public class TimeUtils
 {
-    public static IEnumerable Delay(float seconds)
+    public static IEnumerator Delay(float seconds)
     {
         yield return new WaitForSeconds(seconds);
     }

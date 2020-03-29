@@ -11,6 +11,7 @@ public class objectBuilder : MonoBehaviour
 {
     public List<BuildableObjectScript> Objects;
 
+    public GameObject ShadowPrefab;
     public GameObject PrefabToCreate = null;
     public GameObject BuilderPanel;
     public GameObject ButtonPrefab;
@@ -40,11 +41,12 @@ public class objectBuilder : MonoBehaviour
                 Destroy(m_shadow);
             }
 
-            m_shadow = Instantiate(PrefabToCreate, TileUtils.MouseCellPosition() + TileUtils.LevelOffset(m_currentZlevel), TileUtils.qInitRotation);
+            m_shadow = Instantiate(ShadowPrefab, TileUtils.MouseCellPosition() + TileUtils.LevelOffset(m_currentZlevel), TileUtils.qInitRotation);
+            m_shadow.GetComponent<SpriteRenderer>().sprite = PrefabToCreate.GetComponent<SpriteRenderer>().sprite;
             m_shadow.GetComponent<SpriteRenderer>().color = ColorUtils.colorTransparentGreen;
             m_shadow.GetComponent<SpriteRenderer>().sortingLayerName = "shadow";
-            m_shadow.GetComponent<PolygonCollider2D>().isTrigger = true;
             m_shadow.GetComponent<tileObjectScript>().isShadow = true;
+            m_shadow.GetComponent<tileObjectScript>().OnlyXFlip = PrefabToCreate.GetComponent<tileObjectScript>().OnlyXFlip;
         }
     }
 
