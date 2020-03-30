@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// to delete ???
 [System.Serializable]
 public class ObjectInfoHolder
 {

@@ -28,6 +28,16 @@ public class ResoucesScript : MonoBehaviour
         Money = StartMoney;
     }
 
+    public void Earn(int cost)
+    {
+        Money += cost;
+    }
+
+    public void OnEarn(int cost)
+    {
+        Earn(cost);
+    }
+
     public void Spend(int cost)
     {
         Money -= cost;
@@ -45,7 +55,7 @@ public class ResoucesScript : MonoBehaviour
 
     public void OnSell(int sellCost)
     {
-        Spend(-sellCost);
+        Earn(sellCost);
     }
 
     public bool CanBeBuilt(BuildableObjectScript obj)

@@ -75,7 +75,7 @@ public class objectBuilder : MonoBehaviour
     int GetSellCost()
     {
         int cost = 0;
-        try { cost = m_tileManager.GetGameObject(m_shadow.transform.position).GetComponent<BuildableObjectScript>().Cost; }
+        try { cost = m_tileManager.GetGameObject(m_shadow.transform.position).GetComponent<BuildableObjectScript>().SellCost; }
         catch (Exception) { /* ignored */ }
         return cost;
     }

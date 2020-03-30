@@ -4,6 +4,6 @@ using UnityEngine;
 
 public interface IOutput : IMover
 {
-    bool IsReadyToEmit();
+    bool IsReadyToEmit { get; }
     void Emit();
 }

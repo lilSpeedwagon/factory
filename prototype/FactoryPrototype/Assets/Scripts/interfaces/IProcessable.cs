@@ -6,4 +6,5 @@ public interface IProcessable
 {
     MaterialType Type { get; set; }
     GameObject gameObject { get; }
+    int Cost { get; }
 }

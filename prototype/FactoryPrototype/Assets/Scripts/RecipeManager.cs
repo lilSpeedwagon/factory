@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class RecipeManager : MonoBehaviour
 {
+    public static RecipeManager instance { get; private set; }
+
     public List<Recipe> Recipes;
 
     public float ProcessingTime(IProcessable obj, ProcessorType proc)
@@ -32,6 +34,12 @@ public class RecipeManager : MonoBehaviour
             if (r.Processor == proc && r.From == mat)
                 return r.Prefab;
         return null;
+    }
+
+    private void Start()
+    {
+        if (instance == null)
+            instance = this;
     }
 }
 

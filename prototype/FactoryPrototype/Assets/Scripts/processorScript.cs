@@ -13,25 +13,22 @@ public class processorScript : tileObjectScript, IProcessor, IMover
 
     public GameObject Process(IProcessable processableObj)
     {
-        if (!CanProcess(processableObj.Type))
-            throw new System.InvalidOperationException("cannot process the material of type " + processableObj.Type.ToString());
-        
         Destroy(processableObj.gameObject);
 
         try
         {
-            TimeUtils.Delay(RecipeManager.ProcessingTime(processableObj, Type)); // coroutine delay  
+            TimeUtils.Delay(RecipeManager.instance.ProcessingTime(processableObj, Type));
         }
         catch (Exception e) { Debug.LogWarning(e.Message); }
         
-        GameObject newInstance = Instantiate(RecipeManager.FindPrefab(Type, processableObj.Type), GetPosition(), TileUtils.qInitRotation);
+        GameObject newInstance = Instantiate(RecipeManager.instance.FindPrefab(Type, processableObj.Type), GetPosition(), TileUtils.qInitRotation);
 
         try
         {
             var obj = newInstance.GetComponent<MotionScript>();
             if (obj != null)
             {
-                m_currentObject = obj;
+                m_currentMotion = obj;
                 Move(obj);
             }
         }
@@ -45,7 +42,7 @@ public class processorScript : tileObjectScript, IProcessor, IMover
 
     public bool CanProcess(MaterialType type)
     {     
-        return RecipeManager.CanBeProcessed(Type, type);
+        return RecipeManager.instance.CanBeProcessed(Type, type);
     }
     // IProcessor implementation end
 
@@ -57,7 +54,7 @@ public class processorScript : tileObjectScript, IProcessor, IMover
     {
         if (motionObject.IsFinished && IsAbleToMove())
         {
-            m_currentObject = null;
+            m_currentMotion = null;
             motionObject.StartMotion(GetNextPostion(), ConveerSpeed);
             Next?.HoldMotion(motionObject);
         }
@@ -76,25 +73,25 @@ public class processorScript : tileObjectScript, IProcessor, IMover
 
     public bool IsFree()
     {
-        return m_currentObject == null;
+        return m_currentObjectToProcess == null && m_currentMotion == null;
     }
 
     public void HoldMotion(MotionScript obj)
     {
-        m_currentObject = obj;
+        m_currentObjectToProcess = obj;
     }
     // IMover implementation end
 
     // Start is called before the first frame update
     void Start()
     {
-        RecipeManager = PlayerUtils.Player.GetComponent<RecipeManager>();
+
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        var collisions = new List<Collider2D>();
+        /*var collisions = new List<Collider2D>();
         var collider = GetComponent<PolygonCollider2D>();
         collider.OverlapCollider(m_filter, collisions);
 
@@ -114,15 +111,29 @@ public class processorScript : tileObjectScript, IProcessor, IMover
                     }
                 }
             }
+        }*/
+
+        if (m_currentObjectToProcess != null && m_currentObjectToProcess.IsFinished)
+        {
+            var proc = m_currentObjectToProcess.GetComponent<IProcessable>();
+            if (proc != null && CanProcess(proc.Type))
+            {
+                Process(proc);
+            }
+            else
+            {
+                m_currentMotion = m_currentObjectToProcess;
+            }
+            m_currentObjectToProcess = null;
         }
 
-        if (m_currentObject != null)
+        if (m_currentMotion != null)
         {
-            Move(m_currentObject);
+            Move(m_currentMotion);
         }
     }
 
     // current movable object on belt
-    private MotionScript m_currentObject;
-    static RecipeManager RecipeManager;
+    private MotionScript m_currentObjectToProcess;
+    private MotionScript m_currentMotion;
 }

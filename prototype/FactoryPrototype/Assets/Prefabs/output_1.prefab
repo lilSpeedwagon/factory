@@ -162,4 +162,4 @@ MonoBehaviour:
   Speed: 0.6
   PrefabToEmit: {fileID: 2478132065190534643, guid: c1cd9257ad5a72340a384ade06dbe868,
     type: 3}
-  DelayBetweenEmissions: 2
+  DelayBetweenEmissions: 3

@@ -63,21 +63,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BuildableObjectScript.cs" />
-    <Compile Include="Assets\Scripts\IOutput.cs" />
-    <Compile Include="Assets\Scripts\IProcessorScript.cs" />
+    <Compile Include="Assets\Scripts\InputConsumer.cs" />
     <Compile Include="Assets\Scripts\MaterialScript.cs" />
     <Compile Include="Assets\Scripts\MotionScript.cs" />
     <Compile Include="Assets\Scripts\ObjectInfoHolderScript.cs" />
-    <Compile Include="Assets\Scripts\ObjectRemoverScript.cs" />
-    <Compile Include="Assets\Scripts\Output.cs" />
+    <Compile Include="Assets\Scripts\OutputProducer.cs" />
     <Compile Include="Assets\Scripts\RecipeManager.cs" />
     <Compile Include="Assets\Scripts\ResoucesScript.cs" />
     <Compile Include="Assets\Scripts\TileManagerScript.cs" />
     <Compile Include="Assets\Scripts\cameraScript.cs" />
     <Compile Include="Assets\Scripts\conveyerScript.cs" />
+    <Compile Include="Assets\Scripts\interfaces\IInput.cs" />
     <Compile Include="Assets\Scripts\interfaces\IMover.cs" />
+    <Compile Include="Assets\Scripts\interfaces\IOutput.cs" />
     <Compile Include="Assets\Scripts\interfaces\IProcessable.cs" />
-    <Compile Include="Assets\Scripts\interfaces\IProcessor.cs" />
+    <Compile Include="Assets\Scripts\interfaces\IProcessorScript.cs" />
     <Compile Include="Assets\Scripts\objectBuilder.cs" />
     <Compile Include="Assets\Scripts\processorScript.cs" />
     <Compile Include="Assets\Scripts\tileObjectScript.cs" />

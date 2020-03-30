@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Output : MonoBehaviour, IOutput
+public class OutputProducer : MonoBehaviour, IOutput
 {
     public float Speed = 0.2f;
     public GameObject PrefabToEmit;
@@ -42,10 +42,7 @@ public class Output : MonoBehaviour, IOutput
     // end IMover
 
     // IOutput
-    public bool IsReadyToEmit()
-    {
-        return m_currentObj == null;
-    }
+    public bool IsReadyToEmit => m_currentObj == null;
 
     public void Emit()
     {
@@ -59,7 +56,7 @@ public class Output : MonoBehaviour, IOutput
 
     private void EmitInternal()
     {
-        if (IsReadyToEmit())
+        if (IsReadyToEmit)
             Emit();
     }
 
