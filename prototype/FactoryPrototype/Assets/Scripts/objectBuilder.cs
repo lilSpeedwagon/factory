@@ -72,20 +72,19 @@ public class objectBuilder : MonoBehaviour
         }
     }
 
-    int GetSellCost()
+    int GetSellCost(GameObject removable)
     {
-        int cost = 0;
-        try { cost = m_tileManager.GetGameObject(m_shadow.transform.position).GetComponent<BuildableObjectScript>().SellCost; }
-        catch (Exception) { /* ignored */ }
-        return cost;
+        return removable.GetComponent<BuildableObjectScript>()?.SellCost ?? 0;
     }
 
     void RemoveObject()
     {
         try
         {
-            int cost = GetSellCost();
-            m_tileManager.RemoveObject(m_shadow.transform.position);
+            var pos = m_shadow.transform.position;
+            var removableObject = m_tileManager.GetGameObject(pos);
+            int cost = GetSellCost(removableObject);
+            m_tileManager.RemoveObject(pos);
             m_onRemoveSignal(cost);
         }
         catch (System.Exception)

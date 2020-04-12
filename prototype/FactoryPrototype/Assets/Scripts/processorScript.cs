@@ -82,37 +82,9 @@ public class processorScript : tileObjectScript, IProcessor, IMover
     }
     // IMover implementation end
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
     // Update is called once per frame
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        /*var collisions = new List<Collider2D>();
-        var collider = GetComponent<PolygonCollider2D>();
-        collider.OverlapCollider(m_filter, collisions);
-
-        foreach (var collision in collisions)
-        {
-            if (collision.gameObject.tag.Equals("detail"))
-            {
-                if (collision.GetComponent<IProcessable>() != null && collision.GetComponent<MotionScript>().IsFinished)
-                {
-                    try
-                    {
-                        Process(collision.GetComponent<IProcessable>());
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogWarning(e.Message);
-                    }
-                }
-            }
-        }*/
-
         if (m_currentObjectToProcess != null && m_currentObjectToProcess.IsFinished)
         {
             var proc = m_currentObjectToProcess.GetComponent<IProcessable>();
@@ -131,6 +103,14 @@ public class processorScript : tileObjectScript, IProcessor, IMover
         {
             Move(m_currentMotion);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (m_currentMotion != null)
+            Destroy(m_currentMotion.gameObject);
+        if (m_currentObjectToProcess != null)
+            Destroy(m_currentObjectToProcess.gameObject);
     }
 
     // current movable object on belt

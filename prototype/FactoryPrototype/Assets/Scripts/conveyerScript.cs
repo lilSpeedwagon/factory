@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class conveyerScript : tileObjectScript, IMover
@@ -47,28 +48,16 @@ public class conveyerScript : tileObjectScript, IMover
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        /*var collisions = new List<Collider2D>();
-        var collider = GetComponent<Collider2D>();
-        collider.OverlapCollider(m_filter, collisions);
-
-        foreach (var collision in collisions.Where(collision => collision.gameObject.tag.Equals("detail")))
-        { 
-            try
-            {
-                var obj = collision.GetComponent<MotionScript>();
-                if (obj != null && m_currentObject == null)
-                    m_currentObject = obj;
-            }
-            catch (System.NullReferenceException e)
-            {
-                Debug.LogError(e.Message);
-            }
-        }*/
-
         if (m_currentObject != null)
             Move(m_currentObject);
+    }
+
+    private void OnDestroy()
+    {
+        if (m_currentObject != null)
+            Destroy(m_currentObject.gameObject);
     }
     
     private Vector2 m_vDirection;

@@ -13,7 +13,7 @@ public class OutputProducer : MonoBehaviour, IOutput
     {
         if (motionObject.IsFinished && IsAbleToMove())
         {
-            m_currentObj = null;
+            m_currentMotion = null;
             motionObject.StartMotion(m_tile.GetNextPostion(), Speed);
             Next.HoldMotion(motionObject);
         }
@@ -32,7 +32,7 @@ public class OutputProducer : MonoBehaviour, IOutput
 
     public bool IsFree()
     {
-        return m_currentObj == null;
+        return m_currentMotion == null;
     }
 
     public void HoldMotion(MotionScript obj)
@@ -42,13 +42,13 @@ public class OutputProducer : MonoBehaviour, IOutput
     // end IMover
 
     // IOutput
-    public bool IsReadyToEmit => m_currentObj == null;
+    public bool IsReadyToEmit => m_currentMotion == null;
 
     public void Emit()
     {
         var obj = Instantiate(PrefabToEmit, m_tile.GetPosition(), TileUtils.qInitRotation);
-        m_currentObj = obj.GetComponent<MotionScript>(); // could be null
-        Move(m_currentObj);
+        m_currentMotion = obj.GetComponent<MotionScript>(); // could be null
+        Move(m_currentMotion);
     }
     // end IOutput
 
@@ -71,10 +71,16 @@ public class OutputProducer : MonoBehaviour, IOutput
     {
         if (GetComponent<tileObjectScript>().isShadow) return;
 
-        if (m_currentObj != null)
-            Move(m_currentObj);
+        if (m_currentMotion != null)
+            Move(m_currentMotion);
+    }
+
+    private void OnDestroy()
+    {
+        if (m_currentMotion != null)
+            Destroy(m_currentMotion.gameObject);
     }
 
     private tileObjectScript m_tile;
-    private MotionScript m_currentObj;
+    private MotionScript m_currentMotion;
 }

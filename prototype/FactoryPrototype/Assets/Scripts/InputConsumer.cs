@@ -61,6 +61,12 @@ public class InputConsumer : MonoBehaviour, IInput, IMover
             m_currentMotion = null;
         }
     }
-    
+
+    private void OnDestroy()
+    {
+        if (m_currentMotion != null)
+            Destroy(m_currentMotion.gameObject);
+    }
+
     private MotionScript m_currentMotion;
 }
