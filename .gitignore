@@ -94,3 +94,12 @@ crashlytics-build.properties
 *.exe
 *.out
 *.app
+
+# Logs
+*.tlog
+*.log
+
+# Visual Studio
+*.idb
+*.ilk
+*.exp
