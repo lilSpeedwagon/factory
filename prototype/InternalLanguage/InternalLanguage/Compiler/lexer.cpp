@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "lexer.h"
 
+#include <algorithm>
+
 void Lexer::Init(std::string const& code, LogDelegate& delegate)
 {
 	m_strCode = code;
@@ -41,9 +43,13 @@ void Lexer::tokenize()
 		++tokenEnd;
 		if (tokenEnd == m_strCode.end())
 			return;
+
+		// skip EOF
+		if (*tokenEnd < 0)
+			continue;
 		
 		CharType currentType = getType(*tokenEnd);
-
+		
 		switch (prevType)
 		{
 		case Operator:
@@ -59,6 +65,11 @@ void Lexer::tokenize()
 		case QBracket:
 		{
 			addToken(tokenBegin, tokenEnd, Tokens::QBracket);
+			break;
+		}
+		case CBracket:
+		{
+			addToken(tokenBegin, tokenEnd, Tokens::CBracket);
 			break;
 		}
 		case Quote:
@@ -119,26 +130,17 @@ Tokens::TokenType Lexer::getTokenType(StrIter begin, StrIter end)
 	std::string token(begin, end);
 	
 	bool isLetterFirst = isalpha(*begin) || *begin == '_';
-	if (isLetterFirst)
+	int numOfDots = std::count<StrIter>(begin, end, '.');
+	int numOfAlphas = std::count_if<StrIter>(begin, end, isalpha);
+	
+	if (isLetterFirst && numOfDots == 0)
 	{
-		if (token.find('.') == std::string::npos)
-		{
-			return Tokens::Identifier;
-		}
-		else
-		{
-			return Tokens::Undefined;
-		}
+		return Tokens::Identifier;
 	}
 
-	try
+	if (numOfAlphas == 0 && (numOfDots == 1 || numOfDots == 0))
 	{
-		std::stof(token.c_str());
 		return Tokens::Number;
-	}
-	catch(std::invalid_argument&)
-	{
-		return Tokens::Undefined;
 	}
 
 	return Tokens::Undefined;
@@ -160,6 +162,9 @@ Lexer::CharType Lexer::getType(char c)
 
 	if (Tokens::QBrackets.find(c) != std::string::npos)
 		return QBracket;
+	
+	if (Tokens::CBrackets.find(c) != std::string::npos)
+		return CBracket;
 	
 	if (c == '\"')
 		return Quote;

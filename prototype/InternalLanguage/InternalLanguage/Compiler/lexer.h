@@ -25,6 +25,7 @@ private:
 		AlNum, // number or letter
 		Bracket,
 		QBracket,
+		CBracket,
 		Quote,
 		Semicolon,
 		Slash,

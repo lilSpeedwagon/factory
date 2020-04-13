@@ -11,6 +11,7 @@ namespace Tokens
 	static const std::string Operators = "+-/*%^";
 	static const std::string Brackets = "()";
 	static const std::string QBrackets = "[]";
+	static const std::string CBrackets = "{}";
 	
 	enum TokenType
 	{
@@ -21,6 +22,7 @@ namespace Tokens
 		Equality,
 		Bracket,
 		QBracket,
+		CBracket,
 		Quote,
 		Semicolon,
 		Comment,
@@ -37,6 +39,7 @@ namespace Tokens
 		IF_TYPE(Equality, t)
 		IF_TYPE(Bracket, t)
 		IF_TYPE(QBracket, t)
+		IF_TYPE(CBracket, t)
 		IF_TYPE(Quote, t)
 		IF_TYPE(Semicolon, t)
 		IF_TYPE(Comment, t)
