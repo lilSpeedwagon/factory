@@ -151,22 +151,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Compiler.h" />
+    <ClInclude Include="DataTypes.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="lexer.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="Operations.h" />
+    <ClInclude Include="Runtime.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Syntaxer.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Compiler.cpp" />
+    <ClCompile Include="DataTypes.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="lexer.cpp" />
+    <ClCompile Include="Operations.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Syntaxer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

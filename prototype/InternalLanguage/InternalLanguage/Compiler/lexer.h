@@ -5,13 +5,18 @@
 
 class Lexer : Logger
 {
+	RESTRICT_COPY(Lexer)
 public:
-	Lexer()	{}
+	Lexer(std::string const& code, LogDelegate& delegate) :
+		m_strCode(code), m_tokensFound(0), m_undefinedTokensFound(0)
+	{
+		SetLogDelegate(delegate);
+		SetLogName("Lexer");
+	}
 	~Lexer() = default;
 
-	void Init(std::string const& code, LogDelegate& delegate);
 	bool Run();
-	Tokens::TokenList Result() const { return m_result; }
+	const Tokens::TokenList& Result() const { return m_result; }
 
 private:
 	typedef std::string::const_iterator StrIter;
@@ -28,13 +33,16 @@ private:
 		CBracket,
 		Quote,
 		Semicolon,
-		Slash,
 		Delimiter
 	};
 	
 	static CharType getType(char c);
 	static Tokens::TokenType getTokenType(StrIter begin, StrIter end);
+
+	static const int TOKEN_DENSITY;
 	
 	std::string m_strCode;
 	Tokens::TokenList m_result;
+	int m_tokensFound;
+	int m_undefinedTokensFound;
 };

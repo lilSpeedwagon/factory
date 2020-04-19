@@ -2,13 +2,9 @@
 #include "lexer.h"
 
 #include <algorithm>
+#include <sstream>
 
-void Lexer::Init(std::string const& code, LogDelegate& delegate)
-{
-	m_strCode = code;
-	SetLogDelegate(delegate);
-	SetLogName("Lexer");
-}
+const int Lexer::TOKEN_DENSITY = 2;
 
 bool Lexer::Run()
 {
@@ -24,18 +20,22 @@ bool Lexer::Run()
 
 	Log("Code: " + m_strCode);
 	Log("Tokens:");
+	m_result.reserve(m_strCode.length() / TOKEN_DENSITY);
 	tokenize();
-
+	m_result.shrink_to_fit();
+	
 	result = true;
 	Log("done");
+
+	std::stringstream ss;
+	ss << m_tokensFound << " tokens found. " << m_undefinedTokensFound << " undefined.";
+	Log(ss.str());
 	
 	return result;
 }
 
 void Lexer::tokenize()
 {
-	size_t length = m_strCode.length();
-
 	StrIter tokenBegin = m_strCode.begin(), tokenEnd = m_strCode.begin();
 	CharType prevType = getType(*tokenBegin);
 	for (; tokenBegin != m_strCode.end();)
@@ -99,16 +99,8 @@ void Lexer::tokenize()
 					addToken(tokenBegin, tokenEnd, type);
 					break;
 				}
-				case Slash:
-				{
-					// skip comments
-					if (std::distance(tokenEnd, tokenBegin) > 1)
-					{
-						tokenBegin = std::find<StrIter>(tokenEnd, m_strCode.end(), '\n');
-						tokenEnd = tokenEnd;
-					}
-					break;
-				}
+				default:
+					addToken(tokenBegin, tokenEnd, Tokens::Undefined);
 				}
 			}
 		}
@@ -123,6 +115,9 @@ void Lexer::addToken(StrIter& begin, StrIter& end, Tokens::TokenType type)
 	m_result.push_back({ std::string(begin, end), type});
 	Log(("\"" + std::string(begin, end) + "\" type: " + Tokens::GetTypeName(type)).c_str());
 	begin = end;
+	m_tokensFound++;
+	if (type == Tokens::Undefined)
+		m_undefinedTokensFound++;
 }
 
 Tokens::TokenType Lexer::getTokenType(StrIter begin, StrIter end)
@@ -171,9 +166,6 @@ Lexer::CharType Lexer::getType(char c)
 
 	if (c == ';')
 		return Semicolon;
-
-	if (c == '/')
-		return Slash;
 	
 	return Undefined;
 }
