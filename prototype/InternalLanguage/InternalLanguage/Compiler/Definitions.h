@@ -12,7 +12,7 @@ namespace Tokens
 {
 	static const std::string Delimiters = " \n\t";
 	static const std::string AdditionToIdentifiers = "-_.";
-	static const std::string Operators = "+-/*%^";
+	static const std::string Operators = "+-/*%";
 	static const std::string Brackets = "()";
 	static const std::string QBrackets = "[]";
 	static const std::string CBrackets = "{}";
@@ -23,7 +23,7 @@ namespace Tokens
 		Operator,
 		Identifier,
 		Number,
-		Equality,
+		Assignment,
 		Bracket,
 		QBracket,
 		CBracket,
@@ -41,7 +41,7 @@ namespace Tokens
 		IF_TYPE(Operator, t)
 		IF_TYPE(Identifier, t)
 		IF_TYPE(Number, t)
-		IF_TYPE(Equality, t)
+		IF_TYPE(Assignment, t)
 		IF_TYPE(Bracket, t)
 		IF_TYPE(QBracket, t)
 		IF_TYPE(CBracket, t)
@@ -52,18 +52,34 @@ namespace Tokens
 		return TYPENAME(Undefined);
 	}
 
-	typedef std::pair<std::string, TokenType> Token;
+	struct Token
+	{
+		std::string value;
+		TokenType type;
+	};
 	typedef std::vector<Token> TokenList;
 }
 
-class CompilationError : public Utils::BaseException
+
+
+typedef std::variant<int, float, std::string, bool> Value;
+struct Variable
+{
+	std::string identifier;
+	Value value;
+};
+
+class ValueException : public Utils::BaseException
 {
 public:
-	CompilationError() { m_pMessage = nullptr; }
-	CompilationError(const char* msg)
+	ValueException() {}
+	ValueException(const char* msg)
 	{
-		m_pMessage = new char[strlen(msg) + 1];
-		strcpy(m_pMessage, msg);
+		m_msg.assign(msg);
 	}
-	virtual ~CompilationError() = default;
+	ValueException(std::string const& str)
+	{
+		m_msg = str;
+	}
+	virtual ~ValueException() = default;
 };

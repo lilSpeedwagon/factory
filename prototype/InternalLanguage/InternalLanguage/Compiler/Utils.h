@@ -23,27 +23,12 @@ namespace Utils
 	class BaseException
 	{
 	public:
-		BaseException()
-		{
-			m_pMessage = nullptr;
-		}
-		BaseException(const char* msg)
-		{
-			m_pMessage = new char[strlen(msg) + 1];
-			strcpy(m_pMessage, msg);
-		}
-		virtual ~BaseException()
-		{
-			delete[] m_pMessage; // standard says its ok to delete nullptr (?)
-		}
-		const char* Message() const
-		{
-			if (m_pMessage == nullptr)
-				return "";
-			
-			return m_pMessage;
-		}
+		BaseException() {}
+		BaseException(std::string const& msg) : m_msg(msg) {}
+		BaseException(const char* msg) : m_msg(msg) {}
+		virtual ~BaseException() = default;
+		virtual std::string Message() const	{ return m_msg;	}
 	protected:
-		char* m_pMessage;
+		std::string m_msg;
 	};
 }

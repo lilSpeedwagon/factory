@@ -5,21 +5,14 @@
 
 namespace Runtime
 {
-	typedef std::variant<int, float, std::string, bool> Value;
-	struct Variable
-	{
-		std::string identifier;
-		Value value;
-	};
 
 	class RuntimeException : public Utils::BaseException
 	{
 	public:
-		RuntimeException() { m_pMessage = nullptr; }
+		RuntimeException() {}
 		RuntimeException(const char* msg)
 		{
-			m_pMessage = new char[strlen(msg) + 1];
-			strcpy(m_pMessage, msg);
+			m_msg.assign(msg);
 		}
 		virtual ~RuntimeException() = default;
 	};

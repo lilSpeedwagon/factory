@@ -12,7 +12,7 @@ void OperationScope::Execute()
 	}
 }
 
-Runtime::Value OperationScope::GetVariableValue(std::string const& varName) const
+Value OperationScope::GetVariableValue(std::string const& varName) const
 {
 	auto it = m_mapVariables.find(varName);
 	if (it == m_mapVariables.end())
@@ -23,12 +23,12 @@ Runtime::Value OperationScope::GetVariableValue(std::string const& varName) cons
 	return it->second;
 }
 
-Runtime::Value UnaryExpression::Calculate()
+Value UnaryExpression::Calculate()
 {
 	return m_function(m_pOperand->Calculate());
 }
 
-Runtime::Value BinaryExpression::Calculate()
+Value BinaryExpression::Calculate()
 {
 	return m_function(m_pLeftOperand->Calculate(), m_pRightOperand->Calculate());
 }
@@ -63,7 +63,7 @@ ValueExpression::ValueExpression(std::string strValue)
 	{
 		std::stringstream ss;
 		ss << "Out of range exception \"" << e.what() << " in token " << strValue;
-		throw CompilationError(ss.str().c_str());
+		throw ValueException(ss.str().c_str());
 	}
 
 	try
@@ -75,21 +75,21 @@ ValueExpression::ValueExpression(std::string strValue)
 	catch (std::out_of_range& e)
 	{
 		std::stringstream ss;
-		ss << "Out of range exception \"" << e.what() << " in token " << strValue;
-		throw CompilationError(ss.str().c_str());
+		ss << "Out of range exception \"" << e.what() << "\" in token " << strValue;
+		throw ValueException(ss.str().c_str());
 	}
 }
 
-Runtime::Value ValueExpression::Calculate()
+Value ValueExpression::Calculate()
 {
 	return m_value;
 }
 
-Runtime::Value IdentifierExpression::Calculate()
+Value IdentifierExpression::Calculate()
 {
 	if (m_pScope == nullptr)
 	{
-		throw Runtime::RuntimeException();
+		throw Runtime::RuntimeException("no scope found");
 	}
 
 	return m_pScope->GetVariableValue(m_identifier);

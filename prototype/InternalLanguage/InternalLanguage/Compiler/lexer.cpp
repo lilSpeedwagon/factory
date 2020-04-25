@@ -36,12 +36,12 @@ bool Lexer::Run()
 
 void Lexer::tokenize()
 {
-	StrIter tokenBegin = m_strCode.begin(), tokenEnd = m_strCode.begin();
+	StrIter tokenBegin = m_strCode.cbegin(), tokenEnd = m_strCode.cbegin();
 	CharType prevType = getType(*tokenBegin);
-	for (; tokenBegin != m_strCode.end();)
+	for (; tokenBegin != m_strCode.cend();)
 	{
 		++tokenEnd;
-		if (tokenEnd == m_strCode.end())
+		if (tokenEnd == m_strCode.cend())
 			return;
 
 		// skip EOF
@@ -54,7 +54,7 @@ void Lexer::tokenize()
 		{
 		case Operator:
 		{
-			addToken(tokenBegin, tokenEnd, *tokenBegin == '=' ? Tokens::Equality : Tokens::Operator);
+			addToken(tokenBegin, tokenEnd, *tokenBegin == '=' ? Tokens::Assignment : Tokens::Operator);
 			break;
 		}
 		case Bracket:
@@ -74,6 +74,8 @@ void Lexer::tokenize()
 		}
 		case Quote:
 		{
+			// looking for next quote
+			tokenEnd = std::find(tokenBegin + 1, m_strCode.cend(), '\"');
 			addToken(tokenBegin, tokenEnd, Tokens::Quote);
 			break;
 		}
