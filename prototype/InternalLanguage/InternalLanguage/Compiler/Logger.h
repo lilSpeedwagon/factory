@@ -7,11 +7,12 @@ class Logger
 public:
 	Logger()
 	{
+		m_logName = "";
 		m_logDelegate = nullptr;
 	}
 
 protected:
-	void Log(std::string const& message) const
+	inline void Log(std::string const& message) const
 	{
 		std::string msg = m_logName + ": " + message;
 		m_logDelegate(msg.c_str());

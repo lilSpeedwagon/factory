@@ -10,12 +10,14 @@ typedef void(__stdcall *LogDelegate)(const char*);
 
 namespace Tokens
 {
-	static const std::string Delimiters = " \n\t";
+	static const std::string Delimiters = " \r\n\t";
 	static const std::string AdditionToIdentifiers = "-_.";
-	static const std::string Operators = "+-/*%";
+	static const std::string Operators = "+-/*%><=";
 	static const std::string Brackets = "()";
 	static const std::string QBrackets = "[]";
 	static const std::string CBrackets = "{}";
+	static const std::vector<std::string> ComplexOperators = { "==", "!=", "<=", ">=" };
+	static const std::vector<std::string> CommentOperator = { "//", "///" };
 	
 	enum TokenType
 	{

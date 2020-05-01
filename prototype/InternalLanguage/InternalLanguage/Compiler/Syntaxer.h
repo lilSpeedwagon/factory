@@ -59,7 +59,7 @@ public:
 	}
 	CompilationError(std::string msg, Tokens::TokenList::iterator itBegin, Tokens::TokenList::iterator itEnd)
 	{
-		m_msg = msg + " source: " + std::string(itBegin, itEnd);
+		m_msg = msg + " source: " + std::string(itBegin->value.begin(), itEnd->value.end());
 	}
 	virtual ~CompilationError() = default;
 };

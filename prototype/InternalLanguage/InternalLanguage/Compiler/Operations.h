@@ -7,7 +7,7 @@
 class Operation
 {
 public:
-	virtual ~Operation() = 0;
+	virtual ~Operation() {}
 	virtual void Execute() = 0;
 };
 DEFINE_PTR(Operation)
@@ -32,7 +32,7 @@ DEFINE_PTR(OperationScope)
 class Expression
 {
 public:
-	virtual ~Expression() = 0;
+	virtual ~Expression() {}
 	virtual Value Calculate() = 0;
 
 	void SetScope(OperationScopePtr pScope) { m_pScope = pScope; }

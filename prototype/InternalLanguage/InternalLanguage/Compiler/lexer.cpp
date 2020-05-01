@@ -23,13 +23,13 @@ bool Lexer::Run()
 	m_result.reserve(m_strCode.length() / TOKEN_DENSITY);
 	tokenize();
 	m_result.shrink_to_fit();
-	
-	result = true;
 	Log("done");
 
 	std::stringstream ss;
 	ss << m_tokensFound << " tokens found. " << m_undefinedTokensFound << " undefined.";
 	Log(ss.str());
+
+	result = m_undefinedTokensFound == 0;
 	
 	return result;
 }
@@ -49,14 +49,10 @@ void Lexer::tokenize()
 			continue;
 		
 		CharType currentType = getType(*tokenEnd);
-		
+
+		// add token after its type definition
 		switch (prevType)
 		{
-		case Operator:
-		{
-			addToken(tokenBegin, tokenEnd, *tokenBegin == '=' ? Tokens::Assignment : Tokens::Operator);
-			break;
-		}
 		case Bracket:
 		{
 			addToken(tokenBegin, tokenEnd, Tokens::Bracket);
@@ -76,7 +72,16 @@ void Lexer::tokenize()
 		{
 			// looking for next quote
 			tokenEnd = std::find(tokenBegin + 1, m_strCode.cend(), '\"');
-			addToken(tokenBegin, tokenEnd, Tokens::Quote);
+			if (tokenEnd != m_strCode.end())
+			{
+				++tokenEnd;
+				addToken(tokenBegin, tokenEnd, Tokens::Quote);
+				currentType = getType(*tokenEnd);
+			}
+			else
+			{
+				addToken(tokenBegin, tokenEnd, Tokens::Undefined);
+			}
 			break;
 		}
 		case Semicolon:
@@ -86,6 +91,7 @@ void Lexer::tokenize()
 		}
 		default:
 		{
+			// add token if another type token found
 			if (currentType != prevType)
 			{
 				switch (prevType)
@@ -93,6 +99,40 @@ void Lexer::tokenize()
 				case Delimiter:
 				{
 					addToken(tokenBegin, tokenEnd, Tokens::Delimiter);
+					break;
+				}
+				case Operator:
+				{
+					// one char operator
+					if (std::distance(tokenBegin, tokenEnd) == 1)
+					{
+						addToken(tokenBegin, tokenEnd, *tokenBegin == '=' ? Tokens::Assignment : Tokens::Operator);
+					}
+					else
+					{
+						std::string tokenStr(tokenBegin, tokenEnd);
+						
+						// check for complex operator...
+						if (std::find(Tokens::ComplexOperators.cbegin(), Tokens::ComplexOperators.cend(), tokenStr) != Tokens::ComplexOperators.cend())
+						{
+							addToken(tokenBegin, tokenEnd, Tokens::Operator);
+						}
+						// or comment
+						else if (std::find(Tokens::CommentOperator.cbegin(), Tokens::CommentOperator.cend(), tokenStr) != Tokens::CommentOperator.cend())
+						{
+							tokenEnd = std::find(tokenEnd, m_strCode.cend(), '\n');
+							if (tokenEnd != m_strCode.cend())
+							{
+								++tokenEnd;
+								tokenBegin  = tokenEnd;
+								currentType = getType(*tokenBegin);
+							}
+						}
+						else
+						{
+							addToken(tokenBegin, tokenEnd, Tokens::Undefined);
+						}
+					}
 					break;
 				}
 				case AlNum:
@@ -151,7 +191,7 @@ Lexer::CharType Lexer::getType(char c)
 	if (Tokens::Delimiters.find(c) != std::string::npos)
 		return Delimiter;
 
-	if (Tokens::Operators.find(c) != std::string::npos || c == '=')
+	if (Tokens::Operators.find(c) != std::string::npos)
 		return Operator;
 
 	if (Tokens::Brackets.find(c) != std::string::npos)

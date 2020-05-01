@@ -4,14 +4,26 @@
 
 void Syntaxer::prepare_tokens()
 {
-	/*std::remove_if(m_pTokens->begin(), m_pTokens->end(), [](Tokens::Token& t)
+	Log("Preparing tokens.");
+	
+	// remove delimiters
+	std::remove_if(m_pTokens->begin(), m_pTokens->end(), [](Tokens::Token& t)
 	{
 		return t.type == Tokens::Delimiter;
-	});*/
+	});
+
+	// unite complex operators
+
+	// remove comments
+	
+	Log("Tokens are ready.");
 }
 
 void Syntaxer::Run()
 {
+	Log("Running...");
+	prepare_tokens();
+	
 	OperationScopePtr operation_tree = std::make_shared<OperationScope>();
 	try
 	{
@@ -21,10 +33,14 @@ void Syntaxer::Run()
 	{
 		Log("Compilation error: " + std::string(e.Message()));
 	}
+
+	Log("Done.");
 }
 
 void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope)
 {
+	Log("extending scope for : " + std::string(itBegin->value.cbegin(), itEnd->value.cend()));
+	
 	auto it = itBegin;
 	auto expr_begin = it, expr_end = it;;
 	while (it != itEnd)
@@ -61,6 +77,8 @@ Syntaxer::ItToken Syntaxer::find_high_priority_operator(ItToken itBegin, ItToken
 
 void Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope)
 {
+	Log("Extending expression: " + std::string(itBegin->value.cbegin(), itEnd->value.cend()));
+	
 	// assignment
 	ItToken itAssign = find_token_type(itBegin, itEnd, Tokens::Assignment);
 	if (itAssign != itEnd)
@@ -128,7 +146,7 @@ Syntaxer::ItToken Syntaxer::find_token_type_throw(ItToken itBegin, ItToken itEnd
 	ItToken it = find_token_type(itBegin, itEnd, type);
 	if (it == itEnd)
 		throw CompilationError("Token with type " + Tokens::GetTypeName(type) + " expected, but not found");
-
+		
 	return it;
 }
 
