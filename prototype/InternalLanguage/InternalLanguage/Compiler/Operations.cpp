@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Operations.h"
 #include "DataTypes.h"
+#include "Runtime.h"
 #include "sstream"
 
 void OperationScope::Execute()
@@ -21,6 +22,16 @@ Value OperationScope::GetVariableValue(std::string const& varName) const
 	}
 
 	return it->second;
+}
+
+void OperationScope::AddOperation(OperationPtr pOperation)
+{
+	m_qOperations.push(pOperation);
+}
+
+void OperationAssign::Execute()
+{
+	
 }
 
 Value UnaryExpression::Calculate()
@@ -92,7 +103,7 @@ Value IdentifierExpression::Calculate()
 		throw Runtime::RuntimeException("no scope found");
 	}
 
-	return m_pScope->GetVariableValue(m_identifier);
+	return m_pScope->GetVariableValue(m_strIdentifier);
 }
 
 

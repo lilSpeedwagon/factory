@@ -2,6 +2,9 @@
 
 #include "stdafx.h"
 
+#define DEFINE_PTR(T) typedef std::shared_ptr<T> T##Ptr;
+#define RESTRICT_COPY(T) private: T(T const&); void operator=(T const&);
+
 namespace Utils
 {
 	inline bool isQuotedString(std::string const& str)

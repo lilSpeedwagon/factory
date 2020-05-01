@@ -2,8 +2,21 @@
 
 #include "stdafx.h"
 #include "Definitions.h"
-#include "Runtime.h"
 
+// predefined classes
+class Expression;
+DEFINE_PTR(Expression)
+class UnaryExpression;
+DEFINE_PTR(UnaryExpression)
+class BinaryExpression;
+DEFINE_PTR(BinaryExpression)
+class ValueExpression;
+DEFINE_PTR(ValueExpression)
+class IdentifierExpression;
+DEFINE_PTR(IdentifierExpression)
+
+
+// classes declaration
 class Operation
 {
 public:
@@ -21,12 +34,28 @@ public:
 	virtual ~OperationScope() = default;
 	void Execute() override;
 	Value GetVariableValue(std::string const& varName) const;
+	void AddOperation(OperationPtr pOperation);
 
 protected:
 	std::map<std::string, Value> m_mapVariables;
 	std::queue<OperationPtr> m_qOperations;
 };
 DEFINE_PTR(OperationScope)
+
+
+class OperationAssign : public Operation
+{
+	RESTRICT_COPY(OperationAssign)
+public:
+	OperationAssign(IdentifierExpressionPtr pIdentifier, ExpressionPtr pExpr) :
+		m_pIdentifier(pIdentifier), m_pExpression(pExpr) {}
+	virtual ~OperationAssign() = default;
+	virtual void Execute();
+private:
+	IdentifierExpressionPtr m_pIdentifier;
+	ExpressionPtr m_pExpression;
+};
+DEFINE_PTR(OperationAssign)
 
 
 class Expression
@@ -39,7 +68,6 @@ public:
 protected:
 	OperationScopePtr m_pScope = nullptr;
 };
-DEFINE_PTR(Expression)
 
 
 class UnaryExpression : public Expression
@@ -92,8 +120,10 @@ class IdentifierExpression : public Expression
 {
 	RESTRICT_COPY(IdentifierExpression)
 public:
+	IdentifierExpression(std::string const& name) :
+		m_strIdentifier(name) {}
 	virtual ~IdentifierExpression() = default;
 	Value Calculate() override;
 protected:
-	std::string m_identifier;
+	std::string m_strIdentifier;
 };

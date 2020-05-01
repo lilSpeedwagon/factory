@@ -17,7 +17,7 @@ public:
 	}
 	~Syntaxer() = default;
 
-	void Run();
+	bool Run();
 	
 private:
 	typedef Tokens::TokenList::iterator ItToken;
@@ -32,8 +32,11 @@ private:
 	};
 	
 	void prepare_tokens();
-	void extend_expression(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope);
+	
+	void extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope);
 	void extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope);
+	OperationAssignPtr extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign) const;
+	ExpressionPtr extend_expression(ItToken itBegin, ItToken itEnd) const;
 
 	static ItToken find_high_priority_operator(ItToken itBegin, ItToken itEnd);
 	static ItToken find_if_throw(ItToken itBegin, ItToken itEnd, bool(*predicate)(Tokens::Token& t));
@@ -59,7 +62,7 @@ public:
 	}
 	CompilationError(std::string msg, Tokens::TokenList::iterator itBegin, Tokens::TokenList::iterator itEnd)
 	{
-		m_msg = msg + " source: " + std::string(itBegin->value.begin(), itEnd->value.end());
+		m_msg = msg + " source: " + Tokens::make_string_from_tokens(itBegin, itEnd);
 	}
 	virtual ~CompilationError() = default;
 };

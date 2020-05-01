@@ -3,8 +3,6 @@
 #include "stdafx.h"
 #include "Utils.h"
 
-#define DEFINE_PTR(T) typedef std::shared_ptr<T> T##Ptr;
-#define RESTRICT_COPY(T) private: T(T const&); void operator=(T const&);
 
 typedef void(__stdcall *LogDelegate)(const char*);
 
@@ -60,6 +58,16 @@ namespace Tokens
 		TokenType type;
 	};
 	typedef std::vector<Token> TokenList;
+
+	inline std::string make_string_from_tokens(TokenList::const_iterator from, TokenList::const_iterator to)
+	{
+		std::string str;
+		for (; from != to; ++from)
+		{
+			str.append(from->value);
+		}
+		return str;
+	}
 }
 
 

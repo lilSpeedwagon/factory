@@ -7,23 +7,20 @@ void Syntaxer::prepare_tokens()
 	Log("Preparing tokens.");
 	
 	// remove delimiters
-	std::remove_if(m_pTokens->begin(), m_pTokens->end(), [](Tokens::Token& t)
-	{
-		return t.type == Tokens::Delimiter;
-	});
-
-	// unite complex operators
+	m_pTokens->erase(std::remove_if(m_pTokens->begin(), m_pTokens->end(),
+		[](Tokens::Token& t) {	return t.type == Tokens::Delimiter;	}),
+		m_pTokens->end());
 
 	// remove comments
 	
 	Log("Tokens are ready.");
 }
 
-void Syntaxer::Run()
+bool Syntaxer::Run()
 {
 	Log("Running...");
 	prepare_tokens();
-	
+
 	OperationScopePtr operation_tree = std::make_shared<OperationScope>();
 	try
 	{
@@ -32,14 +29,16 @@ void Syntaxer::Run()
 	catch(CompilationError& e)
 	{
 		Log("Compilation error: " + std::string(e.Message()));
+		return false;
 	}
 
 	Log("Done.");
+	return true;
 }
 
 void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope)
 {
-	Log("extending scope for : " + std::string(itBegin->value.cbegin(), itEnd->value.cend()));
+	Log("Extending scope for: " + make_string_from_tokens(itBegin, itEnd));
 	
 	auto it = itBegin;
 	auto expr_begin = it, expr_end = it;;
@@ -49,8 +48,8 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 		if (it->type == Tokens::Identifier)
 		{
 			ItToken itExprEnd = find_if_throw(it, itEnd, [](Tokens::Token& t) { return t.type == Tokens::Semicolon; });
-			extend_expression(it, itExprEnd, pCurrentScope);
-			it = itExprEnd, 1;
+			extend_operation(it, itExprEnd, pCurrentScope);
+			it = itExprEnd + 1;
 			continue;
 		}
 
@@ -62,50 +61,17 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 	}
 }
 
-Syntaxer::ItToken Syntaxer::find_high_priority_operator(ItToken itBegin, ItToken itEnd)
+void Syntaxer::extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope)
 {
-	/*ItToken itMaxPriority = itEnd;
-	ItToken it = itBegin;
-	while (it != itEnd)
-	{
-		it = std::find_if(it, itEnd, [](Tokens::Token& t) { return t.type == Tokens::Operator; });
-		
-	}*/
-	return itBegin;
-}
-
-
-void Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope)
-{
-	Log("Extending expression: " + std::string(itBegin->value.cbegin(), itEnd->value.cend()));
+	Log("Extending operation: " + make_string_from_tokens(itBegin, itEnd));
 	
 	// assignment
 	ItToken itAssign = find_token_type(itBegin, itEnd, Tokens::Assignment);
 	if (itAssign != itEnd)
 	{
-		if (std::distance(itBegin, itAssign) != 1 || itBegin->type != Tokens::Identifier)
-			throw CompilationError("Cannot assign value to non identifier", itBegin, itEnd);
-
-		size_t distToEnd = std::distance(itAssign, itEnd);
-		if (distToEnd < 1)
-			throw CompilationError("Missing assignment argument", itBegin, itEnd);
-
-		if (distToEnd == 1)
-		{
-			Tokens::TokenType rightArgType = (itAssign + 1)->type;
-			switch(rightArgType)
-			{
-			case Tokens::Identifier:
-
-				break;
-			case Tokens::Number:
-				
-				break;
-			default:
-				break;
-			}
-		}
-		
+		OperationAssignPtr pAssignOp = extend_assignment(itBegin, itEnd, itAssign);
+		pCurrentScope->AddOperation(pAssignOp);
+		return;
 	}
 
 	// find operator
@@ -125,6 +91,70 @@ void Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, OperationScopeP
 		ItToken itBracketEnd = find_if_throw(it, itEnd, [](Tokens::Token& t) { return t.type == Tokens::Bracket && t.value == ")"; });
 
 	}*/
+}
+
+OperationAssignPtr Syntaxer::extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign) const
+{
+	Log("Extending assignment: " + Tokens::make_string_from_tokens(itBegin, itEnd));
+	
+	if (std::distance(itBegin, itAssign) != 1 || itBegin->type != Tokens::Identifier)
+		throw CompilationError("Cannot assign value to non identifier", itBegin, itEnd);
+
+	const size_t distToEnd = std::distance(itAssign, itEnd);
+	if (distToEnd < 2)
+		throw CompilationError("Missing assignment argument", itBegin, itEnd);
+
+	Log("Left operand: " + itBegin->value);
+	IdentifierExpressionPtr pIdentifier = std::make_shared<IdentifierExpression>(itBegin->value);
+	ExpressionPtr pExpr;
+
+	// right operand is single value or identifier
+	if (distToEnd == 2)
+	{
+		const ItToken itRightArg = itAssign + 1;
+		const Tokens::TokenType rightArgType = (itRightArg)->type;
+		switch (rightArgType)
+		{
+		case Tokens::Identifier:
+			Log("Right operand is an identifier: " + itRightArg->value);
+			pExpr = std::make_shared<IdentifierExpression>(itRightArg->value);
+			break;
+		case Tokens::Number:
+			Log("Right operand is a value: " + itRightArg->value);
+			pExpr = std::make_shared<ValueExpression>(itRightArg->value);
+			break;
+		case Tokens::Quote:
+			Log("Right operand is a string literal: " + itRightArg->value);
+			pExpr = std::make_shared<ValueExpression>(itRightArg->value);
+			break;
+		default:
+			throw CompilationError("Wrong argument in the right side of assignment.");
+		}
+	}
+	else // right operand is expression
+	{
+		
+	}
+
+	return std::make_shared<OperationAssign>(pIdentifier, pExpr);
+}
+
+
+ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd) const
+{
+	return nullptr;
+}
+
+Syntaxer::ItToken Syntaxer::find_high_priority_operator(ItToken itBegin, ItToken itEnd)
+{
+	/*ItToken itMaxPriority = itEnd;
+	ItToken it = itBegin;
+	while (it != itEnd)
+	{
+		it = std::find_if(it, itEnd, [](Tokens::Token& t) { return t.type == Tokens::Operator; });
+
+	}*/
+	return itBegin;
 }
 
 Syntaxer::ItToken Syntaxer::find_if_throw(ItToken itBegin, ItToken itEnd, bool(*predicate)(Tokens::Token& t))
