@@ -22,14 +22,7 @@ public:
 private:
 	typedef Tokens::TokenList::iterator ItToken;
 
-	enum OperatorPriority
-	{
-		Undefined = -1,
-		Lowest = 0,
-		Low = 1,
-		Medium = 5,
-		High = 10
-	};
+	
 	
 	void prepare_tokens();
 	
@@ -38,11 +31,11 @@ private:
 	OperationAssignPtr extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign) const;
 	ExpressionPtr extend_expression(ItToken itBegin, ItToken itEnd) const;
 
-	static ItToken find_high_priority_operator(ItToken itBegin, ItToken itEnd);
+
+	static ItToken find_lowest_priority_operator(ItToken itBegin, ItToken itEnd);
 	static ItToken find_if_throw(ItToken itBegin, ItToken itEnd, bool(*predicate)(Tokens::Token& t));
 	static ItToken find_token_type(ItToken itBegin, ItToken itEnd, Tokens::TokenType t);
 	static ItToken find_token_type_throw(ItToken itBegin, ItToken itEnd, Tokens::TokenType t);
-	static inline OperatorPriority get_operator_priority(ItToken t);
 	
 	std::shared_ptr<Tokens::TokenList> m_pTokens;
 };

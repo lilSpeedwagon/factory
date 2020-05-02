@@ -10,11 +10,11 @@ namespace Tokens
 {
 	static const std::string Delimiters = " \r\n\t";
 	static const std::string AdditionToIdentifiers = "-_.";
-	static const std::string Operators = "+-/*%><=";
+	static const std::string Operators = "+-/*%><=!";
 	static const std::string Brackets = "()";
 	static const std::string QBrackets = "[]";
 	static const std::string CBrackets = "{}";
-	static const std::vector<std::string> ComplexOperators = { "==", "!=", "<=", ">=" };
+	static const std::vector<std::string> ComplexOperators = { "==", "!=", "<=", ">=", "&&", "||" };
 	static const std::vector<std::string> CommentOperator = { "//", "///" };
 	
 	enum TokenType
@@ -70,7 +70,45 @@ namespace Tokens
 	}
 }
 
+namespace Operators
+{
+	typedef int Priority;
+	static const Priority max_priority = 100;
+	static const Priority min_priority = 0;
+	
+	template<int Size>
+	bool isOperator(std::array<const char*, Size> const& vars, std::string const& str)
+	{
+		return std::find(vars.begin(), vars.end(), str) != vars.end();
+	}
 
+	constexpr std::pair LogicalOr =			{ std::array{ "||" },											5 };
+	constexpr std::pair LogicalAnd =		{ std::array{ "&&" },											10 };
+	constexpr std::pair Comparison =		{ std::array{ "==", "!=" },								15 };
+	constexpr std::pair MoreLess =			{ std::array{ ">=", "<=", ">", "<" },	20 };
+	constexpr std::pair ArithmeticLow =		{ std::array{ "+", "-" },								25 };
+	constexpr std::pair ArithmeticHigh =	{ std::array{ "*", "/", "%" },					30 };
+	constexpr std::pair Not =				{ std::array{ "!" },											35 };
+
+	inline Priority operatorPriority(std::string const& str)
+	{
+		if (isOperator(LogicalOr.first, str))		{ return LogicalOr.second; }
+		if (isOperator(LogicalAnd.first, str))		{ return LogicalAnd.second; }
+		if (isOperator(Comparison.first, str))		{ return Comparison.second; }
+		if (isOperator(MoreLess.first, str))		{ return MoreLess.second; }
+		if (isOperator(ArithmeticLow.first, str))	{ return ArithmeticLow.second; }
+		if (isOperator(ArithmeticHigh.first, str))	{ return ArithmeticHigh.second; }
+		if (isOperator(Not.first, str))				{ return Not.second; }
+		
+		return -1;
+	}
+
+	constexpr std::array UnaryOperators = { "!" };
+	inline bool isUnaryOperator(std::string const& str)
+	{
+		return std::find(UnaryOperators.begin(), UnaryOperators.end(), str) != UnaryOperators.end();
+	}
+}
 
 typedef std::variant<int, float, std::string, bool> Value;
 struct Variable

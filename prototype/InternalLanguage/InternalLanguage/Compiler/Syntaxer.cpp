@@ -100,41 +100,11 @@ OperationAssignPtr Syntaxer::extend_assignment(ItToken itBegin, ItToken itEnd, I
 	if (std::distance(itBegin, itAssign) != 1 || itBegin->type != Tokens::Identifier)
 		throw CompilationError("Cannot assign value to non identifier", itBegin, itEnd);
 
-	const size_t distToEnd = std::distance(itAssign, itEnd);
-	if (distToEnd < 2)
-		throw CompilationError("Missing assignment argument", itBegin, itEnd);
-
 	Log("Left operand: " + itBegin->value);
 	IdentifierExpressionPtr pIdentifier = std::make_shared<IdentifierExpression>(itBegin->value);
-	ExpressionPtr pExpr;
-
-	// right operand is single value or identifier
-	if (distToEnd == 2)
-	{
-		const ItToken itRightArg = itAssign + 1;
-		const Tokens::TokenType rightArgType = (itRightArg)->type;
-		switch (rightArgType)
-		{
-		case Tokens::Identifier:
-			Log("Right operand is an identifier: " + itRightArg->value);
-			pExpr = std::make_shared<IdentifierExpression>(itRightArg->value);
-			break;
-		case Tokens::Number:
-			Log("Right operand is a value: " + itRightArg->value);
-			pExpr = std::make_shared<ValueExpression>(itRightArg->value);
-			break;
-		case Tokens::Quote:
-			Log("Right operand is a string literal: " + itRightArg->value);
-			pExpr = std::make_shared<ValueExpression>(itRightArg->value);
-			break;
-		default:
-			throw CompilationError("Wrong argument in the right side of assignment.");
-		}
-	}
-	else // right operand is expression
-	{
-		
-	}
+	ItToken itRightOperand = itAssign + 1;
+	Log("Right operand: " + Tokens::make_string_from_tokens(itRightOperand, itEnd));
+	ExpressionPtr pExpr = extend_expression(itRightOperand, itEnd);
 
 	return std::make_shared<OperationAssign>(pIdentifier, pExpr);
 }
@@ -142,19 +112,89 @@ OperationAssignPtr Syntaxer::extend_assignment(ItToken itBegin, ItToken itEnd, I
 
 ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd) const
 {
-	return nullptr;
+	Log("Extending expression: " + Tokens::make_string_from_tokens(itBegin, itEnd));
+	ExpressionPtr pExpr;
+	
+	const size_t length = std::distance(itBegin, itEnd);
+	
+	// expression is a single value or an identifier
+	if (length == 1)
+	{
+		const Tokens::TokenType argType = (itBegin)->type;
+		std::string const& strArg = itBegin->value;
+		switch (argType)
+		{
+		case Tokens::Identifier:
+			Log("Expression is an identifier: " + strArg);
+			pExpr = std::make_shared<IdentifierExpression>(strArg);
+			break;
+		case Tokens::Number:
+			Log("Expression is a value: " + strArg);
+			pExpr = std::make_shared<ValueExpression>(strArg);
+			break;
+		case Tokens::Quote:
+			Log("Expression is a string literal: " + strArg);
+			pExpr = std::make_shared<ValueExpression>(strArg);
+			break;
+		default:
+			throw CompilationError("Wrong argument in the right side of assignment.");
+		}
+	}
+	else // expression is complex
+	{
+		// 1. find lowest prior operator
+		ItToken itLowestPriority = find_lowest_priority_operator(itBegin, itEnd);
+		if (itLowestPriority == itEnd)
+		{
+			throw CompilationError("Error in expression: " + make_string_from_tokens(itBegin, itEnd));
+		}
+		Log("Extend arguments of operator: " + itLowestPriority->value);
+
+		// 2. extend its operands
+		bool isUnaryOperation = Operators::isUnaryOperator(itLowestPriority->value);
+		if (isUnaryOperation)
+		{
+			Log("Unary operand: " + Tokens::make_string_from_tokens(itLowestPriority + 1, itEnd));
+			ExpressionPtr pOperand = extend_expression(itLowestPriority + 1, itEnd);
+			
+			UnaryExpression::UnaryFunction func = [](Value v) -> Value { return Value(); };
+			pExpr = std::make_shared<UnaryExpression>(func, pOperand);
+		}
+		else
+		{
+			Log("Left operand: " + Tokens::make_string_from_tokens(itBegin, itLowestPriority));
+			ExpressionPtr pLeftOperand = extend_expression(itBegin, itLowestPriority);
+			Log("Right operand: " + Tokens::make_string_from_tokens(itLowestPriority + 1, itEnd));
+			ExpressionPtr pRightOperand = extend_expression(itLowestPriority + 1, itEnd);
+
+			BinaryExpression::BinaryFunction func = [](Value v, Value v2) -> Value { return Value(); };
+			pExpr = std::make_shared<BinaryExpression>(func, pLeftOperand, pRightOperand);
+		}
+	}
+	
+	return pExpr;
 }
 
-Syntaxer::ItToken Syntaxer::find_high_priority_operator(ItToken itBegin, ItToken itEnd)
-{
-	/*ItToken itMaxPriority = itEnd;
-	ItToken it = itBegin;
-	while (it != itEnd)
-	{
-		it = std::find_if(it, itEnd, [](Tokens::Token& t) { return t.type == Tokens::Operator; });
 
-	}*/
-	return itBegin;
+Syntaxer::ItToken Syntaxer::find_lowest_priority_operator(ItToken itBegin, ItToken itEnd)
+{
+	ItToken it = itBegin, itLowestPriorityOperator = itEnd;
+	Operators::Priority lowestPriority = Operators::max_priority;
+
+	do
+	{
+		it = find_token_type(it + 1, itEnd, Tokens::Operator);
+		const Operators::Priority priority = Operators::operatorPriority(it->value);
+
+		if (priority > 0 && priority < lowestPriority)
+		{
+			lowestPriority = priority;
+			itLowestPriorityOperator = it;
+		}
+	}
+	while (it != itEnd);
+	
+	return itLowestPriorityOperator;
 }
 
 Syntaxer::ItToken Syntaxer::find_if_throw(ItToken itBegin, ItToken itEnd, bool(*predicate)(Tokens::Token& t))
@@ -179,18 +219,4 @@ Syntaxer::ItToken Syntaxer::find_token_type_throw(ItToken itBegin, ItToken itEnd
 		
 	return it;
 }
-
-Syntaxer::OperatorPriority Syntaxer::get_operator_priority(ItToken t)
-{
-	char op = t->value[0];
-
-	if (op == '+' || op == '-')
-		return Medium;
-
-	if (op == '*' || op == '/' || op == '%')
-		return High;
-
-	return Undefined;
-}
-
 

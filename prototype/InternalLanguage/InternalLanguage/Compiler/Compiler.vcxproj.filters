@@ -48,6 +48,9 @@
     <ClInclude Include="DataTypes.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="OperationTreeViewHelper.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

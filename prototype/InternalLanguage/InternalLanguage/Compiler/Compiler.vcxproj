@@ -157,6 +157,7 @@
     <ClInclude Include="lexer.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Operations.h" />
+    <ClInclude Include="OperationTreeViewHelper.h" />
     <ClInclude Include="Runtime.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Syntaxer.h" />
