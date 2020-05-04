@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "Definitions.h"
+#include "OperationTreeViewHelper.h"
 
 // predefined classes
 class Expression;
@@ -17,10 +18,10 @@ DEFINE_PTR(IdentifierExpression)
 
 
 // classes declaration
-class Operation
+class Operation : public TreeHelper
 {
 public:
-	virtual ~Operation() {}
+	virtual ~Operation() = default;
 	virtual void Execute() = 0;
 };
 DEFINE_PTR(Operation)
@@ -35,10 +36,11 @@ public:
 	void Execute() override;
 	Value GetVariableValue(std::string const& varName) const;
 	void AddOperation(OperationPtr pOperation);
+	void ExtendView(std::stringstream& ss, int nLevel) override;
 
 protected:
 	std::map<std::string, Value> m_mapVariables;
-	std::queue<OperationPtr> m_qOperations;
+	std::list<OperationPtr> m_listOperations;
 };
 DEFINE_PTR(OperationScope)
 
@@ -51,6 +53,7 @@ public:
 		m_pIdentifier(pIdentifier), m_pExpression(pExpr) {}
 	virtual ~OperationAssign() = default;
 	virtual void Execute();
+	void ExtendView(std::stringstream& ss, int nLevel) override;
 private:
 	IdentifierExpressionPtr m_pIdentifier;
 	ExpressionPtr m_pExpression;
@@ -58,10 +61,10 @@ private:
 DEFINE_PTR(OperationAssign)
 
 
-class Expression
+class Expression : public TreeHelper
 {
 public:
-	virtual ~Expression() {}
+	virtual ~Expression() = default;
 	virtual Value Calculate() = 0;
 
 	void SetScope(OperationScopePtr pScope) { m_pScope = pScope; }
@@ -80,6 +83,7 @@ public:
 		m_function(func), m_pOperand(operand) {}
 	virtual ~UnaryExpression() = default;
 	Value Calculate() override;
+	void ExtendView(std::stringstream& ss, int nLevel) override;
 
 protected:
 	UnaryFunction m_function;
@@ -97,6 +101,8 @@ public:
 		m_function(func), m_pLeftOperand(leftOp), m_pRightOperand(rightOp) {}
 	virtual ~BinaryExpression() = default;
 	Value Calculate() override;
+	void ExtendView(std::stringstream& ss, int nLevel) override;
+	
 protected:
 	BinaryFunction m_function;
 	ExpressionPtr m_pLeftOperand;
@@ -111,6 +117,8 @@ public:
 	ValueExpression(std::string strValue);
 	virtual ~ValueExpression() = default;
 	Value Calculate() override;
+	void ExtendView(std::stringstream& ss, int nLevel) override;
+	
 protected:
 	Value m_value;
 };
@@ -124,6 +132,8 @@ public:
 		m_strIdentifier(name) {}
 	virtual ~IdentifierExpression() = default;
 	Value Calculate() override;
+	void ExtendView(std::stringstream& ss, int nLevel) override;
+	
 protected:
 	std::string m_strIdentifier;
 };

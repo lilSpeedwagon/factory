@@ -1,11 +1,16 @@
 #pragma once
 
-#include "Operations.h"
+#include "Definitions.h"
+#include "sstream"
 
-
-void showOperaionTree(OperationPtr tree)
+class TreeHelper
 {
-	
-}
+public:
+	virtual ~TreeHelper() = default;
+	virtual void ExtendView(std::stringstream& ss, int nLevel) = 0;
+};
 
-#define VIEW_SUPPORT friend showOperationTree;
+inline void make_indent(std::stringstream& ss, int nLevel)
+{
+	for (int i = 0; i < nLevel; i++) ss << "  ";
+}

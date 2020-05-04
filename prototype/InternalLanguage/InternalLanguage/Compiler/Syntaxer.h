@@ -31,11 +31,15 @@ private:
 	OperationAssignPtr extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign) const;
 	ExpressionPtr extend_expression(ItToken itBegin, ItToken itEnd) const;
 
-
+	static bool reduce_brackets(ItToken& itBegin, ItToken& itEnd);
+	static bool is_bracketed_expr(ItToken itBegin, ItToken itEnd);
 	static ItToken find_lowest_priority_operator(ItToken itBegin, ItToken itEnd);
+	
 	static ItToken find_if_throw(ItToken itBegin, ItToken itEnd, bool(*predicate)(Tokens::Token& t));
 	static ItToken find_token_type(ItToken itBegin, ItToken itEnd, Tokens::TokenType t);
 	static ItToken find_token_type_throw(ItToken itBegin, ItToken itEnd, Tokens::TokenType t);
+	static ItToken find_token(ItToken itBegin, ItToken itEnd, Tokens::TokenType t, std::string const& value);
+	static ItToken find_token_throw(ItToken itBegin, ItToken itEnd, Tokens::TokenType t, std::string const& value);
 	
 	std::shared_ptr<Tokens::TokenList> m_pTokens;
 };

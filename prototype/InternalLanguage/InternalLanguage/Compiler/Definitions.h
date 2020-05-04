@@ -9,7 +9,7 @@ typedef void(__stdcall *LogDelegate)(const char*);
 namespace Tokens
 {
 	static const std::string Delimiters = " \r\n\t";
-	static const std::string AdditionToIdentifiers = "-_.";
+	static const std::string AdditionToIdentifiers = "_.";
 	static const std::string Operators = "+-/*%><=!";
 	static const std::string Brackets = "()";
 	static const std::string QBrackets = "[]";
@@ -73,8 +73,9 @@ namespace Tokens
 namespace Operators
 {
 	typedef int Priority;
-	static const Priority max_priority = 100;
+	static const Priority max_priority = MAXINT;
 	static const Priority min_priority = 0;
+	static const Priority brackets_priority = 50;
 	
 	template<int Size>
 	bool isOperator(std::array<const char*, Size> const& vars, std::string const& str)
@@ -111,6 +112,7 @@ namespace Operators
 }
 
 typedef std::variant<int, float, std::string, bool> Value;
+
 struct Variable
 {
 	std::string identifier;

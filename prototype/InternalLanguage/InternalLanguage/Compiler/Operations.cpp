@@ -6,10 +6,9 @@
 
 void OperationScope::Execute()
 {
-	while (!m_qOperations.empty())
+	for (auto op : m_listOperations)
 	{
-		m_qOperations.front()->Execute();
-		m_qOperations.pop();
+		op->Execute();
 	}
 }
 
@@ -24,9 +23,17 @@ Value OperationScope::GetVariableValue(std::string const& varName) const
 	return it->second;
 }
 
+void OperationScope::ExtendView(std::stringstream& ss, int nLevel)
+{
+	make_indent(ss, nLevel);
+	ss << "scope\n";
+	for(auto op : m_listOperations)
+		op->ExtendView(ss, nLevel + 1);
+}
+
 void OperationScope::AddOperation(OperationPtr pOperation)
 {
-	m_qOperations.push(pOperation);
+	m_listOperations.push_back(pOperation);
 }
 
 void OperationAssign::Execute()
@@ -34,14 +41,37 @@ void OperationAssign::Execute()
 	
 }
 
+void OperationAssign::ExtendView(std::stringstream& ss, int nLevel)
+{
+	make_indent(ss, nLevel);
+	ss << "assign\n";
+	m_pIdentifier->ExtendView(ss, nLevel + 1);
+	m_pExpression->ExtendView(ss, nLevel + 1);
+}
+
 Value UnaryExpression::Calculate()
 {
 	return m_function(m_pOperand->Calculate());
 }
 
+void UnaryExpression::ExtendView(std::stringstream& ss, int nLevel)
+{
+	make_indent(ss, nLevel);
+	ss << "unary\n";
+	m_pOperand->ExtendView(ss, ++nLevel);
+}
+
 Value BinaryExpression::Calculate()
 {
 	return m_function(m_pLeftOperand->Calculate(), m_pRightOperand->Calculate());
+}
+
+void BinaryExpression::ExtendView(std::stringstream& ss, int nLevel)
+{
+	make_indent(ss, nLevel);
+	ss << "binary\n";
+	m_pLeftOperand->ExtendView(ss, nLevel + 1);
+	m_pRightOperand->ExtendView(ss, nLevel + 1);
 }
 
 ValueExpression::ValueExpression(std::string strValue)
@@ -96,6 +126,12 @@ Value ValueExpression::Calculate()
 	return m_value;
 }
 
+void ValueExpression::ExtendView(std::stringstream& ss, int nLevel)
+{
+	make_indent(ss, nLevel);
+	ss << "value\n";
+}
+
 Value IdentifierExpression::Calculate()
 {
 	if (m_pScope == nullptr)
@@ -106,4 +142,8 @@ Value IdentifierExpression::Calculate()
 	return m_pScope->GetVariableValue(m_strIdentifier);
 }
 
-
+void IdentifierExpression::ExtendView(std::stringstream& ss, int nLevel)
+{
+	make_indent(ss, nLevel);
+	ss << "identifier: " << m_strIdentifier << '\n';
+}

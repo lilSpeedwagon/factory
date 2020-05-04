@@ -38,16 +38,13 @@ void Lexer::tokenize()
 {
 	StrIter tokenBegin = m_strCode.cbegin(), tokenEnd = m_strCode.cbegin();
 	CharType prevType = getType(*tokenBegin);
+	
 	for (; tokenBegin != m_strCode.cend();)
 	{
 		++tokenEnd;
 		if (tokenEnd == m_strCode.cend())
-			return;
+			break;
 
-		// skip EOF
-		if (*tokenEnd < 0)
-			continue;
-		
 		CharType currentType = getType(*tokenEnd);
 
 		// add token after its type definition
@@ -185,6 +182,9 @@ Tokens::TokenType Lexer::getTokenType(StrIter begin, StrIter end)
 
 Lexer::CharType Lexer::getType(char c)
 {
+	if (c < 0) // EOF
+		return Undefined;
+	
 	if (isalnum(c) || Tokens::AdditionToIdentifiers.find(c) != std::string::npos)
 		return AlNum;
 
