@@ -52,7 +52,8 @@ public:
 	OperationAssign(IdentifierExpressionPtr pIdentifier, ExpressionPtr pExpr) :
 		m_pIdentifier(pIdentifier), m_pExpression(pExpr) {}
 	virtual ~OperationAssign() = default;
-	virtual void Execute();
+	
+	void Execute() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 private:
 	IdentifierExpressionPtr m_pIdentifier;
@@ -60,6 +61,25 @@ private:
 };
 DEFINE_PTR(OperationAssign)
 
+
+class OperationControlFlow : public Operation
+{
+	RESTRICT_COPY(OperationControlFlow)
+public:
+	OperationControlFlow(ExpressionPtr pExpr, OperationScopePtr pScopeIfTrue, bool isLoop = false) :
+		m_pCondition(pExpr), m_pScopeIfTrue(pScopeIfTrue), m_pScopeElse(nullptr), m_isLoop(isLoop) {}
+	OperationControlFlow(ExpressionPtr pExpr, OperationScopePtr pScopeIfTrue, OperationScopePtr pScopeElse, bool isLoop = false) :
+		m_pCondition(pExpr), m_pScopeIfTrue(pScopeIfTrue), m_pScopeElse(pScopeElse), m_isLoop(isLoop) {}
+	virtual ~OperationControlFlow() = default;
+	void Execute() override;
+	void ExtendView(std::stringstream& ss, int nLevel) override;
+private:
+	ExpressionPtr m_pCondition;
+	OperationScopePtr m_pScopeIfTrue;
+	OperationScopePtr m_pScopeElse;
+	bool m_isLoop;
+};
+DEFINE_PTR(OperationControlFlow)
 
 class Expression : public TreeHelper
 {

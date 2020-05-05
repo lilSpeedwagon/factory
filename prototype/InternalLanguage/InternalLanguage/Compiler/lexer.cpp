@@ -41,6 +41,9 @@ void Lexer::tokenize()
 	
 	for (; tokenBegin != m_strCode.cend();)
 	{
+		if (tokenEnd == m_strCode.cend())
+			break;
+
 		++tokenEnd;
 		if (tokenEnd == m_strCode.cend())
 			break;
@@ -121,8 +124,11 @@ void Lexer::tokenize()
 							if (tokenEnd != m_strCode.cend())
 							{
 								++tokenEnd;
-								tokenBegin  = tokenEnd;
-								currentType = getType(*tokenBegin);
+								if (tokenEnd != m_strCode.cend())
+								{
+									tokenBegin = tokenEnd;
+									currentType = getType(*tokenBegin);
+								}
 							}
 						}
 						else

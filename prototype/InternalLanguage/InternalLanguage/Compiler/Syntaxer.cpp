@@ -49,12 +49,66 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 	auto expr_begin = it, expr_end = it;;
 	while (it != itEnd)
 	{
-		// expression in scope
+		// expression or operation in scope
 		if (it->type == Tokens::Identifier)
 		{
-			ItToken itExprEnd = find_token_type_throw(it, itEnd, Tokens::Semicolon);
-			extend_operation(it, itExprEnd, pCurrentScope);
-			it = itExprEnd + 1;
+			if (it->value == KeyWords::IfElse.first)
+			{
+				Log("Extending if-else block.");
+				// find condition
+				ItToken itOpenBracket = it + 1;
+				if (itOpenBracket == itEnd || itOpenBracket->type != Tokens::Bracket || itOpenBracket->value != "(")
+					throw CompilationError("Missing condition expression.");
+
+				ItToken itCloseBracket = find_token_throw(itOpenBracket + 1, itEnd, Tokens::Bracket, ")");
+				Log("Condition: " + Tokens::make_string_from_tokens(itOpenBracket + 1, itCloseBracket));
+				ExpressionPtr pExprCondition = extend_expression(itOpenBracket + 1, itCloseBracket);
+
+				// find true scope
+				ItToken itOpenTrueBracket = itCloseBracket + 1;
+				if (itOpenTrueBracket == itEnd || itOpenTrueBracket->type != Tokens::CBracket || itOpenTrueBracket->value != "{")
+					throw CompilationError("Missing brackets for if scope.");
+
+				ItToken itCloseTrueBracket = find_token_throw(itOpenTrueBracket + 1, itEnd, Tokens::CBracket, "}");
+				Log("If scope: " + Tokens::make_string_from_tokens(itOpenTrueBracket + 1, itCloseTrueBracket));
+				OperationScopePtr pIfTrueScope = std::make_shared<OperationScope>();
+				extend_scope(itOpenTrueBracket + 1, itCloseTrueBracket, pIfTrueScope);
+
+				ItToken itLastBracket = itCloseTrueBracket;
+				
+				// find else scope
+				OperationScopePtr pElseScope = nullptr;
+				
+				ItToken itPossibleElse = itCloseTrueBracket + 1;
+				if (itPossibleElse != itEnd && itPossibleElse->type == Tokens::Identifier && itPossibleElse->value == KeyWords::IfElse.second)
+				{
+					ItToken itOpenElseBracket = itPossibleElse + 1;
+					if (itOpenElseBracket == itEnd || itOpenElseBracket->type != Tokens::CBracket || itOpenElseBracket->value != "{")
+						throw CompilationError("Missing brackets for else scope.");
+
+					ItToken itCloseElseBracket = find_token_throw(itOpenElseBracket + 1, itEnd, Tokens::CBracket, "}");
+					Log("Else scope: " + Tokens::make_string_from_tokens(itOpenElseBracket + 1, itCloseElseBracket));
+					pElseScope = std::make_shared<OperationScope>();
+					extend_scope(itOpenElseBracket + 1, itCloseElseBracket, pElseScope);
+
+					itLastBracket = itCloseElseBracket;
+				}
+
+				OperationControlFlowPtr pIfElse = std::make_shared<OperationControlFlow>(pExprCondition, pIfTrueScope, pElseScope);
+				pCurrentScope->AddOperation(pIfElse);
+
+				it = itLastBracket + 1;
+			}
+			else if (it->value == KeyWords::Loop)
+			{
+				
+			}
+			else
+			{
+				ItToken itExprEnd = find_token_type_throw(it, itEnd, Tokens::Semicolon);
+				extend_operation(it, itExprEnd, pCurrentScope);
+				it = itExprEnd + 1;
+			}
 			continue;
 		}
 
@@ -105,6 +159,9 @@ OperationAssignPtr Syntaxer::extend_assignment(ItToken itBegin, ItToken itEnd, I
 	if (std::distance(itBegin, itAssign) != 1 || itBegin->type != Tokens::Identifier)
 		throw CompilationError("Cannot assign value to non identifier", itBegin, itEnd);
 
+	if (std::find(KeyWords::KeyWords.cbegin(), KeyWords::KeyWords.cend(), itBegin->value) != KeyWords::KeyWords.cend())
+		throw CompilationError("Unexpected keyword in the left part of assignment", itBegin, itEnd);
+	
 	Log("Left operand: " + itBegin->value);
 	IdentifierExpressionPtr pIdentifier = std::make_shared<IdentifierExpression>(itBegin->value);
 	ItToken itRightOperand = itAssign + 1;
@@ -124,6 +181,9 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd) const
 		Log("Brackets reduced.");
 	
 	const size_t length = std::distance(itBegin, itEnd);
+
+	if (length == 0)
+		throw CompilationError("Unexpected empty expression.");
 	
 	// expression is a single value or an identifier
 	if (length == 1)

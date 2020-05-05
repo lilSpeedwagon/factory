@@ -4,6 +4,7 @@
 #include "Runtime.h"
 #include "sstream"
 
+// OperationScope
 void OperationScope::Execute()
 {
 	for (auto op : m_listOperations)
@@ -35,7 +36,9 @@ void OperationScope::AddOperation(OperationPtr pOperation)
 {
 	m_listOperations.push_back(pOperation);
 }
+// OperationScope end
 
+// OperatorAssign
 void OperationAssign::Execute()
 {
 	
@@ -48,7 +51,26 @@ void OperationAssign::ExtendView(std::stringstream& ss, int nLevel)
 	m_pIdentifier->ExtendView(ss, nLevel + 1);
 	m_pExpression->ExtendView(ss, nLevel + 1);
 }
+// OperatorAssign end
 
+// OperationControlFlow
+void OperationControlFlow::Execute()
+{
+	
+}
+
+void OperationControlFlow::ExtendView(std::stringstream& ss, int nLevel)
+{
+	make_indent(ss, nLevel);
+	ss << "Control flow " << (m_isLoop ? "loop\n" : "\n");
+	m_pCondition->ExtendView(ss, nLevel + 1);
+	m_pScopeIfTrue->ExtendView(ss, nLevel + 1);
+	if (m_pScopeElse != nullptr)
+		m_pScopeElse->ExtendView(ss, nLevel + 1);
+}
+// OperationControlFlow end
+
+// UnaryExpression
 Value UnaryExpression::Calculate()
 {
 	return m_function(m_pOperand->Calculate());
@@ -60,7 +82,9 @@ void UnaryExpression::ExtendView(std::stringstream& ss, int nLevel)
 	ss << "unary\n";
 	m_pOperand->ExtendView(ss, ++nLevel);
 }
+// UnaryExpression end
 
+// BinaryExpression
 Value BinaryExpression::Calculate()
 {
 	return m_function(m_pLeftOperand->Calculate(), m_pRightOperand->Calculate());
@@ -73,7 +97,9 @@ void BinaryExpression::ExtendView(std::stringstream& ss, int nLevel)
 	m_pLeftOperand->ExtendView(ss, nLevel + 1);
 	m_pRightOperand->ExtendView(ss, nLevel + 1);
 }
+// BinaryExpression end
 
+// ValueExpression
 ValueExpression::ValueExpression(std::string strValue)
 {
 	if (DataTypes::isStringLiteral(strValue))
@@ -131,7 +157,9 @@ void ValueExpression::ExtendView(std::stringstream& ss, int nLevel)
 	make_indent(ss, nLevel);
 	ss << "value\n";
 }
+// ValueExpression end
 
+// IdentifierExpression
 Value IdentifierExpression::Calculate()
 {
 	if (m_pScope == nullptr)
@@ -147,3 +175,4 @@ void IdentifierExpression::ExtendView(std::stringstream& ss, int nLevel)
 	make_indent(ss, nLevel);
 	ss << "identifier: " << m_strIdentifier << '\n';
 }
+// IdentifierExpression end

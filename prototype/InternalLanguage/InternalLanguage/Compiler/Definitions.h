@@ -111,6 +111,14 @@ namespace Operators
 	}
 }
 
+namespace KeyWords
+{
+	static const std::pair<std::string, std::string> IfElse = { "if", "else" };
+	static const std::string Loop = "while";
+	constexpr std::array KeyWords = { "if", "else", "for", "print", "true", "false" };
+}
+
+
 typedef std::variant<int, float, std::string, bool> Value;
 
 struct Variable
