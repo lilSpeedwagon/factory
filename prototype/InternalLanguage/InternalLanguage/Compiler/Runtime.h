@@ -5,11 +5,93 @@
 
 namespace Runtime
 {
+	class Value
+	{
+	public:
+		typedef void* _Value;
+		enum ValueType
+		{
+			Undefined = -1,
+			Integer = 0,
+			Float = 1,
+			Boolean = 2,
+			String = 3,
+		};
 
+		Value();
+		Value(Value const&);
+		Value& operator=(Value const& v);
+		Value& operator=(int const& v);
+		Value& operator=(bool const& v);
+		Value& operator=(float const& v);
+		Value& operator=(std::string const& v);
+		Value operator!();
+		Value operator+(Value const& r_val);
+		Value operator-(Value const& r_val);
+		Value operator/(Value const& r_val);
+		Value operator*(Value const& r_val);
+		Value operator%(Value const& r_val);
+		Value operator==(Value const& r_val);
+		Value operator!=(Value const& r_val);
+		Value operator>(Value const& r_val);
+		Value operator<(Value const& r_val);
+		Value operator>=(Value const& r_val);
+		Value operator<=(Value const& r_val);
+		Value operator&&(Value const& r_val);
+		Value operator||(Value const& r_val);
+		
+
+		ValueType getType() const
+		{
+			return m_type;
+		}
+		template<typename T>
+		T getValue() const
+		{
+			return reinterpret_cast<T>(m_value);
+		}
+
+	private:
+		ValueType m_type;
+		_Value m_value;
+	};
+
+	struct Variable
+	{
+		Variable(std::string const& name) : identifier(name) {}
+		std::string identifier;
+		Value value;
+	};
+
+	typedef void(*Procedure)();
+	typedef void(*ProcedureUnary)(Value arg);
+	typedef void(*ProcedureBinary)(Value l_arg, Value r_arg);
+	typedef Value(*Function)();
+	typedef Value(*FunctionUnary)(Value arg);
+	typedef Value(*FunctionBinary)(Value l_arg, Value r_arg);
+
+	const std::map<std::string, FunctionUnary> mapUnaryFunctions = {
+		{ "!", [](Value arg) { return !arg; } }
+	};
+	
+	const std::map<std::string, FunctionBinary> mapBinaryFunctions = {
+		{ "+", [](Value l_arg, Value r_arg) { return l_arg + r_arg; } },
+		{ "-", [](Value l_arg, Value r_arg) { return l_arg - r_arg; } },
+		{ "/", [](Value l_arg, Value r_arg) { return l_arg / r_arg; } },
+		{ "*", [](Value l_arg, Value r_arg) { return l_arg * r_arg; } },
+		{ "%", [](Value l_arg, Value r_arg) { return l_arg % r_arg; } },
+		{ "==", [](Value l_arg, Value r_arg) { return l_arg == r_arg; } },
+		{ "!=", [](Value l_arg, Value r_arg) { return l_arg != r_arg; } },
+		{ ">", [](Value l_arg, Value r_arg) { return l_arg > r_arg; } },
+		{ "<", [](Value l_arg, Value r_arg) { return l_arg < r_arg; } },
+		{ ">=", [](Value l_arg, Value r_arg) { return l_arg >= r_arg; } },
+		{ "<=", [](Value l_arg, Value r_arg) { return l_arg <= r_arg; } },		
+	};
+	
 	class RuntimeException : public Utils::BaseException
 	{
 	public:
-		RuntimeException() {}
+		RuntimeException() = default;
 		RuntimeException(const char* msg)
 		{
 			m_msg.assign(msg);

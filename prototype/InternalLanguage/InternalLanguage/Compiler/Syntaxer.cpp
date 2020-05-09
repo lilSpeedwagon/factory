@@ -216,16 +216,17 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd) const
 		{
 			throw CompilationError("Error in expression: " + make_string_from_tokens(itBegin, itEnd));
 		}
-		Log("Extend arguments of operator: " + itLowestPriority->value);
+		const std::string strOperator = itLowestPriority->value;
+		Log("Extend arguments of operator: " + strOperator);
 
 		// 2. extend its operands
-		bool isUnaryOperation = Operators::isUnaryOperator(itLowestPriority->value);
+		const bool isUnaryOperation = Operators::isUnaryOperator(strOperator);
 		if (isUnaryOperation)
 		{
 			Log("Unary operand: " + Tokens::make_string_from_tokens(itLowestPriority + 1, itEnd));
 			ExpressionPtr pOperand = extend_expression(itLowestPriority + 1, itEnd);
 			
-			UnaryExpression::UnaryFunction func = [](Value v) -> Value { return Value(); };
+			Runtime::FunctionUnary func = [](Runtime::Value v) -> Runtime::Value { return Runtime::Value(); };
 			pExpr = std::make_shared<UnaryExpression>(func, pOperand);
 		}
 		else
@@ -235,7 +236,7 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd) const
 			Log("Right operand: " + Tokens::make_string_from_tokens(itLowestPriority + 1, itEnd));
 			ExpressionPtr pRightOperand = extend_expression(itLowestPriority + 1, itEnd);
 
-			BinaryExpression::BinaryFunction func = [](Value v, Value v2) -> Value { return Value(); };
+			Runtime::FunctionBinary func = get_function_for_binary_operator(strOperator);
 			pExpr = std::make_shared<BinaryExpression>(func, pLeftOperand, pRightOperand);
 		}
 	}
@@ -327,6 +328,26 @@ Syntaxer::ItToken Syntaxer::find_lowest_priority_operator(ItToken itBegin, ItTok
 	while (it != itEnd);
 	
 	return itLowestPriorityOperator;
+}
+
+Runtime::FunctionUnary Syntaxer::get_function_for_unary_operator(std::string const& op)
+{
+	auto it = Runtime::mapUnaryFunctions.find(op);
+	if (it == Runtime::mapUnaryFunctions.cend())
+	{
+		throw CompilationError("Cannot find runtime operation for operator \"" + op + "\"");
+	}
+	return it->second;
+}
+
+Runtime::FunctionBinary Syntaxer::get_function_for_binary_operator(std::string const& op)
+{
+	auto it = Runtime::mapBinaryFunctions.find(op);
+	if (it == Runtime::mapBinaryFunctions.cend())
+	{
+		throw CompilationError("Cannot find runtime operation for operator \"" + op + "\"");
+	}
+	return it->second;
 }
 
 Syntaxer::ItToken Syntaxer::find_if_throw(ItToken itBegin, ItToken itEnd, bool(*predicate)(Tokens::Token& t))

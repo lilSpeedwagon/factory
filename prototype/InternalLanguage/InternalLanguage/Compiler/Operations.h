@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "Definitions.h"
 #include "OperationTreeViewHelper.h"
+#include "Runtime.h"
 
 // predefined classes
 class Expression;
@@ -34,12 +35,12 @@ public:
 	OperationScope() {}
 	virtual ~OperationScope() = default;
 	void Execute() override;
-	Value GetVariableValue(std::string const& varName) const;
+	Runtime::Value GetVariableValue(std::string const& varName);
 	void AddOperation(OperationPtr pOperation);
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 
 protected:
-	std::map<std::string, Value> m_mapVariables;
+	std::map<std::string, Runtime::Value> m_mapVariables;
 	std::list<OperationPtr> m_listOperations;
 };
 DEFINE_PTR(OperationScope)
@@ -71,6 +72,7 @@ public:
 	OperationControlFlow(ExpressionPtr pExpr, OperationScopePtr pScopeIfTrue, OperationScopePtr pScopeElse, bool isLoop = false) :
 		m_pCondition(pExpr), m_pScopeIfTrue(pScopeIfTrue), m_pScopeElse(pScopeElse), m_isLoop(isLoop) {}
 	virtual ~OperationControlFlow() = default;
+	
 	void Execute() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 private:
@@ -85,7 +87,7 @@ class Expression : public TreeHelper
 {
 public:
 	virtual ~Expression() = default;
-	virtual Value Calculate() = 0;
+	virtual Runtime::Value Calculate() = 0;
 
 	void SetScope(OperationScopePtr pScope) { m_pScope = pScope; }
 protected:
@@ -97,16 +99,15 @@ class UnaryExpression : public Expression
 {
 	RESTRICT_COPY(UnaryExpression)
 public:
-	typedef Value(*UnaryFunction)(Value val);
-
-	UnaryExpression(UnaryFunction func, ExpressionPtr operand) :
+	UnaryExpression(Runtime::FunctionUnary func, ExpressionPtr operand) :
 		m_function(func), m_pOperand(operand) {}
 	virtual ~UnaryExpression() = default;
-	Value Calculate() override;
+	
+	Runtime::Value Calculate() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 
 protected:
-	UnaryFunction m_function;
+	Runtime::FunctionUnary m_function;
 	ExpressionPtr m_pOperand;
 };
 
@@ -115,16 +116,15 @@ class BinaryExpression : public Expression
 {
 	RESTRICT_COPY(BinaryExpression)
 public:
-	typedef Value(*BinaryFunction)(Value val1, Value val2);
-
-	BinaryExpression(BinaryFunction func, ExpressionPtr leftOp, ExpressionPtr rightOp) :
+	BinaryExpression(Runtime::FunctionBinary func, ExpressionPtr leftOp, ExpressionPtr rightOp) :
 		m_function(func), m_pLeftOperand(leftOp), m_pRightOperand(rightOp) {}
 	virtual ~BinaryExpression() = default;
-	Value Calculate() override;
+	
+	Runtime::Value Calculate() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 	
 protected:
-	BinaryFunction m_function;
+	Runtime::FunctionBinary m_function;
 	ExpressionPtr m_pLeftOperand;
 	ExpressionPtr m_pRightOperand;
 };
@@ -136,11 +136,12 @@ class ValueExpression : public Expression
 public:
 	ValueExpression(std::string strValue);
 	virtual ~ValueExpression() = default;
-	Value Calculate() override;
+	
+	Runtime::Value Calculate() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 	
 protected:
-	Value m_value;
+	Runtime::Value m_value;
 };
 
 
@@ -151,7 +152,8 @@ public:
 	IdentifierExpression(std::string const& name) :
 		m_strIdentifier(name) {}
 	virtual ~IdentifierExpression() = default;
-	Value Calculate() override;
+	
+	Runtime::Value Calculate() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 	
 protected:

@@ -170,6 +170,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="lexer.cpp" />
     <ClCompile Include="Operations.cpp" />
+    <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

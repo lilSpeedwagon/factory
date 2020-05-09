@@ -89,7 +89,7 @@ namespace Operators
 	constexpr std::pair MoreLess =			{ std::array{ ">=", "<=", ">", "<" },	20 };
 	constexpr std::pair ArithmeticLow =		{ std::array{ "+", "-" },								25 };
 	constexpr std::pair ArithmeticHigh =	{ std::array{ "*", "/", "%" },					30 };
-	constexpr std::pair Not =				{ std::array{ "!" },											35 };
+	constexpr std::pair Not =				{ std::array{ "!", "-" },								35 };
 
 	inline Priority operatorPriority(std::string const& str)
 	{
@@ -104,7 +104,7 @@ namespace Operators
 		return -1;
 	}
 
-	constexpr std::array UnaryOperators = { "!" };
+	constexpr std::array UnaryOperators = { "!", "-" };
 	inline bool isUnaryOperator(std::string const& str)
 	{
 		return std::find(UnaryOperators.begin(), UnaryOperators.end(), str) != UnaryOperators.end();
@@ -119,13 +119,8 @@ namespace KeyWords
 }
 
 
-typedef std::variant<int, float, std::string, bool> Value;
+// typedef std::variant<int, float, std::string, bool> Value;
 
-struct Variable
-{
-	std::string identifier;
-	Value value;
-};
 
 class ValueException : public Utils::BaseException
 {
