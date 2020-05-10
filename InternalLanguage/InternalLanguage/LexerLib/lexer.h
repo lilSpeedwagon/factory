@@ -1,5 +1,5 @@
 #pragma once
-
+#include "pch.h"
 #include "Definitions.h"
 #include "Logger.h"
 
