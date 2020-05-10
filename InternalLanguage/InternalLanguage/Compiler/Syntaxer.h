@@ -29,8 +29,8 @@ private:
 	
 	void extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope);
 	void extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope);
-	OperationAssignPtr extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign) const;
-	ExpressionPtr extend_expression(ItToken itBegin, ItToken itEnd) const;
+	OperationAssignPtr extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign, OperationScopePtr pCurrentScope) const;
+	ExpressionPtr extend_expression(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope) const;
 
 	static bool reduce_brackets(ItToken& itBegin, ItToken& itEnd);
 	static bool is_bracketed_expr(ItToken itBegin, ItToken itEnd);

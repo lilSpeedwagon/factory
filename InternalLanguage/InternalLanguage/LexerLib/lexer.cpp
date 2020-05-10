@@ -1,7 +1,6 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "lexer.h"
 
-#include <algorithm>
 #include <sstream>
 
 const int Lexer::TOKEN_DENSITY = 2;
@@ -45,10 +44,7 @@ void Lexer::tokenize()
 			break;
 
 		++tokenEnd;
-		if (tokenEnd == m_strCode.cend())
-			break;
-
-		CharType currentType = getType(*tokenEnd);
+		CharType currentType = tokenEnd != m_strCode.cend() ? getType(*tokenEnd) : Undefined;
 
 		// add token after its type definition
 		switch (prevType)
@@ -90,7 +86,7 @@ void Lexer::tokenize()
 			break;
 		}
 		default:
-		{
+		{				
 			// add token if another type token found
 			if (currentType != prevType)
 			{

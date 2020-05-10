@@ -1,6 +1,5 @@
 #pragma once
-
-#include "stdafx.h"
+#include "pch.h"
 #include "BaseException.h"
 #include "Utils.h"
 

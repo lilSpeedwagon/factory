@@ -38,6 +38,8 @@ bool Syntaxer::Run()
 	Log(ss.str());
 
 	Log("Done.");
+
+	operation_tree->Execute();
 	return true;
 }
 
@@ -62,7 +64,8 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 
 				ItToken itCloseBracket = find_token_throw(itOpenBracket + 1, itEnd, Tokens::Bracket, ")");
 				Log("Condition: " + Tokens::make_string_from_tokens(itOpenBracket + 1, itCloseBracket));
-				ExpressionPtr pExprCondition = extend_expression(itOpenBracket + 1, itCloseBracket);
+				ExpressionPtr pExprCondition = extend_expression(itOpenBracket + 1, itCloseBracket, pCurrentScope);
+				pExprCondition->SetScope(pCurrentScope);
 
 				// find true scope
 				ItToken itOpenTrueBracket = itCloseBracket + 1;
@@ -73,6 +76,7 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 				Log("If scope: " + Tokens::make_string_from_tokens(itOpenTrueBracket + 1, itCloseTrueBracket));
 				OperationScopePtr pIfTrueScope = std::make_shared<OperationScope>();
 				extend_scope(itOpenTrueBracket + 1, itCloseTrueBracket, pIfTrueScope);
+				pIfTrueScope->SetParentScope(pCurrentScope);
 
 				ItToken itLastBracket = itCloseTrueBracket;
 				
@@ -90,11 +94,13 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 					Log("Else scope: " + Tokens::make_string_from_tokens(itOpenElseBracket + 1, itCloseElseBracket));
 					pElseScope = std::make_shared<OperationScope>();
 					extend_scope(itOpenElseBracket + 1, itCloseElseBracket, pElseScope);
+					pElseScope->SetParentScope(pCurrentScope);
 
 					itLastBracket = itCloseElseBracket;
 				}
 
 				OperationControlFlowPtr pIfElse = std::make_shared<OperationControlFlow>(pExprCondition, pIfTrueScope, pElseScope);
+				pIfElse->SetParentScope(pCurrentScope);
 				pCurrentScope->AddOperation(pIfElse);
 
 				it = itLastBracket + 1;
@@ -121,6 +127,7 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 			ItToken itScopeEnd = find_token(it + 1, itEnd, Tokens::CBracket, "}");
 			OperationScopePtr pInternalScope = std::make_shared<OperationScope>();
 			extend_scope(it + 1, itScopeEnd, pInternalScope);
+			pInternalScope->SetParentScope(pCurrentScope);
 			pCurrentScope->AddOperation(pInternalScope);
 			it = itScopeEnd + 1;
 			continue;
@@ -138,7 +145,7 @@ void Syntaxer::extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePt
 	ItToken itAssign = find_token_type(itBegin, itEnd, Tokens::Assignment);
 	if (itAssign != itEnd)
 	{
-		OperationAssignPtr pAssignOp = extend_assignment(itBegin, itEnd, itAssign);
+		OperationAssignPtr pAssignOp = extend_assignment(itBegin, itEnd, itAssign, pCurrentScope);
 		pCurrentScope->AddOperation(pAssignOp);
 		return;
 	}
@@ -152,7 +159,7 @@ void Syntaxer::extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePt
 
 }
 
-OperationAssignPtr Syntaxer::extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign) const
+OperationAssignPtr Syntaxer::extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign, OperationScopePtr pCurrentScope) const
 {
 	Log("Extending assignment: " + Tokens::make_string_from_tokens(itBegin, itEnd));
 	
@@ -166,13 +173,14 @@ OperationAssignPtr Syntaxer::extend_assignment(ItToken itBegin, ItToken itEnd, I
 	IdentifierExpressionPtr pIdentifier = std::make_shared<IdentifierExpression>(itBegin->value);
 	ItToken itRightOperand = itAssign + 1;
 	Log("Right operand: " + Tokens::make_string_from_tokens(itRightOperand, itEnd));
-	ExpressionPtr pExpr = extend_expression(itRightOperand, itEnd);
+	ExpressionPtr pExpr = extend_expression(itRightOperand, itEnd, pCurrentScope);
+	pExpr->SetScope(pCurrentScope);
 
 	return std::make_shared<OperationAssign>(pIdentifier, pExpr);
 }
 
 
-ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd) const
+ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope) const
 {
 	Log("Extending expression: " + Tokens::make_string_from_tokens(itBegin, itEnd));
 	ExpressionPtr pExpr;
@@ -224,20 +232,26 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd) const
 		if (isUnaryOperation)
 		{
 			Log("Unary operand: " + Tokens::make_string_from_tokens(itLowestPriority + 1, itEnd));
-			ExpressionPtr pOperand = extend_expression(itLowestPriority + 1, itEnd);
+			ExpressionPtr pOperand = extend_expression(itLowestPriority + 1, itEnd, pCurrentScope);
+			pOperand->SetScope(pCurrentScope);
 			
 			Runtime::FunctionUnary func = [](Runtime::Value v) -> Runtime::Value { return Runtime::Value(); };
 			pExpr = std::make_shared<UnaryExpression>(func, pOperand);
+			pExpr->SetScope(pCurrentScope);
 		}
 		else
 		{
 			Log("Left operand: " + Tokens::make_string_from_tokens(itBegin, itLowestPriority));
-			ExpressionPtr pLeftOperand = extend_expression(itBegin, itLowestPriority);
+			ExpressionPtr pLeftOperand = extend_expression(itBegin, itLowestPriority, pCurrentScope);
+			pLeftOperand->SetScope(pCurrentScope);
+			
 			Log("Right operand: " + Tokens::make_string_from_tokens(itLowestPriority + 1, itEnd));
-			ExpressionPtr pRightOperand = extend_expression(itLowestPriority + 1, itEnd);
+			ExpressionPtr pRightOperand = extend_expression(itLowestPriority + 1, itEnd, pCurrentScope);
+			pRightOperand->SetScope(pCurrentScope);
 
 			Runtime::FunctionBinary func = get_function_for_binary_operator(strOperator);
 			pExpr = std::make_shared<BinaryExpression>(func, pLeftOperand, pRightOperand);
+			pExpr->SetScope(pCurrentScope);
 		}
 	}
 	

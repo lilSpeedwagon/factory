@@ -17,6 +17,8 @@ DEFINE_PTR(ValueExpression)
 class IdentifierExpression;
 DEFINE_PTR(IdentifierExpression)
 
+class OperationScope;
+DEFINE_PTR(OperationScope)
 
 // classes declaration
 class Operation : public TreeHelper
@@ -24,6 +26,10 @@ class Operation : public TreeHelper
 public:
 	virtual ~Operation() = default;
 	virtual void Execute() = 0;
+	void SetParentScope(OperationScopePtr pScope) { m_pParentScope = pScope; }
+	
+protected:
+	OperationScopePtr m_pParentScope = nullptr;
 };
 DEFINE_PTR(Operation)
 
@@ -34,16 +40,18 @@ class OperationScope : public Operation
 public:
 	OperationScope() {}
 	virtual ~OperationScope() = default;
+	
 	void Execute() override;
 	Runtime::Value GetVariableValue(std::string const& varName);
+	void SetVariableValue(std::string const& varName, Runtime::Value const& val);
 	void AddOperation(OperationPtr pOperation);
 	void ExtendView(std::stringstream& ss, int nLevel) override;
-
+	bool IsRoot() const { return m_pParentScope == nullptr; }
+	
 protected:
 	std::map<std::string, Runtime::Value> m_mapVariables;
 	std::list<OperationPtr> m_listOperations;
 };
-DEFINE_PTR(OperationScope)
 
 
 class OperationAssign : public Operation
@@ -56,6 +64,7 @@ public:
 	
 	void Execute() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
+	
 private:
 	IdentifierExpressionPtr m_pIdentifier;
 	ExpressionPtr m_pExpression;
@@ -155,6 +164,7 @@ public:
 	
 	Runtime::Value Calculate() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
+	std::string GetName() const { return m_strIdentifier; }
 	
 protected:
 	std::string m_strIdentifier;

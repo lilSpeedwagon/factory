@@ -51,10 +51,25 @@ namespace Runtime
 		{
 			return m_type;
 		}
+		
 		template<typename T>
 		T getValue() const
 		{
 			return reinterpret_cast<T>(m_value);
+		}
+		template<>
+		float getValue<float>() const
+		{
+			// DANGER ZONE
+			static_assert(sizeof(_Value) == sizeof(float));
+			float fValue;
+			memcpy_s(static_cast<void*>(&fValue), sizeof(float), &m_value, sizeof(_Value));
+			return fValue;
+		}
+		template<>
+		bool getValue<bool>() const
+		{
+			return m_value != NULL;
 		}
 
 	private:

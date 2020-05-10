@@ -28,6 +28,11 @@ Runtime::Value OperationScope::GetVariableValue(std::string const& varName)
 	return it->second;
 }
 
+void OperationScope::SetVariableValue(std::string const& varName, Runtime::Value const& val)
+{
+	m_mapVariables[varName] = val;
+}
+
 void OperationScope::ExtendView(std::stringstream& ss, int nLevel)
 {
 	make_indent(ss, nLevel);
@@ -45,7 +50,7 @@ void OperationScope::AddOperation(OperationPtr pOperation)
 // OperatorAssign
 void OperationAssign::Execute()
 {
-	
+	m_pParentScope->SetVariableValue(m_pIdentifier->GetName(), m_pExpression->Calculate());
 }
 
 void OperationAssign::ExtendView(std::stringstream& ss, int nLevel)
