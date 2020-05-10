@@ -1,14 +1,19 @@
 #pragma once
 
-#include "stdafx.h"
-#include "Utils.h"
+#include "pch.h"
+#include "BaseException.h"
 
 namespace Runtime
 {
 	class Value
 	{
 	public:
+		/* Sizes of void*, int and float depend of the OS but the are always equal between each other.
+		 * Let's assume bool as int and store 0 for false and 1 for true.
+		 * We can also store char* in void*.
+		 * So this way void* is appropriate for storing different data types. */
 		typedef void* _Value;
+		
 		enum ValueType
 		{
 			Undefined = -1,
@@ -20,6 +25,7 @@ namespace Runtime
 
 		Value();
 		Value(Value const&);
+		~Value();
 		Value& operator=(Value const& v);
 		Value& operator=(int const& v);
 		Value& operator=(bool const& v);
@@ -88,7 +94,7 @@ namespace Runtime
 		{ "<=", [](Value l_arg, Value r_arg) { return l_arg <= r_arg; } },		
 	};
 	
-	class RuntimeException : public Utils::BaseException
+	class RuntimeException : public BaseException
 	{
 	public:
 		RuntimeException() = default;

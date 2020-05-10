@@ -1,8 +1,8 @@
 #pragma once
 
 #include "stdafx.h"
+#include "BaseException.h"
 #include "Utils.h"
-
 
 typedef void(__stdcall *LogDelegate)(const char*);
 
@@ -116,13 +116,26 @@ namespace KeyWords
 	static const std::pair<std::string, std::string> IfElse = { "if", "else" };
 	static const std::string Loop = "while";
 	constexpr std::array KeyWords = { "if", "else", "for", "print", "true", "false" };
+
+	const static std::string BoolLiteralTrue = "true";
+	const static std::string BoolLiteralFalse = "false";
+
+	inline bool isStringLiteral(std::string const& str)
+	{
+		return Utils::isQuotedString(str);
+	}
+
+	inline bool isBoolLiteral(std::string const& str)
+	{
+		return str == BoolLiteralTrue || str == BoolLiteralFalse;
+	}
 }
 
 
 // typedef std::variant<int, float, std::string, bool> Value;
 
 
-class ValueException : public Utils::BaseException
+class ValueException : public BaseException
 {
 public:
 	ValueException() {}

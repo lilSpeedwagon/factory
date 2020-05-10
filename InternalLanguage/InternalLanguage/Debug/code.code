@@ -1,0 +1,13 @@
+// program example
+a = 5;
+b = 10 + b * c;
+s = "string" - 1;
+v = true == false;
+// scope
+{
+	p = a + b + c + d + e;
+	q = true != !true;
+}
+if (true) { a = 10; }
+a = 10;
+a = -100;

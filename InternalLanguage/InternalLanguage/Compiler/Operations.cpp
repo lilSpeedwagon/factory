@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Operations.h"
-#include "DataTypes.h"
 #include "Runtime.h"
 #include "sstream"
 
@@ -107,19 +106,19 @@ void BinaryExpression::ExtendView(std::stringstream& ss, int nLevel)
 // ValueExpression
 ValueExpression::ValueExpression(std::string strValue)
 {
-	if (DataTypes::isStringLiteral(strValue))
+	if (KeyWords::isStringLiteral(strValue))
 	{
 		m_value = strValue;
 		return;
 	}
 
-	if (strValue == DataTypes::BoolLiteralTrue)
+	if (strValue == KeyWords::BoolLiteralTrue)
 	{
 		m_value = true;
 		return;
 	}
 
-	if (strValue == DataTypes::BoolLiteralFalse)
+	if (strValue == KeyWords::BoolLiteralFalse)
 	{
 		m_value = false;
 		return;

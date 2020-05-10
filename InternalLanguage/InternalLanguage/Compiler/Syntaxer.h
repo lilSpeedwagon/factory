@@ -4,6 +4,7 @@
 #include "Definitions.h"
 #include "Logger.h"
 #include "Operations.h"
+#include "BaseException.h"
 
 class Syntaxer : public Logger
 {
@@ -48,7 +49,7 @@ private:
 };
 
 
-class CompilationError : public Utils::BaseException
+class CompilationError : public BaseException
 {
 public:
 	CompilationError() {}
