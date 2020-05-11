@@ -72,7 +72,8 @@ void Lexer::tokenize()
 			{
 				++tokenEnd;
 				addToken(tokenBegin, tokenEnd, Tokens::Quote);
-				currentType = getType(*tokenEnd);
+				if (tokenEnd != m_strCode.end())
+					currentType = getType(*tokenEnd);
 			}
 			else
 			{
