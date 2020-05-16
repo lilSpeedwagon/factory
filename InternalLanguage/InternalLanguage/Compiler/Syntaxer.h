@@ -36,8 +36,8 @@ private:
 	static bool is_bracketed_expr(ItToken itBegin, ItToken itEnd);
 	static ItToken find_lowest_priority_operator(ItToken itBegin, ItToken itEnd);
 
-	static Runtime::FunctionUnary get_function_for_unary_operator(std::string const& op);
-	static Runtime::FunctionBinary get_function_for_binary_operator(std::string const& op);
+	static runtime::FunctionUnary get_function_for_unary_operator(std::string const& op);
+	static runtime::FunctionBinary get_function_for_binary_operator(std::string const& op);
 	
 	static ItToken find_if_throw(ItToken itBegin, ItToken itEnd, bool(*predicate)(Tokens::Token& t));
 	static ItToken find_token_type(ItToken itBegin, ItToken itEnd, Tokens::TokenType t);

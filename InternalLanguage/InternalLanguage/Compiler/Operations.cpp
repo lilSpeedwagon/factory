@@ -12,12 +12,12 @@ void OperationScope::Execute()
 	}
 }
 
-Runtime::Value OperationScope::GetVariableValue(std::string const& varName)
+runtime::Value OperationScope::GetVariableValue(std::string const& varName)
 {
 	auto it = m_mapVariables.find(varName);
 	if (it == m_mapVariables.end())
 	{
-		Runtime::Value val;
+		runtime::Value val;
 		const auto insertResult =  m_mapVariables.insert({ varName, val });
 		if (insertResult.second)
 		{
@@ -28,7 +28,7 @@ Runtime::Value OperationScope::GetVariableValue(std::string const& varName)
 	return it->second;
 }
 
-void OperationScope::SetVariableValue(std::string const& varName, Runtime::Value const& val)
+void OperationScope::SetVariableValue(std::string const& varName, runtime::Value const& val)
 {
 	m_mapVariables[varName] = val;
 }
@@ -80,7 +80,7 @@ void OperationControlFlow::ExtendView(std::stringstream& ss, int nLevel)
 // OperationControlFlow end
 
 // UnaryExpression
-Runtime::Value UnaryExpression::Calculate()
+runtime::Value UnaryExpression::Calculate()
 {
 	return m_function(m_pOperand->Calculate());
 }
@@ -94,7 +94,7 @@ void UnaryExpression::ExtendView(std::stringstream& ss, int nLevel)
 // UnaryExpression end
 
 // BinaryExpression
-Runtime::Value BinaryExpression::Calculate()
+runtime::Value BinaryExpression::Calculate()
 {
 	return m_function(m_pLeftOperand->Calculate(), m_pRightOperand->Calculate());
 }
@@ -156,7 +156,7 @@ ValueExpression::ValueExpression(std::string strValue)
 	}
 }
 
-Runtime::Value ValueExpression::Calculate()
+runtime::Value ValueExpression::Calculate()
 {
 	return m_value;
 }
@@ -169,11 +169,11 @@ void ValueExpression::ExtendView(std::stringstream& ss, int nLevel)
 // ValueExpression end
 
 // IdentifierExpression
-Runtime::Value IdentifierExpression::Calculate()
+runtime::Value IdentifierExpression::Calculate()
 {
 	if (m_pScope == nullptr)
 	{
-		throw Runtime::RuntimeException("no scope found");
+		throw runtime::RuntimeException("no scope found");
 	}
 
 	return m_pScope->GetVariableValue(m_strIdentifier);

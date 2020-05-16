@@ -42,14 +42,14 @@ public:
 	virtual ~OperationScope() = default;
 	
 	void Execute() override;
-	Runtime::Value GetVariableValue(std::string const& varName);
-	void SetVariableValue(std::string const& varName, Runtime::Value const& val);
+	runtime::Value GetVariableValue(std::string const& varName);
+	void SetVariableValue(std::string const& varName, runtime::Value const& val);
 	void AddOperation(OperationPtr pOperation);
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 	bool IsRoot() const { return m_pParentScope == nullptr; }
 	
 protected:
-	std::map<std::string, Runtime::Value> m_mapVariables;
+	std::map<std::string, runtime::Value> m_mapVariables;
 	std::list<OperationPtr> m_listOperations;
 };
 
@@ -96,7 +96,7 @@ class Expression : public TreeHelper
 {
 public:
 	virtual ~Expression() = default;
-	virtual Runtime::Value Calculate() = 0;
+	virtual runtime::Value Calculate() = 0;
 
 	void SetScope(OperationScopePtr pScope) { m_pScope = pScope; }
 protected:
@@ -108,15 +108,15 @@ class UnaryExpression : public Expression
 {
 	RESTRICT_COPY(UnaryExpression)
 public:
-	UnaryExpression(Runtime::FunctionUnary func, ExpressionPtr operand) :
+	UnaryExpression(runtime::FunctionUnary func, ExpressionPtr operand) :
 		m_function(func), m_pOperand(operand) {}
 	virtual ~UnaryExpression() = default;
 	
-	Runtime::Value Calculate() override;
+	runtime::Value Calculate() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 
 protected:
-	Runtime::FunctionUnary m_function;
+	runtime::FunctionUnary m_function;
 	ExpressionPtr m_pOperand;
 };
 
@@ -125,15 +125,15 @@ class BinaryExpression : public Expression
 {
 	RESTRICT_COPY(BinaryExpression)
 public:
-	BinaryExpression(Runtime::FunctionBinary func, ExpressionPtr leftOp, ExpressionPtr rightOp) :
+	BinaryExpression(runtime::FunctionBinary func, ExpressionPtr leftOp, ExpressionPtr rightOp) :
 		m_function(func), m_pLeftOperand(leftOp), m_pRightOperand(rightOp) {}
 	virtual ~BinaryExpression() = default;
 	
-	Runtime::Value Calculate() override;
+	runtime::Value Calculate() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 	
 protected:
-	Runtime::FunctionBinary m_function;
+	runtime::FunctionBinary m_function;
 	ExpressionPtr m_pLeftOperand;
 	ExpressionPtr m_pRightOperand;
 };
@@ -146,11 +146,11 @@ public:
 	ValueExpression(std::string strValue);
 	virtual ~ValueExpression() = default;
 	
-	Runtime::Value Calculate() override;
+	runtime::Value Calculate() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 	
 protected:
-	Runtime::Value m_value;
+	runtime::Value m_value;
 };
 
 
@@ -162,7 +162,7 @@ public:
 		m_strIdentifier(name) {}
 	virtual ~IdentifierExpression() = default;
 	
-	Runtime::Value Calculate() override;
+	runtime::Value Calculate() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 	std::string GetName() const { return m_strIdentifier; }
 	

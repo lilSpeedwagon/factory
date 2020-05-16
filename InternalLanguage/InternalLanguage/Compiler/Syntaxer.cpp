@@ -235,7 +235,7 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 			ExpressionPtr pOperand = extend_expression(itLowestPriority + 1, itEnd, pCurrentScope);
 			pOperand->SetScope(pCurrentScope);
 			
-			Runtime::FunctionUnary func = [](Runtime::Value v) -> Runtime::Value { return Runtime::Value(); };
+			runtime::FunctionUnary func = get_function_for_unary_operator(strOperator);
 			pExpr = std::make_shared<UnaryExpression>(func, pOperand);
 			pExpr->SetScope(pCurrentScope);
 		}
@@ -249,7 +249,7 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 			ExpressionPtr pRightOperand = extend_expression(itLowestPriority + 1, itEnd, pCurrentScope);
 			pRightOperand->SetScope(pCurrentScope);
 
-			Runtime::FunctionBinary func = get_function_for_binary_operator(strOperator);
+			runtime::FunctionBinary func = get_function_for_binary_operator(strOperator);
 			pExpr = std::make_shared<BinaryExpression>(func, pLeftOperand, pRightOperand);
 			pExpr->SetScope(pCurrentScope);
 		}
@@ -344,20 +344,20 @@ Syntaxer::ItToken Syntaxer::find_lowest_priority_operator(ItToken itBegin, ItTok
 	return itLowestPriorityOperator;
 }
 
-Runtime::FunctionUnary Syntaxer::get_function_for_unary_operator(std::string const& op)
+runtime::FunctionUnary Syntaxer::get_function_for_unary_operator(std::string const& op)
 {
-	auto it = Runtime::mapUnaryFunctions.find(op);
-	if (it == Runtime::mapUnaryFunctions.cend())
+	auto it = runtime::mapUnaryFunctions.find(op);
+	if (it == runtime::mapUnaryFunctions.cend())
 	{
 		throw CompilationError("Cannot find runtime operation for operator \"" + op + "\"");
 	}
 	return it->second;
 }
 
-Runtime::FunctionBinary Syntaxer::get_function_for_binary_operator(std::string const& op)
+runtime::FunctionBinary Syntaxer::get_function_for_binary_operator(std::string const& op)
 {
-	auto it = Runtime::mapBinaryFunctions.find(op);
-	if (it == Runtime::mapBinaryFunctions.cend())
+	auto it = runtime::mapBinaryFunctions.find(op);
+	if (it == runtime::mapBinaryFunctions.cend())
 	{
 		throw CompilationError("Cannot find runtime operation for operator \"" + op + "\"");
 	}
