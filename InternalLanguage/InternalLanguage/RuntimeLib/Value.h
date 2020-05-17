@@ -1,9 +1,27 @@
 #pragma once
 #include "BaseException.h"
+#include "sstream"
 
 namespace runtime
 {
-	class UndefinedValueException : public BaseException {};
+	class UndefinedValueException : public BaseException
+	{
+	public:
+		virtual ~UndefinedValueException() = default;
+	};
+	class InvalidOperationException : public BaseException
+	{
+	public:
+		virtual ~InvalidOperationException() = default;
+		InvalidOperationException(std::string const& strOperation, std::string const& strLType, std::string const& strRType = "")
+		{
+			std::stringstream ss;
+			ss << "Invalid operation \"" << strOperation << "\" with type \"" << strLType << "\"";
+			if (!strRType.empty())
+				ss << " and \"" << strRType << "\"";
+			m_msg = ss.str();
+		}
+	};
 	
 	class Value
 	{

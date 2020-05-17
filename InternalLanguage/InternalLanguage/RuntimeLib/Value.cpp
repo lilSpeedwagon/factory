@@ -188,38 +188,148 @@ runtime::Value runtime::Value::operator+(Value const& r_val) const
 
 runtime::Value runtime::Value::operator-(Value const& r_val) const
 {
-	// TODO
-	return *this;
-}
+	Value val;
 
-runtime::Value runtime::Value::operator/(Value const& r_val) const
-{
-	// TODO
-	return *this;
+	const ValueType resultType = getHighestPriorityType(m_type, r_val.m_type);
+	switch (resultType)
+	{
+	case Boolean:	// cast true to 1 and false to 0
+	case Integer:
+		val = toInt().getValue<int>() - r_val.toInt().getValue<int>();
+		break;
+	case Float:
+		val = toFloat().getValue<float>() - r_val.toFloat().getValue<float>();
+		break;
+	case String:
+		throw InvalidOperationException("-", TYPENAME(String));
+	default:
+		throw UndefinedValueException();
+	}
+
+	return val;
 }
 
 runtime::Value runtime::Value::operator*(Value const& r_val) const
 {
-	// TODO
-	return *this;
+	Value val;
+
+	const ValueType resultType = getHighestPriorityType(m_type, r_val.m_type);
+	switch (resultType)
+	{
+	case Integer:
+		val = toInt().getValue<int>() * r_val.toInt().getValue<int>();
+		break;
+	case Float:
+		val = toFloat().getValue<float>() * r_val.toFloat().getValue<float>();
+		break;
+	case Boolean:
+		val = toBool().getValue<bool>() && r_val.toBool().getValue<bool>();
+		break;
+	case String:
+	{
+		if (m_type == Integer || r_val.m_type == Integer)
+		{
+			std::string str;
+			if (m_type == Integer)
+			{
+				const std::string r_strVal = r_val.getValue<std::string>();
+				for (int i = 0; i < getValue<int>(); i++)
+					str += r_strVal;
+			}
+			else
+			{
+				const std::string l_strVal = getValue<std::string>();
+				for (int i = 0; i < getValue<int>(); i++)
+					str += l_strVal;
+			}
+			val = str;
+		}
+		else
+		{
+			throw InvalidOperationException("*", TYPENAME(String));
+		}
+		break;
+	}
+	default:
+		throw UndefinedValueException();
+	}
+
+	return val;
+}
+
+runtime::Value runtime::Value::operator/(Value const& r_val) const
+{
+	Value val;
+
+	const ValueType resultType = getHighestPriorityType(m_type, r_val.m_type);
+	switch (resultType)
+	{
+	case Integer:
+	case Boolean:
+	case Float:
+		val = toFloat().getValue<float>() / r_val.toFloat().getValue<float>();
+		break;
+	case String:
+		throw InvalidOperationException("*", TYPENAME(String));
+	default:
+		throw UndefinedValueException();
+	}
+
+	return val;
 }
 
 runtime::Value runtime::Value::operator%(Value const& r_val) const
 {
-	// TODO
-	return *this;
+	Value val;
+
+	const ValueType resultType = getHighestPriorityType(m_type, r_val.m_type);
+	switch (resultType)
+	{
+	case Integer:
+		val = toInt().getValue<int>() % r_val.toInt().getValue<int>();
+		break;
+	case Float:
+		throw InvalidOperationException("%", TYPENAME(Float));
+	case Boolean:
+		throw InvalidOperationException("%", TYPENAME(Boolean));
+	case String:
+		throw InvalidOperationException("%", TYPENAME(String));
+	default:
+		throw UndefinedValueException();
+	}
+
+	return val;
 }
 
 runtime::Value runtime::Value::operator==(Value const& r_val) const
 {
-	// TODO
-	return *this;
+	bool isEqual = false;
+
+	const ValueType resultType = getHighestPriorityType(m_type, r_val.m_type);
+	switch (resultType)
+	{
+	case Integer:
+		isEqual = toInt().getValue<int>() == r_val.toInt().getValue<int>();
+		break;
+	case Float:
+		isEqual = toFloat().getValue<float>() == r_val.toFloat().getValue<float>();
+		break;
+	case Boolean:
+		isEqual = toBool().getValue<bool>() == r_val.toBool().getValue<bool>();
+		break;
+	case String:
+		isEqual = toString().getValue<std::string>() == r_val.toString().getValue<std::string>();
+		break;
+	default:
+		throw UndefinedValueException();
+	}
+
+	return isEqual;
 }
 
 runtime::Value runtime::Value::operator!=(Value const& r_val) const
 {
-	// TODO
-	return *this;
+	return !operator==(r_val);
 }
 
 runtime::Value runtime::Value::operator>(Value const& r_val) const

@@ -32,7 +32,6 @@ namespace Tokens
 		Delimiter
 	};
 
-#define TYPENAME(t) (#t)
 #define IF_TYPE(type_name, t) { if ((type_name) == (t)) { return TYPENAME(type_name); }}
 	
 	inline std::string GetTypeName(TokenType t)
