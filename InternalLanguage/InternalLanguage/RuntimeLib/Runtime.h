@@ -34,7 +34,8 @@ namespace runtime
 	typedef Value(*FunctionBinary)(Value const& l_arg, Value const& r_arg);
 
 	const std::map<std::string, FunctionUnary> mapUnaryFunctions = {
-		{ "!", [](Value const& arg) { return !arg; } }
+		{ "!", [](Value const& arg) { return !arg; } },
+		{ "-", [](Value const& arg) { return Value() - arg; } } //TODO
 	};
 	
 	const std::map<std::string, FunctionBinary> mapBinaryFunctions = {

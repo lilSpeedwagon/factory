@@ -228,7 +228,8 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 		Log("Extend arguments of operator: " + strOperator);
 
 		// 2. extend its operands
-		const bool isUnaryOperation = Operators::isUnaryOperator(strOperator);
+		const bool hasLeftOperand = std::distance(itBegin, itLowestPriority) > 0;
+		const bool isUnaryOperation = Operators::isUnaryOperator(strOperator) && !hasLeftOperand;
 		if (isUnaryOperation)
 		{
 			Log("Unary operand: " + Tokens::make_string_from_tokens(itLowestPriority + 1, itEnd));
@@ -349,7 +350,7 @@ runtime::FunctionUnary Syntaxer::get_function_for_unary_operator(std::string con
 	auto it = runtime::mapUnaryFunctions.find(op);
 	if (it == runtime::mapUnaryFunctions.cend())
 	{
-		throw CompilationError("Cannot find runtime operation for operator \"" + op + "\"");
+		throw CompilationError("Cannot find runtime operation for unary operator \"" + op + "\"");
 	}
 	return it->second;
 }
@@ -359,7 +360,7 @@ runtime::FunctionBinary Syntaxer::get_function_for_binary_operator(std::string c
 	auto it = runtime::mapBinaryFunctions.find(op);
 	if (it == runtime::mapBinaryFunctions.cend())
 	{
-		throw CompilationError("Cannot find runtime operation for operator \"" + op + "\"");
+		throw CompilationError("Cannot find runtime operation for binary operator \"" + op + "\"");
 	}
 	return it->second;
 }

@@ -130,20 +130,3 @@ namespace KeyWords
 }
 
 
-// typedef std::variant<int, float, std::string, bool> Value;
-
-
-class ValueException : public BaseException
-{
-public:
-	ValueException() {}
-	ValueException(const char* msg)
-	{
-		m_msg.assign(msg);
-	}
-	ValueException(std::string const& str)
-	{
-		m_msg = str;
-	}
-	virtual ~ValueException() = default;
-};

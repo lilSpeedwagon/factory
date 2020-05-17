@@ -139,7 +139,6 @@ ValueExpression::ValueExpression(std::string strValue)
 	{
 		std::stringstream ss;
 		ss << "Out of range exception \"" << e.what() << " in token " << strValue;
-		throw ValueException(ss.str().c_str());
 	}
 
 	try
@@ -152,8 +151,9 @@ ValueExpression::ValueExpression(std::string strValue)
 	{
 		std::stringstream ss;
 		ss << "Out of range exception \"" << e.what() << "\" in token " << strValue;
-		throw ValueException(ss.str().c_str());
 	}
+
+	m_value = 0;
 }
 
 runtime::Value ValueExpression::Calculate()
@@ -164,7 +164,7 @@ runtime::Value ValueExpression::Calculate()
 void ValueExpression::ExtendView(std::stringstream& ss, int nLevel)
 {
 	make_indent(ss, nLevel);
-	ss << "value\n";
+	ss << m_value.toString().getValue<std::string>();
 }
 // ValueExpression end
 
