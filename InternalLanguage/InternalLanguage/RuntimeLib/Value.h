@@ -22,6 +22,12 @@ namespace runtime
 			m_msg = ss.str();
 		}
 	};
+	class DivisionByZeroException : public BaseException
+	{
+	public:
+		DivisionByZeroException() { m_msg = "Division by zero"; }
+		virtual ~DivisionByZeroException() = default;
+	};
 	
 	class Value
 	{

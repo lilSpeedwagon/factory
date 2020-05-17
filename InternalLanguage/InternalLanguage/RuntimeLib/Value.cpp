@@ -239,7 +239,7 @@ runtime::Value runtime::Value::operator*(Value const& r_val) const
 			else
 			{
 				const std::string l_strVal = getValue<std::string>();
-				for (int i = 0; i < getValue<int>(); i++)
+				for (int i = 0; i < r_val.getValue<int>(); i++)
 					str += l_strVal;
 			}
 			val = str;
@@ -267,8 +267,13 @@ runtime::Value runtime::Value::operator/(Value const& r_val) const
 	case Integer:
 	case Boolean:
 	case Float:
-		val = toFloat().getValue<float>() / r_val.toFloat().getValue<float>();
+	{
+		const float r_floatValue = r_val.toFloat().getValue<float>();
+		if (r_floatValue == 0.0f)
+			throw DivisionByZeroException();
+		val = toFloat().getValue<float>() / r_floatValue;
 		break;
+	}
 	case String:
 		throw InvalidOperationException("*", TYPENAME(String));
 	default:
@@ -303,7 +308,7 @@ runtime::Value runtime::Value::operator%(Value const& r_val) const
 
 runtime::Value runtime::Value::operator==(Value const& r_val) const
 {
-	bool isEqual = false;
+	bool isEqual;
 
 	const ValueType resultType = getHighestPriorityType(m_type, r_val.m_type);
 	switch (resultType)
