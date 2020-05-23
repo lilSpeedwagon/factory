@@ -28,6 +28,7 @@ private:
 		Undefined,
 		Operator,
 		AlNum, // number or letter
+		Comma,
 		Bracket,
 		QBracket,
 		CBracket,

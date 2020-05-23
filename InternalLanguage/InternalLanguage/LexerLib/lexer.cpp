@@ -64,6 +64,10 @@ void Lexer::tokenize()
 			addToken(tokenBegin, tokenEnd, Tokens::CBracket);
 			break;
 		}
+		case Comma:
+		{
+			addToken(tokenBegin, tokenEnd, Tokens::Comma);
+		}
 		case Quote:
 		{
 			// looking for next quote
@@ -196,6 +200,9 @@ Lexer::CharType Lexer::getType(char c)
 
 	if (Tokens::Operators.find(c) != std::string::npos)
 		return Operator;
+
+	if (Tokens::Commas.find(c) != std::string::npos)
+		return Comma;
 
 	if (Tokens::Brackets.find(c) != std::string::npos)
 		return Bracket;

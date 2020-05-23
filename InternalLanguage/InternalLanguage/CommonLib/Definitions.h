@@ -10,6 +10,7 @@ namespace Tokens
 	static const std::string Delimiters = " \r\n\t";
 	static const std::string AdditionToIdentifiers = "_.";
 	static const std::string Operators = "+-/*%><=!";
+	static const std::string Commas = ",";
 	static const std::string Brackets = "()";
 	static const std::string QBrackets = "[]";
 	static const std::string CBrackets = "{}";
@@ -23,6 +24,7 @@ namespace Tokens
 		Identifier,
 		Number,
 		Assignment,
+		Comma,
 		Bracket,
 		QBracket,
 		CBracket,
@@ -40,6 +42,7 @@ namespace Tokens
 		IF_TYPE(Identifier, t)
 		IF_TYPE(Number, t)
 		IF_TYPE(Assignment, t)
+		IF_TYPE(Comma, t)
 		IF_TYPE(Bracket, t)
 		IF_TYPE(QBracket, t)
 		IF_TYPE(CBracket, t)
@@ -55,6 +58,7 @@ namespace Tokens
 		std::string value;
 		TokenType type;
 	};
+	inline bool operator==(Token const& l_val, Token const& r_val) { return l_val.type == r_val.type && l_val.value == r_val.value; }
 	typedef std::vector<Token> TokenList;
 
 	inline std::string make_string_from_tokens(TokenList::const_iterator from, TokenList::const_iterator to)

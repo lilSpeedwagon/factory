@@ -19,10 +19,11 @@ public:
 	~Syntaxer() = default;
 
 	bool Run();
+	OperationScopePtr GetResult() const { return m_result; }
 	
 private:
 	typedef Tokens::TokenList::iterator ItToken;
-
+	OperationScopePtr m_result;
 	
 	
 	void prepare_tokens();
@@ -31,6 +32,7 @@ private:
 	void extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope);
 	OperationAssignPtr extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign, OperationScopePtr pCurrentScope) const;
 	ExpressionPtr extend_expression(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope) const;
+	ExpressionPtr extend_function(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope) const;
 
 	static bool reduce_brackets(ItToken& itBegin, ItToken& itEnd);
 	static bool is_bracketed_expr(ItToken itBegin, ItToken itEnd);
@@ -38,12 +40,17 @@ private:
 
 	static runtime::FunctionUnary get_function_for_unary_operator(std::string const& op);
 	static runtime::FunctionBinary get_function_for_binary_operator(std::string const& op);
+
+	static runtime::FunctionUnary get_unary_function(std::string const& f);
+	static runtime::FunctionBinary get_binary_function(std::string const& f);
 	
 	static ItToken find_if_throw(ItToken itBegin, ItToken itEnd, bool(*predicate)(Tokens::Token& t));
 	static ItToken find_token_type(ItToken itBegin, ItToken itEnd, Tokens::TokenType t);
 	static ItToken find_token_type_throw(ItToken itBegin, ItToken itEnd, Tokens::TokenType t);
 	static ItToken find_token(ItToken itBegin, ItToken itEnd, Tokens::TokenType t, std::string const& value);
 	static ItToken find_token_throw(ItToken itBegin, ItToken itEnd, Tokens::TokenType t, std::string const& value);
+
+	static ItToken find_close_bracket(ItToken itLeftBracket, ItToken itEnd);
 	
 	std::shared_ptr<Tokens::TokenList> m_pTokens;
 };

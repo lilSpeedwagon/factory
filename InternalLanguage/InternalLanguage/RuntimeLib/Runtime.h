@@ -1,5 +1,4 @@
 #pragma once
-
 #include "pch.h"
 #include "BaseException.h"
 #include "Value.h"
@@ -26,19 +25,15 @@ namespace runtime
 		Value value;
 	};
 
-	typedef void(*Procedure)();
-	typedef void(*ProcedureUnary)(Value const& arg);
-	typedef void(*ProcedureBinary)(Value const& l_arg, Value const& r_arg);
-	typedef Value(*Function)();
 	typedef Value(*FunctionUnary)(Value const& arg);
 	typedef Value(*FunctionBinary)(Value const& l_arg, Value const& r_arg);
 
-	const std::map<std::string, FunctionUnary> mapUnaryFunctions = {
+	const std::map<std::string, FunctionUnary> mapUnaryOperators = {
 		{ "!", [](Value const& arg) { return !arg; } },
 		{ "-", [](Value const& arg) { return Value() - arg; } } //TODO
 	};
 	
-	const std::map<std::string, FunctionBinary> mapBinaryFunctions = {
+	const std::map<std::string, FunctionBinary> mapBinaryOperators = {
 		{ "+", [](Value const& l_arg, Value const& r_arg) { return l_arg + r_arg; } },
 		{ "-", [](Value const& l_arg, Value const& r_arg) { return l_arg - r_arg; } },
 		{ "/", [](Value const& l_arg, Value const& r_arg) { return l_arg / r_arg; } },
@@ -51,6 +46,15 @@ namespace runtime
 		{ ">=", [](Value const& l_arg, Value const& r_arg) { return l_arg >= r_arg; } },
 		{ "<=", [](Value const& l_arg, Value const& r_arg) { return l_arg <= r_arg; } },
 	};
+
+	Value func_print(Value const& val);
 	
+	const std::map<std::string, FunctionUnary> mapUnaryFunctions = {
+		{ "print", func_print },
+	};
+
+	const std::map<std::string, FunctionBinary> mapBinaryFunctions = {
+		
+	};
 	
 }

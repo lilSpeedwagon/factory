@@ -65,7 +65,22 @@ void OperationAssign::ExtendView(std::stringstream& ss, int nLevel)
 // OperationControlFlow
 void OperationControlFlow::Execute()
 {
-	
+	if (!m_isLoop)
+	{
+		runtime::Value condition = m_pCondition->Calculate();
+		if (condition.toBool().getValue<bool>() == true)
+		{
+			m_pScopeIfTrue->Execute();
+		}
+		else if (m_pScopeElse != nullptr)
+		{
+			m_pScopeElse->Execute();
+		}
+	}
+	else
+	{
+		// TODO
+	}
 }
 
 void OperationControlFlow::ExtendView(std::stringstream& ss, int nLevel)
@@ -78,6 +93,20 @@ void OperationControlFlow::ExtendView(std::stringstream& ss, int nLevel)
 		m_pScopeElse->ExtendView(ss, nLevel + 1);
 }
 // OperationControlFlow end
+
+// OperationFunctionCall
+void OperationFunctionCall::Execute()
+{
+	m_pFunction->Calculate();
+}
+
+void OperationFunctionCall::ExtendView(std::stringstream& ss, int nLevel)
+{
+	make_indent(ss, nLevel);
+	ss << "function call";
+	m_pFunction->ExtendView(ss, ++nLevel);
+}
+// OperationFunctionCall end
 
 // UnaryExpression
 runtime::Value UnaryExpression::Calculate()
@@ -133,6 +162,7 @@ ValueExpression::ValueExpression(std::string strValue)
 	{
 		int value = std::stoi(strValue);
 		m_value = value;
+		return;
 	}
 	catch(std::invalid_argument&) {}
 	catch(std::out_of_range& e)
@@ -145,6 +175,7 @@ ValueExpression::ValueExpression(std::string strValue)
 	{
 		float value = std::stof(strValue);
 		m_value = value;
+		return;
 	}
 	catch (std::invalid_argument&) {}
 	catch (std::out_of_range& e)
@@ -153,7 +184,7 @@ ValueExpression::ValueExpression(std::string strValue)
 		ss << "Out of range exception \"" << e.what() << "\" in token " << strValue;
 	}
 
-	m_value = 0;
+	m_value = runtime::Value();
 }
 
 runtime::Value ValueExpression::Calculate()

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Syntaxer.h"
 
-
 void Syntaxer::prepare_tokens()
 {
 	Log("Preparing tokens.");
@@ -21,6 +20,7 @@ bool Syntaxer::Run()
 	Log("Running...");
 	prepare_tokens();
 
+	m_result.reset();
 	OperationScopePtr operation_tree = std::make_shared<OperationScope>();
 	try
 	{
@@ -37,9 +37,9 @@ bool Syntaxer::Run()
 	operation_tree->ExtendView(ss, 0);
 	Log(ss.str());
 
+	m_result = operation_tree;
 	Log("Done.");
 
-	operation_tree->Execute();
 	return true;
 }
 
@@ -146,17 +146,22 @@ void Syntaxer::extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePt
 	if (itAssign != itEnd)
 	{
 		OperationAssignPtr pAssignOp = extend_assignment(itBegin, itEnd, itAssign, pCurrentScope);
+		pAssignOp->SetParentScope(pCurrentScope);
 		pCurrentScope->AddOperation(pAssignOp);
 		return;
 	}
 
-	// find operator
-	ItToken itOperator = find_token_type_throw(itBegin, itEnd, Tokens::Operator);
-	if (std::distance(itBegin, itOperator) < 1 || std::distance(itOperator, itEnd) < 1)
+	// function call
+	const ItToken itOpenBracket = itBegin + 1;
+	if (itOpenBracket->type == Tokens::Bracket && itOpenBracket->value == "(")
 	{
-		throw CompilationError("");
+		const ItToken itCloseBracket = find_close_bracket(itOpenBracket, itEnd);
+		const ItToken itFunction = itBegin;
+		ExpressionPtr pExpr = extend_function(itFunction, itCloseBracket, pCurrentScope);
+		OperationFunctionCallPtr pFunc = std::make_shared<OperationFunctionCall>(pExpr);
+		pCurrentScope->AddOperation(pFunc);
+		return;
 	}
-
 }
 
 OperationAssignPtr Syntaxer::extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign, OperationScopePtr pCurrentScope) const
@@ -203,14 +208,17 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 		case Tokens::Identifier:
 			Log("Expression is an identifier: " + strArg);
 			pExpr = std::make_shared<IdentifierExpression>(strArg);
+			pExpr->SetScope(pCurrentScope);
 			break;
 		case Tokens::Number:
 			Log("Expression is a value: " + strArg);
 			pExpr = std::make_shared<ValueExpression>(strArg);
+			pExpr->SetScope(pCurrentScope);
 			break;
 		case Tokens::Quote:
 			Log("Expression is a string literal: " + strArg);
 			pExpr = std::make_shared<ValueExpression>(strArg);
+			pExpr->SetScope(pCurrentScope);
 			break;
 		default:
 			throw CompilationError("Wrong argument in the right side of assignment.");
@@ -259,6 +267,49 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 	return pExpr;
 }
 
+ExpressionPtr Syntaxer::extend_function(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope) const
+{
+	Log("Extending function: " + Tokens::make_string_from_tokens(itBegin, itEnd));
+	const ItToken itFunc = itBegin;
+	const ItToken itLeftBracket = itFunc + 1;
+
+	ExpressionPtr pExpr;
+	
+	if (std::distance(itLeftBracket, itEnd) == 0)
+	{
+		// functions without args
+		// TODO
+	}
+	else
+	{
+		const size_t args_number = std::count <ItToken, Tokens::Token>(itLeftBracket + 1, itEnd, { ",", Tokens::Comma }) + 1;
+
+		if (args_number == 1)
+		{
+			runtime::FunctionUnary func = get_unary_function(itFunc->value);
+			ExpressionPtr pArg = extend_expression(itLeftBracket + 1, itEnd, pCurrentScope);
+			pExpr = std::make_shared<UnaryExpression>(func, pArg);
+			pExpr->SetScope(pCurrentScope);
+		}
+		else if (args_number == 2)
+		{
+			runtime::FunctionBinary func = get_binary_function(itFunc->value);
+			ItToken itComma = find_token(itLeftBracket + 1, itEnd, Tokens::Comma, ",");
+			ExpressionPtr pLeftArg = extend_expression(itLeftBracket + 1, itComma, pCurrentScope);
+			ExpressionPtr pRightArg = extend_expression(itComma, itEnd, pCurrentScope);
+			pExpr = std::make_shared<BinaryExpression>(func, pLeftArg, pRightArg);
+			pExpr->SetScope(pCurrentScope);
+		}
+		else
+		{
+			// functions with many args
+			// TODO
+		}
+	}
+	
+	return pExpr;
+}
+
 
 bool Syntaxer::reduce_brackets(ItToken& itBegin, ItToken& itEnd)
 {
@@ -282,25 +333,7 @@ bool Syntaxer::is_bracketed_expr(ItToken itBegin, ItToken itEnd)
 	
 	if (hasBrackets)
 	{
-		const ItToken itLeftBracket = itBegin + 1;
-		const ItToken itRightBracket = itEnd + 1;
-
-		ItToken it = itLeftBracket;
-
-		// looking for close bracket for very left bracket
-		for (int nOpenBrackets = 1; it != itRightBracket; ++it)
-		{
-			if (it->type == Tokens::Bracket)
-			{
-				if (it->value == ")")
-					--nOpenBrackets;
-				if (it->value == "(")
-					++nOpenBrackets;
-
-				if (nOpenBrackets <= 0)
-					break;
-			}
-		}
+		const ItToken it = find_close_bracket(itBegin, itEnd);
 
 		// if very right bracket closes very left bracket then the expression is bracketed
 		isBracketed = it == itEnd - 1;
@@ -347,8 +380,8 @@ Syntaxer::ItToken Syntaxer::find_lowest_priority_operator(ItToken itBegin, ItTok
 
 runtime::FunctionUnary Syntaxer::get_function_for_unary_operator(std::string const& op)
 {
-	auto it = runtime::mapUnaryFunctions.find(op);
-	if (it == runtime::mapUnaryFunctions.cend())
+	auto it = runtime::mapUnaryOperators.find(op);
+	if (it == runtime::mapUnaryOperators.cend())
 	{
 		throw CompilationError("Cannot find runtime operation for unary operator \"" + op + "\"");
 	}
@@ -357,10 +390,30 @@ runtime::FunctionUnary Syntaxer::get_function_for_unary_operator(std::string con
 
 runtime::FunctionBinary Syntaxer::get_function_for_binary_operator(std::string const& op)
 {
-	auto it = runtime::mapBinaryFunctions.find(op);
-	if (it == runtime::mapBinaryFunctions.cend())
+	auto it = runtime::mapBinaryOperators.find(op);
+	if (it == runtime::mapBinaryOperators.cend())
 	{
 		throw CompilationError("Cannot find runtime operation for binary operator \"" + op + "\"");
+	}
+	return it->second;
+}
+
+runtime::FunctionUnary Syntaxer::get_unary_function(std::string const& f)
+{
+	auto it = runtime::mapUnaryFunctions.find(f);
+	if (it == runtime::mapUnaryFunctions.end())
+	{
+		throw CompilationError("Cannot find runtime operation for unary function \"" + f + "\"");
+	}
+	return it->second;
+}
+
+runtime::FunctionBinary Syntaxer::get_binary_function(std::string const& f)
+{
+	auto it = runtime::mapBinaryFunctions.find(f);
+	if (it == runtime::mapBinaryFunctions.end())
+	{
+		throw CompilationError("Cannot find runtime operation for binary function \"" + f + "\"");
 	}
 	return it->second;
 }
@@ -407,5 +460,27 @@ Syntaxer::ItToken Syntaxer::find_token_throw(ItToken itBegin, ItToken itEnd, Tok
 	ItToken it = find_token(itBegin, itEnd, t, value);
 	if (it == itEnd)
 		throw CompilationError("Token \"" + value + "\" expected, but not found");
+	return it;
+}
+
+Syntaxer::ItToken Syntaxer::find_close_bracket(ItToken itLeftBracket, ItToken itEnd)
+{
+	ItToken it = itLeftBracket + 1;
+
+	// looking for close bracket for very left bracket
+	for (int nOpenBrackets = 1; it != itEnd; ++it)
+	{
+		if (it->type == Tokens::Bracket)
+		{
+			if (it->value == ")")
+				--nOpenBrackets;
+			else if (it->value == "(")
+				++nOpenBrackets;
+
+			if (nOpenBrackets <= 0)
+				break;
+		}
+	}
+
 	return it;
 }

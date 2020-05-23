@@ -92,6 +92,22 @@ private:
 };
 DEFINE_PTR(OperationControlFlow)
 
+
+class OperationFunctionCall : public Operation
+{
+	RESTRICT_COPY(OperationFunctionCall)
+public:
+	OperationFunctionCall(ExpressionPtr pFuncExpr) : m_pFunction(pFuncExpr) {}
+	virtual ~OperationFunctionCall() = default;
+
+	void Execute() override;
+	void ExtendView(std::stringstream& ss, int nLevel) override;
+private:
+	ExpressionPtr m_pFunction;
+};
+DEFINE_PTR(OperationFunctionCall)
+
+
 class Expression : public TreeHelper
 {
 public:

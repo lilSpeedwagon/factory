@@ -16,7 +16,10 @@ protected:
 	inline void Log(std::string const& message) const
 	{
 		std::string msg = m_logName + ": " + message;
-		m_logDelegate(msg.c_str());
+		if (m_logDelegate != nullptr)
+		{
+			m_logDelegate(msg.c_str());
+		}
 	}
 	void SetLogName(std::string const& name)
 	{
