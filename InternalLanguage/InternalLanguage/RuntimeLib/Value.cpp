@@ -308,6 +308,46 @@ runtime::Value runtime::Value::operator%(Value const& r_val) const
 
 runtime::Value runtime::Value::operator==(Value const& r_val) const
 {
+	return internalEqual(r_val);
+}
+
+runtime::Value runtime::Value::operator!=(Value const& r_val) const
+{
+	return !internalEqual(r_val);
+}
+
+runtime::Value runtime::Value::operator>(Value const& r_val) const
+{
+	return !internalLess(r_val) && !internalEqual(r_val);
+}
+
+runtime::Value runtime::Value::operator<(Value const& r_val) const
+{
+	return internalLess(r_val);
+}
+
+runtime::Value runtime::Value::operator>=(Value const& r_val) const
+{
+	return !internalLess(r_val);
+}
+
+runtime::Value runtime::Value::operator<=(Value const& r_val) const
+{
+	return internalLess(r_val) || internalEqual(r_val);
+}
+
+runtime::Value runtime::Value::operator&&(Value const& r_val) const
+{
+	return toBool().getValue<bool>() && r_val.toBool().getValue<bool>();
+}
+
+runtime::Value runtime::Value::operator||(Value const& r_val) const
+{
+	return toBool().getValue<bool>() || r_val.toBool().getValue<bool>();
+}
+
+bool runtime::Value::internalEqual(Value const& r_val) const
+{
 	bool isEqual;
 
 	const ValueType resultType = getHighestPriorityType(m_type, r_val.m_type);
@@ -332,45 +372,30 @@ runtime::Value runtime::Value::operator==(Value const& r_val) const
 	return isEqual;
 }
 
-runtime::Value runtime::Value::operator!=(Value const& r_val) const
+bool runtime::Value::internalLess(Value const& r_val) const
 {
-	return !operator==(r_val);
-}
+	bool isMore;
 
-runtime::Value runtime::Value::operator>(Value const& r_val) const
-{
-	// TODO
-	return *this;
-}
+	const ValueType resultType = getHighestPriorityType(m_type, r_val.m_type);
+	switch (resultType)
+	{
+	case Integer:
+		isMore = toInt().getValue<int>() < r_val.toInt().getValue<int>();
+		break;
+	case Float:
+		isMore = toFloat().getValue<float>() < r_val.toFloat().getValue<float>();
+		break;
+	case Boolean:
+		isMore = toBool().getValue<bool>() < r_val.toBool().getValue<bool>();
+		break;
+	case String:
+		isMore = toString().getValue<std::string>() < r_val.toString().getValue<std::string>();
+		break;
+	default:
+		throw UndefinedValueException();
+	}
 
-runtime::Value runtime::Value::operator<(Value const& r_val) const
-{
-	// TODO
-	return *this;
-}
-
-runtime::Value runtime::Value::operator>=(Value const& r_val) const
-{
-	// TODO
-	return *this;
-}
-
-runtime::Value runtime::Value::operator<=(Value const& r_val) const
-{
-	// TODO
-	return *this;
-}
-
-runtime::Value runtime::Value::operator&&(Value const& r_val) const
-{
-	// TODO
-	return *this;
-}
-
-runtime::Value runtime::Value::operator||(Value const& r_val) const
-{
-	// TODO
-	return *this;
+	return isMore;
 }
 
 runtime::Value runtime::Value::toInt() const

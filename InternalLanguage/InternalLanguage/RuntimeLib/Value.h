@@ -117,6 +117,8 @@ namespace runtime
 	private:
 		void clear();
 		static ValueType getHighestPriorityType(ValueType lt, ValueType rt);
+		bool internalEqual(Value const& r_val) const;
+		bool internalLess(Value const& r_val) const;
 
 		ValueType m_type;
 		_Value m_value;

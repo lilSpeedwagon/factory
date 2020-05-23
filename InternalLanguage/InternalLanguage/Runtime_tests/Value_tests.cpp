@@ -644,3 +644,84 @@ TEST_CASE("Value operator==", "[Value]")
 		CHECK(v10.getValue<bool>() == true);
 	}
 }
+
+TEST_CASE("Value operator<", "[Value]")
+{
+	SECTION("Integer")
+	{
+		Value res = Value(10) < Value(15);
+		Value res2 = Value(1) < Value(1);
+		REQUIRE(res.getType() == Value::Boolean);
+		CHECK(res.getValue<bool>() == true);
+		REQUIRE(res2.getType() == Value::Boolean);
+		CHECK(res2.getValue<bool>() == false);
+	}
+
+	SECTION("Float")
+	{
+		Value res = Value(10.0f) < Value(5.0f);
+		Value res2 = Value(1.0f) < Value(1.0f);
+		REQUIRE(res.getType() == Value::Boolean);
+		CHECK(res.getValue<bool>() == false);
+		REQUIRE(res2.getType() == Value::Boolean);
+		CHECK(res2.getValue<bool>() == false);
+	}
+
+	SECTION("Boolean")
+	{
+		Value res = Value(false) < Value(true);
+		Value res2 = Value(true) < Value(true);
+		REQUIRE(res.getType() == Value::Boolean);
+		CHECK(res.getValue<bool>() == true);
+		REQUIRE(res2.getType() == Value::Boolean);
+		CHECK(res2.getValue<bool>() == false);
+	}
+
+	SECTION("String")
+	{
+		Value res = Value(std::string("abc")) < Value(std::string("abd"));
+		Value res2 = Value(std::string("str")) < Value(std::string("str"));
+		Value res3 = Value(std::string("")) < Value(std::string(""));
+		REQUIRE(res.getType() == Value::Boolean);
+		CHECK(res.getValue<bool>() == true);
+		REQUIRE(res2.getType() == Value::Boolean);
+		CHECK(res2.getValue<bool>() == false);
+		REQUIRE(res3.getType() == Value::Boolean);
+		CHECK(res3.getValue<bool>() == false);
+	}
+
+	SECTION("Mixed")
+	{
+		Value v1 = Value(10) < Value(10.1f);
+		REQUIRE(v1.getType() == Value::Boolean);
+		CHECK(v1.getValue<bool>() == true);
+
+		Value v2 = Value(6) < Value(5.1f);
+		REQUIRE(v2.getType() == Value::Boolean);
+		CHECK(v2.getValue<bool>() == false);
+
+		Value v3 = Value(true) < Value(2);
+		REQUIRE(v3.getType() == Value::Boolean);
+		CHECK(v3.getValue<bool>() == true);
+
+		Value v4 = Value(false) < Value(-1.0f);
+		REQUIRE(v4.getType() == Value::Boolean);
+		CHECK(v4.getValue<bool>() == false);
+
+		Value v7 = Value(std::string("true")) < Value(true);
+		REQUIRE(v7.getType() == Value::Boolean);
+		CHECK(v7.getValue<bool>() == false);
+
+		Value v8 = Value(std::string("abc")) < Value(false);
+		REQUIRE(v8.getType() == Value::Boolean);
+		CHECK(v8.getValue<bool>() == true);
+
+		Value v9 = Value(std::string("-11")) < Value(-10);
+		REQUIRE(v9.getType() == Value::Boolean);
+		CHECK(v9.getValue<bool>() == false);
+
+		Value v10 = Value(std::string("10.4")) < Value(10.5f);
+		REQUIRE(v10.getType() == Value::Boolean);
+		CHECK(v10.getValue<bool>() == true);
+	}
+}
