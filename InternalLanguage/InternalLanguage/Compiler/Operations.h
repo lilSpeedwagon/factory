@@ -1,6 +1,9 @@
 #pragma once
 
 #include "stdafx.h"
+
+#include <functional>
+
 #include "Definitions.h"
 #include "OperationTreeViewHelper.h"
 #include "Runtime.h"
@@ -27,6 +30,7 @@ public:
 	virtual ~Operation() = default;
 	virtual void Execute() = 0;
 	void SetParentScope(OperationScopePtr pScope) { m_pParentScope = pScope; }
+	OperationScopePtr GetParentScope() const { return m_pParentScope; }
 	
 protected:
 	OperationScopePtr m_pParentScope = nullptr;
@@ -42,8 +46,9 @@ public:
 	virtual ~OperationScope() = default;
 	
 	void Execute() override;
-	runtime::Value GetVariableValue(std::string const& varName);
+	runtime::Value GetVariableValue(std::string const& varName) const;
 	void SetVariableValue(std::string const& varName, runtime::Value const& val);
+	bool IsVariableExist(std::string const& varName) const;
 	void AddOperation(OperationPtr pOperation);
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 	bool IsRoot() const { return m_pParentScope == nullptr; }

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Operations.h"
 #include "Runtime.h"
-#include "sstream"
+#include <sstream>
 
 // OperationScope
 void OperationScope::Execute()
@@ -12,25 +12,55 @@ void OperationScope::Execute()
 	}
 }
 
-runtime::Value OperationScope::GetVariableValue(std::string const& varName)
+runtime::Value OperationScope::GetVariableValue(std::string const& varName) const
 {
-	auto it = m_mapVariables.find(varName);
-	if (it == m_mapVariables.end())
+	const OperationScope* pScope = this;
+	do
 	{
-		runtime::Value val;
-		const auto insertResult =  m_mapVariables.insert({ varName, val });
-		if (insertResult.second)
+		auto it = pScope->m_mapVariables.find(varName);
+		if (it != pScope->m_mapVariables.end())
 		{
-			it = insertResult.first;
+			return it->second;
 		}
-	}
+		pScope = pScope->GetParentScope().get();
+	} while (pScope != nullptr);
 
-	return it->second;
+	throw runtime::RuntimeException("Unknown identifier " + varName);
 }
 
 void OperationScope::SetVariableValue(std::string const& varName, runtime::Value const& val)
 {
+	// trying to find variable in parent scopes
+	OperationScope* pScope = this;
+	do
+	{
+		auto it = pScope->m_mapVariables.find(varName);
+		if (it != pScope->m_mapVariables.end())
+		{
+			pScope->m_mapVariables[varName] = val;
+			return;
+		}
+		pScope = pScope->GetParentScope().get();
+	} while (pScope != nullptr);
+
+	// if variable doesn't exist - create it in current scope
 	m_mapVariables[varName] = val;
+}
+
+bool OperationScope::IsVariableExist(std::string const& varName) const
+{
+	const OperationScope* pScope = this;
+	do
+	{
+		auto it = pScope->m_mapVariables.find(varName);
+		if (it != pScope->m_mapVariables.end())
+		{
+			return true;
+		}
+		pScope = pScope->GetParentScope().get();
+	} while (pScope != nullptr);
+
+	return false;
 }
 
 void OperationScope::ExtendView(std::stringstream& ss, int nLevel)
@@ -103,7 +133,7 @@ void OperationFunctionCall::Execute()
 void OperationFunctionCall::ExtendView(std::stringstream& ss, int nLevel)
 {
 	make_indent(ss, nLevel);
-	ss << "function call";
+	ss << "function call\n";
 	m_pFunction->ExtendView(ss, ++nLevel);
 }
 // OperationFunctionCall end
@@ -195,7 +225,7 @@ runtime::Value ValueExpression::Calculate()
 void ValueExpression::ExtendView(std::stringstream& ss, int nLevel)
 {
 	make_indent(ss, nLevel);
-	ss << m_value.toString().getValue<std::string>();
+	ss << "value: " << m_value.toString().getValue<std::string>() << '\n';
 }
 // ValueExpression end
 

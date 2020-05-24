@@ -9,8 +9,6 @@ void Syntaxer::prepare_tokens()
 	m_pTokens->erase(std::remove_if(m_pTokens->begin(), m_pTokens->end(),
 		[](Tokens::Token& t) {	return t.type == Tokens::Delimiter;	}),
 		m_pTokens->end());
-
-	// remove comments
 	
 	Log("Tokens are ready.");
 }
@@ -62,7 +60,7 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 				if (itOpenBracket == itEnd || itOpenBracket->type != Tokens::Bracket || itOpenBracket->value != "(")
 					throw CompilationError("Missing condition expression.");
 
-				ItToken itCloseBracket = find_token_throw(itOpenBracket + 1, itEnd, Tokens::Bracket, ")");
+				ItToken itCloseBracket = find_close_bracket<Tokens::Bracket>(itOpenBracket, itEnd);				
 				Log("Condition: " + Tokens::make_string_from_tokens(itOpenBracket + 1, itCloseBracket));
 				ExpressionPtr pExprCondition = extend_expression(itOpenBracket + 1, itCloseBracket, pCurrentScope);
 				pExprCondition->SetScope(pCurrentScope);
@@ -72,7 +70,7 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 				if (itOpenTrueBracket == itEnd || itOpenTrueBracket->type != Tokens::CBracket || itOpenTrueBracket->value != "{")
 					throw CompilationError("Missing brackets for if scope.");
 
-				ItToken itCloseTrueBracket = find_token_throw(itOpenTrueBracket + 1, itEnd, Tokens::CBracket, "}");
+				ItToken itCloseTrueBracket = find_close_bracket<Tokens::CBracket>(itOpenTrueBracket, itEnd);
 				Log("If scope: " + Tokens::make_string_from_tokens(itOpenTrueBracket + 1, itCloseTrueBracket));
 				OperationScopePtr pIfTrueScope = std::make_shared<OperationScope>();
 				extend_scope(itOpenTrueBracket + 1, itCloseTrueBracket, pIfTrueScope);
@@ -90,7 +88,7 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 					if (itOpenElseBracket == itEnd || itOpenElseBracket->type != Tokens::CBracket || itOpenElseBracket->value != "{")
 						throw CompilationError("Missing brackets for else scope.");
 
-					ItToken itCloseElseBracket = find_token_throw(itOpenElseBracket + 1, itEnd, Tokens::CBracket, "}");
+					const ItToken itCloseElseBracket = find_close_bracket<Tokens::CBracket>(itOpenElseBracket, itEnd);
 					Log("Else scope: " + Tokens::make_string_from_tokens(itOpenElseBracket + 1, itCloseElseBracket));
 					pElseScope = std::make_shared<OperationScope>();
 					extend_scope(itOpenElseBracket + 1, itCloseElseBracket, pElseScope);
@@ -122,9 +120,9 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 		if (it->type == Tokens::CBracket)
 		{
 			if (it->value != "{")
-				throw CompilationError("Unexpected bracket");
+				throw CompilationError("Unexpected bracket value");
 			
-			ItToken itScopeEnd = find_token(it + 1, itEnd, Tokens::CBracket, "}");
+			ItToken itScopeEnd = find_close_bracket<Tokens::CBracket>(it, itEnd);
 			OperationScopePtr pInternalScope = std::make_shared<OperationScope>();
 			extend_scope(it + 1, itScopeEnd, pInternalScope);
 			pInternalScope->SetParentScope(pCurrentScope);
@@ -155,7 +153,7 @@ void Syntaxer::extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePt
 	const ItToken itOpenBracket = itBegin + 1;
 	if (itOpenBracket->type == Tokens::Bracket && itOpenBracket->value == "(")
 	{
-		const ItToken itCloseBracket = find_close_bracket(itOpenBracket, itEnd);
+		const ItToken itCloseBracket = find_close_bracket<Tokens::Bracket>(itOpenBracket, itEnd);
 		const ItToken itFunction = itBegin;
 		ExpressionPtr pExpr = extend_function(itFunction, itCloseBracket, pCurrentScope);
 		OperationFunctionCallPtr pFunc = std::make_shared<OperationFunctionCall>(pExpr);
@@ -203,24 +201,22 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 	{
 		const Tokens::TokenType argType = (itBegin)->type;
 		std::string const& strArg = itBegin->value;
-		switch (argType)
+
+		if (argType == Tokens::Number || argType == Tokens::Quote || 
+			argType == Tokens::Identifier && KeyWords::isBoolLiteral(strArg))
 		{
-		case Tokens::Identifier:
-			Log("Expression is an identifier: " + strArg);
-			pExpr = std::make_shared<IdentifierExpression>(strArg);
-			pExpr->SetScope(pCurrentScope);
-			break;
-		case Tokens::Number:
 			Log("Expression is a value: " + strArg);
 			pExpr = std::make_shared<ValueExpression>(strArg);
 			pExpr->SetScope(pCurrentScope);
-			break;
-		case Tokens::Quote:
-			Log("Expression is a string literal: " + strArg);
-			pExpr = std::make_shared<ValueExpression>(strArg);
+		}
+		else if (argType == Tokens::Identifier)
+		{
+			Log("Expression is an identifier: " + strArg);
+			pExpr = std::make_shared<IdentifierExpression>(strArg);
 			pExpr->SetScope(pCurrentScope);
-			break;
-		default:
+		}
+		else
+		{
 			throw CompilationError("Wrong argument in the right side of assignment.");
 		}
 	}
@@ -333,7 +329,7 @@ bool Syntaxer::is_bracketed_expr(ItToken itBegin, ItToken itEnd)
 	
 	if (hasBrackets)
 	{
-		const ItToken it = find_close_bracket(itBegin, itEnd);
+		const ItToken it = find_close_bracket<Tokens::Bracket>(itBegin, itEnd);
 
 		// if very right bracket closes very left bracket then the expression is bracketed
 		isBracketed = it == itEnd - 1;
@@ -354,7 +350,7 @@ Syntaxer::ItToken Syntaxer::find_lowest_priority_operator(ItToken itBegin, ItTok
 		{
 			const Operators::Priority priority = Operators::operatorPriority(it->value) + bracketsPriority;
 
-			if (priority > 0 && priority < lowestPriority)
+			if (priority > 0 && priority <= lowestPriority)
 			{
 				lowestPriority = priority;
 				itLowestPriorityOperator = it;
@@ -460,27 +456,5 @@ Syntaxer::ItToken Syntaxer::find_token_throw(ItToken itBegin, ItToken itEnd, Tok
 	ItToken it = find_token(itBegin, itEnd, t, value);
 	if (it == itEnd)
 		throw CompilationError("Token \"" + value + "\" expected, but not found");
-	return it;
-}
-
-Syntaxer::ItToken Syntaxer::find_close_bracket(ItToken itLeftBracket, ItToken itEnd)
-{
-	ItToken it = itLeftBracket + 1;
-
-	// looking for close bracket for very left bracket
-	for (int nOpenBrackets = 1; it != itEnd; ++it)
-	{
-		if (it->type == Tokens::Bracket)
-		{
-			if (it->value == ")")
-				--nOpenBrackets;
-			else if (it->value == "(")
-				++nOpenBrackets;
-
-			if (nOpenBrackets <= 0)
-				break;
-		}
-	}
-
 	return it;
 }

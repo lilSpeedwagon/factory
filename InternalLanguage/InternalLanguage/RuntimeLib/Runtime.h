@@ -9,9 +9,9 @@ namespace runtime
 	{
 	public:
 		RuntimeException() = default;
-		RuntimeException(const char* msg)
+		RuntimeException(std::string const& msg)
 		{
-			m_msg.assign(msg);
+			m_msg = msg;
 		}
 		virtual ~RuntimeException() = default;
 	};
