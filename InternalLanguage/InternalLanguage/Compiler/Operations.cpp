@@ -109,7 +109,10 @@ void OperationControlFlow::Execute()
 	}
 	else
 	{
-		// TODO
+		while(m_pCondition->Calculate().toBool().getValue<bool>() == true)
+		{
+			m_pScopeIfTrue->Execute();
+		}
 	}
 }
 

@@ -105,7 +105,33 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 			}
 			else if (it->value == KeyWords::Loop)
 			{
-				
+				Log("Extending loop block.");
+				// find condition
+				ItToken itOpenBracket = it + 1;
+				if (itOpenBracket == itEnd || itOpenBracket->type != Tokens::Bracket || itOpenBracket->value != "(")
+					throw CompilationError("Missing condition expression.");
+
+				ItToken itCloseBracket = find_close_bracket<Tokens::Bracket>(itOpenBracket, itEnd);
+				Log("Condition: " + Tokens::make_string_from_tokens(itOpenBracket + 1, itCloseBracket));
+				ExpressionPtr pExprCondition = extend_expression(itOpenBracket + 1, itCloseBracket, pCurrentScope);
+				pExprCondition->SetScope(pCurrentScope);
+
+				// find loop scope
+				ItToken itOpenLoopBracket = itCloseBracket + 1;
+				if (itOpenLoopBracket == itEnd || itOpenLoopBracket->type != Tokens::CBracket || itOpenLoopBracket->value != "{")
+					throw CompilationError("Missing brackets for if scope.");
+
+				ItToken itCloseLoopBracket = find_close_bracket<Tokens::CBracket>(itOpenLoopBracket, itEnd);
+				Log("Loop scope: " + Tokens::make_string_from_tokens(itOpenLoopBracket + 1, itCloseLoopBracket));
+				OperationScopePtr pLoopScope = std::make_shared<OperationScope>();
+				extend_scope(itOpenLoopBracket + 1, itCloseLoopBracket, pLoopScope);
+				pLoopScope->SetParentScope(pCurrentScope);
+
+				OperationControlFlowPtr pLoop = std::make_shared<OperationControlFlow>(pExprCondition, pLoopScope, true);
+				pLoop->SetParentScope(pCurrentScope);
+				pCurrentScope->AddOperation(pLoop);
+
+				it = itCloseLoopBracket + 1;
 			}
 			else
 			{
