@@ -11,7 +11,7 @@ class CompilationError : public BaseException
 public:
 	CompilationError() = default;
 	CompilationError(std::string msg) { m_msg = msg; }
-	CompilationError(std::string msg, std::string src) { m_msg = msg + " source: " + src; }
+	CompilationError(std::string msg, std::string src) { m_msg = msg + ". Source: " + src; }
 	CompilationError(std::string msg, Tokens::TokenList::iterator itBegin, Tokens::TokenList::iterator itEnd)
 	{
 		m_msg = msg + " source: " + Tokens::make_string_from_tokens(itBegin, itEnd);
@@ -41,7 +41,7 @@ private:
 	
 	void prepare_tokens();
 	
-	void extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope);
+	void extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope) const;
 	void extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope);
 	OperationAssignPtr extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign, OperationScopePtr pCurrentScope) const;
 	ExpressionPtr extend_expression(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope) const;

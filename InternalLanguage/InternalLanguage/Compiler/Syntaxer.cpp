@@ -161,7 +161,7 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 	}
 }
 
-void Syntaxer::extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope)
+void Syntaxer::extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope) const
 {
 	Log("Extending operation: " + make_string_from_tokens(itBegin, itEnd));
 	
@@ -180,6 +180,10 @@ void Syntaxer::extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePt
 	if (itOpenBracket->type == Tokens::Bracket && itOpenBracket->value == "(")
 	{
 		const ItToken itCloseBracket = find_close_bracket<Tokens::Bracket>(itOpenBracket, itEnd);
+		if (std::distance(itCloseBracket, itEnd) > 1)
+		{
+			throw CompilationError("Unexpected symbols after function call", itBegin, itEnd);
+		}
 		const ItToken itFunction = itBegin;
 		ExpressionPtr pExpr = extend_function(itFunction, itCloseBracket, pCurrentScope);
 		OperationFunctionCallPtr pFunc = std::make_shared<OperationFunctionCall>(pExpr);
@@ -291,10 +295,10 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 
 ExpressionPtr Syntaxer::extend_function(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope) const
 {
-	Log("Extending function: " + Tokens::make_string_from_tokens(itBegin, itEnd));
 	const ItToken itFunc = itBegin;
 	const ItToken itLeftBracket = itFunc + 1;
-
+	Log("Extending function " +itFunc->value + " with arguments " + Tokens::make_string_from_tokens(itLeftBracket + 1, itEnd));
+	
 	ExpressionPtr pExpr;
 	
 	if (std::distance(itLeftBracket, itEnd) == 0)

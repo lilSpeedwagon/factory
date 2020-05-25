@@ -175,7 +175,9 @@ ValueExpression::ValueExpression(std::string strValue)
 {
 	if (KeyWords::isStringLiteral(strValue))
 	{
-		m_value = strValue;
+		std::string unquotedStr;
+		std::copy(strValue.begin() + 1, strValue.end() - 1, std::back_inserter(unquotedStr));
+		m_value = unquotedStr;
 		return;
 	}
 
@@ -191,9 +193,26 @@ ValueExpression::ValueExpression(std::string strValue)
 		return;
 	}
 
+	// if string contains '.' - try to consider it as floating-point number
+	if (strValue.find('.') != std::string::npos)
+	{
+		try
+		{
+			const float value = std::stof(strValue);
+			m_value = value;
+			return;
+		}
+		catch (std::invalid_argument&) {}
+		catch (std::out_of_range& e)
+		{
+			std::stringstream ss;
+			ss << "Out of range exception \"" << e.what() << "\" in token " << strValue;
+		}
+	}
+	
 	try
 	{
-		int value = std::stoi(strValue);
+		const int value = std::stoi(strValue);
 		m_value = value;
 		return;
 	}
@@ -202,19 +221,6 @@ ValueExpression::ValueExpression(std::string strValue)
 	{
 		std::stringstream ss;
 		ss << "Out of range exception \"" << e.what() << " in token " << strValue;
-	}
-
-	try
-	{
-		float value = std::stof(strValue);
-		m_value = value;
-		return;
-	}
-	catch (std::invalid_argument&) {}
-	catch (std::out_of_range& e)
-	{
-		std::stringstream ss;
-		ss << "Out of range exception \"" << e.what() << "\" in token " << strValue;
 	}
 
 	m_value = runtime::Value();
