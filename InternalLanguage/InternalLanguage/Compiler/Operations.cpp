@@ -128,18 +128,31 @@ void OperationControlFlow::ExtendView(std::stringstream& ss, int nLevel)
 // OperationControlFlow end
 
 // OperationFunctionCall
-void OperationFunctionCall::Execute()
+void OperationExpression::Execute()
 {
-	m_pFunction->Calculate();
+	m_pExpr->Calculate();
 }
 
-void OperationFunctionCall::ExtendView(std::stringstream& ss, int nLevel)
+void OperationExpression::ExtendView(std::stringstream& ss, int nLevel)
 {
 	make_indent(ss, nLevel);
 	ss << "function call\n";
-	m_pFunction->ExtendView(ss, ++nLevel);
+	m_pExpr->ExtendView(ss, ++nLevel);
 }
 // OperationFunctionCall end
+
+// ZeroArgsExpression
+runtime::Value ZeroArgsExpression::Calculate()
+{
+	return m_function();
+}
+
+void ZeroArgsExpression::ExtendView(std::stringstream& ss, int nLevel)
+{
+	make_indent(ss, nLevel);
+	ss << "function\n";
+}
+// ZeroArgsExpression end
 
 // UnaryExpression
 runtime::Value UnaryExpression::Calculate()
@@ -150,7 +163,7 @@ runtime::Value UnaryExpression::Calculate()
 void UnaryExpression::ExtendView(std::stringstream& ss, int nLevel)
 {
 	make_indent(ss, nLevel);
-	ss << "unary\n";
+	ss << "unary function\n";
 	m_pOperand->ExtendView(ss, ++nLevel);
 }
 // UnaryExpression end
@@ -164,7 +177,7 @@ runtime::Value BinaryExpression::Calculate()
 void BinaryExpression::ExtendView(std::stringstream& ss, int nLevel)
 {
 	make_indent(ss, nLevel);
-	ss << "binary\n";
+	ss << "binary function\n";
 	m_pLeftOperand->ExtendView(ss, nLevel + 1);
 	m_pRightOperand->ExtendView(ss, nLevel + 1);
 }

@@ -11,6 +11,8 @@
 // predefined classes
 class Expression;
 DEFINE_PTR(Expression)
+class ZeroArgsExpression;
+DEFINE_PTR(ZeroArgsExpression)
 class UnaryExpression;
 DEFINE_PTR(UnaryExpression)
 class BinaryExpression;
@@ -98,19 +100,19 @@ private:
 DEFINE_PTR(OperationControlFlow)
 
 
-class OperationFunctionCall : public Operation
+class OperationExpression : public Operation
 {
-	RESTRICT_COPY(OperationFunctionCall)
+	RESTRICT_COPY(OperationExpression)
 public:
-	OperationFunctionCall(ExpressionPtr pFuncExpr) : m_pFunction(pFuncExpr) {}
-	virtual ~OperationFunctionCall() = default;
+	OperationExpression(ExpressionPtr pFuncExpr) : m_pExpr(pFuncExpr) {}
+	virtual ~OperationExpression() = default;
 
 	void Execute() override;
 	void ExtendView(std::stringstream& ss, int nLevel) override;
 private:
-	ExpressionPtr m_pFunction;
+	ExpressionPtr m_pExpr;
 };
-DEFINE_PTR(OperationFunctionCall)
+DEFINE_PTR(OperationExpression)
 
 
 class Expression : public TreeHelper
@@ -122,6 +124,22 @@ public:
 	void SetScope(OperationScopePtr pScope) { m_pScope = pScope; }
 protected:
 	OperationScopePtr m_pScope = nullptr;
+};
+
+
+class ZeroArgsExpression : public Expression
+{
+	RESTRICT_COPY(ZeroArgsExpression)
+public:
+	ZeroArgsExpression(runtime::FunctionZeroArgs func) :
+		m_function(func) {}
+	virtual ~ZeroArgsExpression() = default;
+
+	runtime::Value Calculate() override;
+	void ExtendView(std::stringstream& ss, int nLevel) override;
+
+protected:
+	runtime::FunctionZeroArgs m_function;
 };
 
 

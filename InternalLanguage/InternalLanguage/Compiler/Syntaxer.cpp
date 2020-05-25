@@ -182,14 +182,21 @@ void Syntaxer::extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePt
 		const ItToken itCloseBracket = find_close_bracket<Tokens::Bracket>(itOpenBracket, itEnd);
 		if (std::distance(itCloseBracket, itEnd) > 1)
 		{
-			throw CompilationError("Unexpected symbols after function call", itBegin, itEnd);
+			throw CompilationError("Unexpected symbols", itBegin, itEnd);
 		}
 		const ItToken itFunction = itBegin;
 		ExpressionPtr pExpr = extend_function(itFunction, itCloseBracket, pCurrentScope);
-		OperationFunctionCallPtr pFunc = std::make_shared<OperationFunctionCall>(pExpr);
+		OperationExpressionPtr pFunc = std::make_shared<OperationExpression>(pExpr);
+		pFunc->SetParentScope(pCurrentScope);
 		pCurrentScope->AddOperation(pFunc);
 		return;
 	}
+
+	// expression
+	ExpressionPtr pExpr = extend_expression(itBegin, itEnd, pCurrentScope);
+	OperationExpressionPtr pOpExpr = std::make_shared<OperationExpression>(pExpr);
+	pOpExpr->SetParentScope(pCurrentScope);
+	pCurrentScope->AddOperation(pOpExpr);
 }
 
 OperationAssignPtr Syntaxer::extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign, OperationScopePtr pCurrentScope) const
@@ -229,7 +236,7 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 	// expression is a single value or an identifier
 	if (length == 1)
 	{
-		const Tokens::TokenType argType = (itBegin)->type;
+		const Tokens::TokenType argType = itBegin->type;
 		std::string const& strArg = itBegin->value;
 
 		if (argType == Tokens::Number || argType == Tokens::Quote || 
@@ -249,6 +256,18 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 		{
 			throw CompilationError("Wrong argument in the right side of assignment.");
 		}
+	}
+	else if (length >= 3 && itBegin->type == Tokens::Identifier
+		 &&	(itBegin + 1)->type == Tokens::Bracket && (itBegin + 1)->value == "("
+		 && find_close_bracket<Tokens::Bracket>(itBegin + 1, itEnd) == itEnd - 1) // expression is a function call
+	{
+		Log("Expression is a function call");
+		const ItToken itFunction = itBegin;
+		const ItToken itOpenBracket = itBegin + 1;
+		const ItToken itCloseBracket = itEnd - 1;
+		
+		pExpr = extend_function(itFunction, itCloseBracket, pCurrentScope);
+		pExpr->SetScope(pCurrentScope);
 	}
 	else // expression is complex
 	{
@@ -297,41 +316,45 @@ ExpressionPtr Syntaxer::extend_function(ItToken itBegin, ItToken itEnd, Operatio
 {
 	const ItToken itFunc = itBegin;
 	const ItToken itLeftBracket = itFunc + 1;
-	Log("Extending function " +itFunc->value + " with arguments " + Tokens::make_string_from_tokens(itLeftBracket + 1, itEnd));
+	Log("Extending function " + itFunc->value + " with arguments " + Tokens::make_string_from_tokens(itLeftBracket + 1, itEnd));
 	
+	const size_t argsCount = count_arguments(itLeftBracket + 1, itEnd);
+
 	ExpressionPtr pExpr;
-	
-	if (std::distance(itLeftBracket, itEnd) == 0)
+	switch(argsCount)
 	{
-		// functions without args
+	case 0:
+	{
+		runtime::FunctionZeroArgs func = get_zeroargs_function(itFunc->value);
+		pExpr = std::make_shared<ZeroArgsExpression>(func);
+		break;
+	}
+	case 1:
+	{
+		runtime::FunctionUnary func = get_unary_function(itFunc->value);
+		ExpressionPtr pArg = extend_expression(itLeftBracket + 1, itEnd, pCurrentScope);
+		pExpr = std::make_shared<UnaryExpression>(func, pArg);
+		break;
+	}
+	case 2:
+	{
+		runtime::FunctionBinary func = get_binary_function(itFunc->value);
+		const ItToken itRightArgBegin = find_next_argument(itLeftBracket + 1, itEnd);
+		const ItToken itComma = itRightArgBegin - 1;
+		if (itRightArgBegin == itEnd || itComma == itLeftBracket + 1)
+		{
+			throw CompilationError("Missing function argument", itBegin, itEnd);
+		}
+		ExpressionPtr pLeftArg = extend_expression(itLeftBracket + 1, itRightArgBegin - 1, pCurrentScope);
+		ExpressionPtr pRightArg = extend_expression(itRightArgBegin, itEnd, pCurrentScope);
+		pExpr = std::make_shared<BinaryExpression>(func, pLeftArg, pRightArg);
+		break;
+	}
+	default: {}
+		// functions with many args
 		// TODO
 	}
-	else
-	{
-		const size_t args_number = std::count <ItToken, Tokens::Token>(itLeftBracket + 1, itEnd, { ",", Tokens::Comma }) + 1;
-
-		if (args_number == 1)
-		{
-			runtime::FunctionUnary func = get_unary_function(itFunc->value);
-			ExpressionPtr pArg = extend_expression(itLeftBracket + 1, itEnd, pCurrentScope);
-			pExpr = std::make_shared<UnaryExpression>(func, pArg);
-			pExpr->SetScope(pCurrentScope);
-		}
-		else if (args_number == 2)
-		{
-			runtime::FunctionBinary func = get_binary_function(itFunc->value);
-			ItToken itComma = find_token(itLeftBracket + 1, itEnd, Tokens::Comma, ",");
-			ExpressionPtr pLeftArg = extend_expression(itLeftBracket + 1, itComma, pCurrentScope);
-			ExpressionPtr pRightArg = extend_expression(itComma, itEnd, pCurrentScope);
-			pExpr = std::make_shared<BinaryExpression>(func, pLeftArg, pRightArg);
-			pExpr->SetScope(pCurrentScope);
-		}
-		else
-		{
-			// functions with many args
-			// TODO
-		}
-	}
+	pExpr->SetScope(pCurrentScope);
 	
 	return pExpr;
 }
@@ -404,12 +427,63 @@ Syntaxer::ItToken Syntaxer::find_lowest_priority_operator(ItToken itBegin, ItTok
 	return itLowestPriorityOperator;
 }
 
+size_t Syntaxer::count_arguments(ItToken itBegin, ItToken itEnd)
+{
+	if (std::distance(itBegin, itEnd) == 0)
+		return 0;
+	
+	size_t argsCount = 1;
+	size_t openBrackets = 0;
+	ItToken it = itBegin;
+	while(it != itEnd)
+	{
+		if (it->type == Tokens::Bracket)
+		{
+			if (it->value == "(")
+				openBrackets++;
+			if (it->value == ")")
+				openBrackets--;
+		}
+		else if (it->type == Tokens::Comma && openBrackets == 0)
+		{
+			argsCount++;
+		}
+		++it;
+	}
+
+	return argsCount;
+}
+
+Syntaxer::ItToken Syntaxer::find_next_argument(ItToken itBegin, ItToken itEnd)
+{
+	size_t openBrackets = 0;
+	ItToken it = itBegin;
+	while (it != itEnd)
+	{
+		if (it->type == Tokens::Bracket)
+		{
+			if (it->value == "(")
+				openBrackets++;
+			if (it->value == ")")
+				openBrackets--;
+		}
+		else if (it->type == Tokens::Comma && openBrackets == 0)
+		{
+			if (it + 1 != itEnd)
+				return it + 1;
+		}
+		++it;
+	}
+
+	return it;
+}
+
 runtime::FunctionUnary Syntaxer::get_function_for_unary_operator(std::string const& op)
 {
 	auto it = runtime::mapUnaryOperators.find(op);
 	if (it == runtime::mapUnaryOperators.cend())
 	{
-		throw CompilationError("Cannot find runtime operation for unary operator \"" + op + "\"");
+		throw CompilationError("Cannot find function " + op + " with 1 argument");
 	}
 	return it->second;
 }
@@ -419,7 +493,17 @@ runtime::FunctionBinary Syntaxer::get_function_for_binary_operator(std::string c
 	auto it = runtime::mapBinaryOperators.find(op);
 	if (it == runtime::mapBinaryOperators.cend())
 	{
-		throw CompilationError("Cannot find runtime operation for binary operator \"" + op + "\"");
+		throw CompilationError("Cannot find function " + op + " with 2 arguments");
+	}
+	return it->second;
+}
+
+runtime::FunctionZeroArgs Syntaxer::get_zeroargs_function(std::string const& f)
+{
+	auto it = runtime::mapZeroArgsFunctions.find(f);
+	if (it == runtime::mapZeroArgsFunctions.end())
+	{
+		throw CompilationError("Cannot find function " + f + " with 0 arguments");
 	}
 	return it->second;
 }
@@ -429,7 +513,7 @@ runtime::FunctionUnary Syntaxer::get_unary_function(std::string const& f)
 	auto it = runtime::mapUnaryFunctions.find(f);
 	if (it == runtime::mapUnaryFunctions.end())
 	{
-		throw CompilationError("Cannot find runtime operation for unary function \"" + f + "\"");
+		throw CompilationError("Cannot find function " + f + " with 1 argument");
 	}
 	return it->second;
 }
@@ -439,7 +523,7 @@ runtime::FunctionBinary Syntaxer::get_binary_function(std::string const& f)
 	auto it = runtime::mapBinaryFunctions.find(f);
 	if (it == runtime::mapBinaryFunctions.end())
 	{
-		throw CompilationError("Cannot find runtime operation for binary function \"" + f + "\"");
+		throw CompilationError("Cannot find function " + f + " with 2 argument");
 	}
 	return it->second;
 }

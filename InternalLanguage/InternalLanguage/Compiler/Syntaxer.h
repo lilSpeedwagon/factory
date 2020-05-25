@@ -14,7 +14,7 @@ public:
 	CompilationError(std::string msg, std::string src) { m_msg = msg + ". Source: " + src; }
 	CompilationError(std::string msg, Tokens::TokenList::iterator itBegin, Tokens::TokenList::iterator itEnd)
 	{
-		m_msg = msg + " source: " + Tokens::make_string_from_tokens(itBegin, itEnd);
+		m_msg = msg + ". Source: " + Tokens::make_string_from_tokens(itBegin, itEnd);
 	}
 	virtual ~CompilationError() = default;
 };
@@ -51,9 +51,13 @@ private:
 	static bool is_bracketed_expr(ItToken itBegin, ItToken itEnd);
 	static ItToken find_lowest_priority_operator(ItToken itBegin, ItToken itEnd);
 
+	static size_t count_arguments(ItToken itBegin, ItToken itEnd);
+	static ItToken find_next_argument(ItToken itBegin, ItToken itEnd);
+	
 	static runtime::FunctionUnary get_function_for_unary_operator(std::string const& op);
 	static runtime::FunctionBinary get_function_for_binary_operator(std::string const& op);
 
+	static runtime::FunctionZeroArgs get_zeroargs_function(std::string const& f);
 	static runtime::FunctionUnary get_unary_function(std::string const& f);
 	static runtime::FunctionBinary get_binary_function(std::string const& f);
 	
@@ -66,7 +70,8 @@ private:
 	template<Tokens::TokenType type>
 	static ItToken find_close_bracket(ItToken itLeftBracket, ItToken itEnd)
 	{
-		static_assert(type == Tokens::Bracket || type == Tokens::CBracket || type == Tokens::QBracket);
+		static_assert(type == Tokens::Bracket || type == Tokens::CBracket || type == Tokens::QBracket,
+			"find_close_bracket call with invalid bracket type");
 		
 		ItToken it = itLeftBracket + 1;
 

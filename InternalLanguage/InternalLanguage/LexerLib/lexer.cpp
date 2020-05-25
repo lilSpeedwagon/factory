@@ -67,6 +67,7 @@ void Lexer::tokenize()
 		case Comma:
 		{
 			addToken(tokenBegin, tokenEnd, Tokens::Comma);
+			break;
 		}
 		case Quote:
 		{
@@ -159,7 +160,7 @@ void Lexer::tokenize()
 void Lexer::addToken(StrIter& begin, StrIter& end, Tokens::TokenType type)
 {
 	m_result.push_back({ std::string(begin, end), type});
-	Log(("\"" + std::string(begin, end) + "\" type: " + Tokens::GetTypeName(type)).c_str());
+	Log(("\"" + std::string(begin, end) + "\" type: " + Tokens::GetTypeName(type)));
 	begin = end;
 	m_tokensFound++;
 	if (type == Tokens::Undefined)
