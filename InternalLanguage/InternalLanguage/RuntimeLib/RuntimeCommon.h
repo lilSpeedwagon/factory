@@ -18,7 +18,10 @@ namespace runtime
 		virtual ~RuntimeException() = default;
 	};
 	
-	
+
+	typedef float IOType;
+	typedef std::vector<IOType> Inputs;
+	typedef std::vector<IOType> Outputs;
 
 	struct Variable
 	{

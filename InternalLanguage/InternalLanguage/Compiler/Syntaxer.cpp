@@ -32,7 +32,6 @@ bool Syntaxer::Run()
 
 	std::stringstream ss;
 	ss << "Operations tree:\n";
-	operation_tree->ExtendView(ss, 0);
 	Log(ss.str());
 
 	m_result = operation_tree;

@@ -1,6 +1,6 @@
-#include "stdafx.h"
+#include "pch.h"
 #include "Operations.h"
-#include "Runtime.h"
+#include "Definitions.h"
 #include <sstream>
 
 // OperationScope
@@ -63,14 +63,6 @@ bool OperationScope::IsVariableExist(std::string const& varName) const
 	return false;
 }
 
-void OperationScope::ExtendView(std::stringstream& ss, int nLevel)
-{
-	make_indent(ss, nLevel);
-	ss << "scope\n";
-	for(auto op : m_listOperations)
-		op->ExtendView(ss, nLevel + 1);
-}
-
 void OperationScope::AddOperation(OperationPtr pOperation)
 {
 	m_listOperations.push_back(pOperation);
@@ -81,14 +73,6 @@ void OperationScope::AddOperation(OperationPtr pOperation)
 void OperationAssign::Execute()
 {
 	m_pParentScope->SetVariableValue(m_pIdentifier->GetName(), m_pExpression->Calculate());
-}
-
-void OperationAssign::ExtendView(std::stringstream& ss, int nLevel)
-{
-	make_indent(ss, nLevel);
-	ss << "assign\n";
-	m_pIdentifier->ExtendView(ss, nLevel + 1);
-	m_pExpression->ExtendView(ss, nLevel + 1);
 }
 // OperatorAssign end
 
@@ -115,29 +99,12 @@ void OperationControlFlow::Execute()
 		}
 	}
 }
-
-void OperationControlFlow::ExtendView(std::stringstream& ss, int nLevel)
-{
-	make_indent(ss, nLevel);
-	ss << "Control flow " << (m_isLoop ? "loop\n" : "\n");
-	m_pCondition->ExtendView(ss, nLevel + 1);
-	m_pScopeIfTrue->ExtendView(ss, nLevel + 1);
-	if (m_pScopeElse != nullptr)
-		m_pScopeElse->ExtendView(ss, nLevel + 1);
-}
 // OperationControlFlow end
 
 // OperationFunctionCall
 void OperationExpression::Execute()
 {
 	m_pExpr->Calculate();
-}
-
-void OperationExpression::ExtendView(std::stringstream& ss, int nLevel)
-{
-	make_indent(ss, nLevel);
-	ss << "function call\n";
-	m_pExpr->ExtendView(ss, ++nLevel);
 }
 // OperationFunctionCall end
 
@@ -146,12 +113,6 @@ runtime::Value ZeroArgsExpression::Calculate()
 {
 	return m_function();
 }
-
-void ZeroArgsExpression::ExtendView(std::stringstream& ss, int nLevel)
-{
-	make_indent(ss, nLevel);
-	ss << "function\n";
-}
 // ZeroArgsExpression end
 
 // UnaryExpression
@@ -159,27 +120,12 @@ runtime::Value UnaryExpression::Calculate()
 {
 	return m_function(m_pOperand->Calculate());
 }
-
-void UnaryExpression::ExtendView(std::stringstream& ss, int nLevel)
-{
-	make_indent(ss, nLevel);
-	ss << "unary function\n";
-	m_pOperand->ExtendView(ss, ++nLevel);
-}
 // UnaryExpression end
 
 // BinaryExpression
 runtime::Value BinaryExpression::Calculate()
 {
 	return m_function(m_pLeftOperand->Calculate(), m_pRightOperand->Calculate());
-}
-
-void BinaryExpression::ExtendView(std::stringstream& ss, int nLevel)
-{
-	make_indent(ss, nLevel);
-	ss << "binary function\n";
-	m_pLeftOperand->ExtendView(ss, nLevel + 1);
-	m_pRightOperand->ExtendView(ss, nLevel + 1);
 }
 // BinaryExpression end
 
@@ -243,12 +189,6 @@ runtime::Value ValueExpression::Calculate()
 {
 	return m_value;
 }
-
-void ValueExpression::ExtendView(std::stringstream& ss, int nLevel)
-{
-	make_indent(ss, nLevel);
-	ss << "value: " << m_value.toString().getValue<std::string>() << '\n';
-}
 // ValueExpression end
 
 // IdentifierExpression
@@ -260,11 +200,5 @@ runtime::Value IdentifierExpression::Calculate()
 	}
 
 	return m_pScope->GetVariableValue(m_strIdentifier);
-}
-
-void IdentifierExpression::ExtendView(std::stringstream& ss, int nLevel)
-{
-	make_indent(ss, nLevel);
-	ss << "identifier: " << m_strIdentifier << '\n';
 }
 // IdentifierExpression end

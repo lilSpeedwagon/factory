@@ -15,9 +15,14 @@ public:
 protected:
 	inline void Log(std::string const& message) const
 	{
-		std::string msg = m_logName + ": " + message;
 		if (m_logDelegate != nullptr)
 		{
+			std::string msg;
+			if (!m_logName.empty())
+			{
+				msg += m_logName + ": ";
+			}
+			msg += message;
 			m_logDelegate(msg.c_str());
 		}
 	}

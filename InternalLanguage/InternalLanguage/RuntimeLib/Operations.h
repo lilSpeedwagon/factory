@@ -1,12 +1,8 @@
 #pragma once
 
-#include "stdafx.h"
-
 #include <functional>
-
-#include "Definitions.h"
-#include "OperationTreeViewHelper.h"
-#include "Runtime.h"
+#include "Utils.h"
+#include "RuntimeCommon.h"
 
 // predefined classes
 class Expression;
@@ -25,8 +21,9 @@ DEFINE_PTR(IdentifierExpression)
 class OperationScope;
 DEFINE_PTR(OperationScope)
 
+
 // classes declaration
-class Operation : public TreeHelper
+class Operation
 {
 public:
 	virtual ~Operation() = default;
@@ -52,7 +49,6 @@ public:
 	void SetVariableValue(std::string const& varName, runtime::Value const& val);
 	bool IsVariableExist(std::string const& varName) const;
 	void AddOperation(OperationPtr pOperation);
-	void ExtendView(std::stringstream& ss, int nLevel) override;
 	bool IsRoot() const { return m_pParentScope == nullptr; }
 	
 protected:
@@ -70,7 +66,6 @@ public:
 	virtual ~OperationAssign() = default;
 	
 	void Execute() override;
-	void ExtendView(std::stringstream& ss, int nLevel) override;
 	
 private:
 	IdentifierExpressionPtr m_pIdentifier;
@@ -90,7 +85,6 @@ public:
 	virtual ~OperationControlFlow() = default;
 	
 	void Execute() override;
-	void ExtendView(std::stringstream& ss, int nLevel) override;
 private:
 	ExpressionPtr m_pCondition;
 	OperationScopePtr m_pScopeIfTrue;
@@ -108,14 +102,13 @@ public:
 	virtual ~OperationExpression() = default;
 
 	void Execute() override;
-	void ExtendView(std::stringstream& ss, int nLevel) override;
 private:
 	ExpressionPtr m_pExpr;
 };
 DEFINE_PTR(OperationExpression)
 
 
-class Expression : public TreeHelper
+class Expression
 {
 public:
 	virtual ~Expression() = default;
@@ -136,7 +129,6 @@ public:
 	virtual ~ZeroArgsExpression() = default;
 
 	runtime::Value Calculate() override;
-	void ExtendView(std::stringstream& ss, int nLevel) override;
 
 protected:
 	runtime::FunctionZeroArgs m_function;
@@ -152,7 +144,6 @@ public:
 	virtual ~UnaryExpression() = default;
 	
 	runtime::Value Calculate() override;
-	void ExtendView(std::stringstream& ss, int nLevel) override;
 
 protected:
 	runtime::FunctionUnary m_function;
@@ -169,7 +160,6 @@ public:
 	virtual ~BinaryExpression() = default;
 	
 	runtime::Value Calculate() override;
-	void ExtendView(std::stringstream& ss, int nLevel) override;
 	
 protected:
 	runtime::FunctionBinary m_function;
@@ -186,7 +176,6 @@ public:
 	virtual ~ValueExpression() = default;
 	
 	runtime::Value Calculate() override;
-	void ExtendView(std::stringstream& ss, int nLevel) override;
 	
 protected:
 	runtime::Value m_value;
@@ -202,7 +191,6 @@ public:
 	virtual ~IdentifierExpression() = default;
 	
 	runtime::Value Calculate() override;
-	void ExtendView(std::stringstream& ss, int nLevel) override;
 	std::string GetName() const { return m_strIdentifier; }
 	
 protected:
