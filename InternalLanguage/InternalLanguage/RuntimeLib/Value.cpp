@@ -76,6 +76,7 @@ runtime::Value& runtime::Value::operator=(Value const& v)
 		const size_t len = strlen(reinterpret_cast<char*>(v.m_value)) + 1;
 		char* buffer = new char[len];
 		strcpy_s(buffer, len, reinterpret_cast<char*>(v.m_value));
+		m_value = reinterpret_cast<_Value>(buffer);
 	}
 	else
 	{

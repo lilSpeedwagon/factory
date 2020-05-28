@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "Runtime.h"
+#include "Value.h"
 
 using namespace runtime;
 
@@ -41,6 +41,41 @@ TEST_CASE("Value assign operator", "[Value]")
 		Value val(std::string("String"));
 		REQUIRE(val.getType() == Value::String);
 		CHECK(val.getValue<std::string>() == "String");
+	}
+
+	SECTION("Value")
+	{
+		SECTION("Integer")
+		{
+			Value val;
+			val = Value(10);
+			REQUIRE(val.getType() == Value::Integer);
+			CHECK(val.getValue<int>() == 10);
+		}
+
+		SECTION("Float")
+		{
+			Value val;
+			val = Value(10.0f);
+			REQUIRE(val.getType() == Value::Float);
+			CHECK(val.getValue<float>() == 10.0f);
+		}
+
+		SECTION("Boolean")
+		{
+			Value val;
+			val = Value(true);
+			REQUIRE(val.getType() == Value::Boolean);
+			CHECK(val.getValue<bool>() == true);
+		}
+
+		SECTION("String")
+		{
+			Value val;
+			val = Value(std::string("String"));
+			REQUIRE(val.getType() == Value::String);
+			CHECK(val.getValue<std::string>() == "String");
+		}
 	}
 }
 
