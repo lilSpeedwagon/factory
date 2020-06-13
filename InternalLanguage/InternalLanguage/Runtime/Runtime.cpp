@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "Runtime.h"
 #include "Operations.h"
-#include "../Serializer/Serializer.h"
+#include "RuntimeContext.h"
+#include "Serializer.h"
 #include "RuntimeExecutor.h"
 
 
@@ -11,9 +12,16 @@ bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), in
 
 	try
 	{
-		Serializer s;
-		OperationScopePtr pOperationTree = s.Load(codeFileName);
+		// upload runtime tree
+		serializer::Serializer s(codeFileName, log);
+		const bool serRes = s.Load();
+		if (!serRes)
+		{
+			return false;
+		}
+		OperationScopePtr pOperationTree = s.GetTree();
 
+		// set inputs and outputs
 		runtime::Inputs vIn;
 		if (inputs != nullptr)
 		{
@@ -25,6 +33,10 @@ bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), in
 		}
 		runtime::Outputs out;
 
+		// set runtime context
+		runtime::ContextLogScopedKeeper logKeeper(log);
+		
+		// run executor
 		runtime::RuntimeExecutor runtime(pOperationTree, log);
 		const bool runtimeResult = runtime.run(vIn, static_cast<size_t>(outputsCount), out);
 		if (!runtimeResult)
@@ -32,6 +44,7 @@ bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), in
 			return false;
 		}
 
+		// handle outputs
 		if (outputs != nullptr)
 		{
 			for (size_t i = 0; i < out.size() && i < static_cast<size_t>(outputsCount); i++)
@@ -41,11 +54,6 @@ bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), in
 		}
 		
 		result = true;
-	}
-	catch(SerializationError const& e)
-	{
-		std::string msg = "Cannot read file: " + e.Message();
-		log(msg.c_str());
 	}
 	catch(std::exception const& e)
 	{

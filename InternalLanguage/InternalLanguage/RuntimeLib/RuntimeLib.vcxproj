@@ -91,13 +91,16 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../CommonLib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../CommonLib; ../Serializer</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -156,6 +159,7 @@
     <ClInclude Include="Operations.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RuntimeCommon.h" />
+    <ClInclude Include="RuntimeContext.h" />
     <ClInclude Include="RuntimeExecutor.h" />
     <ClInclude Include="Value.h" />
   </ItemGroup>
@@ -168,12 +172,16 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="RuntimeCommon.cpp" />
+    <ClCompile Include="RuntimeContext.cpp" />
     <ClCompile Include="RuntimeExecutor.cpp" />
     <ClCompile Include="Value.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommonLib\CommonLib.vcxproj">
       <Project>{229cd476-4504-4377-9408-c4e1df8c3166}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Serializer\Serializer.vcxproj">
+      <Project>{e8b5f3f5-a2a4-4dde-b6da-a5900a9890a2}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

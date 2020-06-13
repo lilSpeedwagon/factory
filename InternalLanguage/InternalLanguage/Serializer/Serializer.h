@@ -1,32 +1,31 @@
 #pragma once
-#include "BaseException.h"
+#include "SerializerCommon.h"
 #include "Logger.h"
 #include "Operations.h"
 
-class SerializationError : public BaseException
+namespace serializer
 {
-public:
-	SerializationError() = default;
-	SerializationError(std::string const& msg)
+	class Serializer : public Logger
 	{
-		m_msg = msg;
-	}
-	virtual ~SerializationError() = default;
-};
+	public:
+		Serializer(std::string const& fileName, LogDelegate log) :
+			m_fileName(Utils::makeBltFileName(fileName)), m_pTree(nullptr), m_isReady(false)
+		{
+			SetLogDelegate(log);
+			SetLogName("Serializer");
+		}
 
+		bool Load();
+		bool Store(OperationScopePtr pOperationTree) const;
+		OperationScopePtr GetTree() const { return m_pTree; };
+		bool isLoaded() const { return m_isReady; }
+	private:
+		BinaryFile openFile(std::string const& fileName, bool isReadOnly = true) const;
+		void closeFile(BinaryFile& file) const;
 
-class Serializer : public Logger
-{
-public:
-	Serializer()
-	{
-		SetLogName("Serializer");
-	}
-
-	OperationScopePtr Load(std::string const& fileName) const;
-	void Store(OperationScopePtr pOperationTree, std::string const& fileName) const;
-private:
-	
-};
-
+		std::string m_fileName;
+		OperationScopePtr m_pTree;
+		bool m_isReady;
+	};
+}
 

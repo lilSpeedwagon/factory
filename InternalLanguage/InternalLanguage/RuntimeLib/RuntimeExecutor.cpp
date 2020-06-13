@@ -1,32 +1,14 @@
 #include "pch.h"
 #include "RuntimeExecutor.h"
-#include "RuntimeCommon.h"
 
-runtime::RuntimeExecutor* runtime::RuntimeExecutor::g_pInstance = nullptr;
-
-void runtime::RuntimeExecutor::print(std::string const& str) const
-{
-	Log(str);
-}
-
-const runtime::RuntimeExecutor& runtime::RuntimeExecutor::getCurrentInstance()
-{
-	return *g_pInstance;
-}
-
-void runtime::RuntimeExecutor::setCurrentInstance(RuntimeExecutor* current)
-{
-	g_pInstance = current;
-}
 
 bool runtime::RuntimeExecutor::run(Inputs const& in, size_t expectedOutputs, Outputs& out)
 {
 	bool result = false;
-	setCurrentInstance(this);
 
 	try
 	{
-		print("Executing...");
+		Log("Executing...");
 
 		for (size_t i = 0; i < in.size(); i++)
 		{
@@ -54,20 +36,21 @@ bool runtime::RuntimeExecutor::run(Inputs const& in, size_t expectedOutputs, Out
 		}
 		
 		result = true;
-		print("Done");
+		Log("Done");
 	}
 	catch (RuntimeException const& e)
 	{
-		print("Runtime exception: " + e.Message());
+		Log("Runtime exception: " + e.Message());
 	}
 	catch (std::exception const& e)
 	{
-		print("Exception: " + std::string(e.what()));
+		Log("Exception: " + std::string(e.what()));
 	}
 	catch (...)
 	{
-		print("Something went wrong. Termination...");
+		Log("Something went wrong. Termination...");
 	}
 
 	return result;
 }
+

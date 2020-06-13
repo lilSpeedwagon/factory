@@ -91,7 +91,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;COMPILER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>../RuntimeLib;../CommonLib;../LexerLib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../RuntimeLib;../CommonLib;../LexerLib;../Serializer</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -170,12 +170,16 @@
   <ItemGroup>
     <ProjectReference Include="..\CommonLib\CommonLib.vcxproj">
       <Project>{229cd476-4504-4377-9408-c4e1df8c3166}</Project>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <ProjectReference Include="..\LexerLib\LexerLib.vcxproj">
       <Project>{a4ec3b58-4d90-4c70-a06e-38be010c5009}</Project>
     </ProjectReference>
     <ProjectReference Include="..\RuntimeLib\RuntimeLib.vcxproj">
       <Project>{9946e094-f343-4832-896d-3495c2db9a1e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Serializer\Serializer.vcxproj">
+      <Project>{e8b5f3f5-a2a4-4dde-b6da-a5900a9890a2}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

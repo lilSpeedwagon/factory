@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Value.h"
 #include "Utils.h"
+#include "FileHelpers.h"
 
 runtime::Value::Value()
 {
@@ -52,6 +53,56 @@ runtime::Value::Value(std::string const& v)
 runtime::Value::~Value()
 {
 	clear();
+}
+
+serializer::BinaryFile& runtime::Value::operator>>(serializer::BinaryFile& file) const
+{
+	const ValueType type = m_type;
+	const uint8_t raw_type = type;
+
+	file << raw_type;
+	
+	if (type == String)
+	{
+		file << getValue<std::string>();
+	}
+	else
+	{
+		file << m_value;
+	}
+	
+	return file;
+}
+
+serializer::BinaryFile& runtime::Value::operator<<(serializer::BinaryFile& file)
+{
+	uint8_t raw_type;
+	file >> raw_type;
+	m_type = static_cast<ValueType>(raw_type);
+
+	if (m_type == String)
+	{
+		std::string str;
+		file >> str;
+		
+		const size_t size = str.size();
+		char* buffer = new char[size + 1];
+		
+		const errno_t err = strcpy_s(buffer, size + 1, str.c_str());
+		if (err != 0)
+		{
+			delete[] buffer;
+			throw serializer::SerializationError("Cannot read value from the file. Error code: " + Utils::toString(err));
+		}
+		
+		m_value = reinterpret_cast<_Value>(buffer);
+	}
+	else
+	{
+		file >> m_value;
+	}
+	
+	return file;
 }
 
 void runtime::Value::clear()

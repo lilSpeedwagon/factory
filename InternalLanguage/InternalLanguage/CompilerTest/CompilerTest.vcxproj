@@ -24,6 +24,7 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>CompilerTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <ProjectName>BeltScriptTest</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -90,7 +91,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../Debug;../Compiler;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Debug;../Compiler;../Runtime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,11 +151,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CompilerTest.cpp" />
+    <ClCompile Include="BeltScriptTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonLib\CommonLib.vcxproj">
+      <Project>{229cd476-4504-4377-9408-c4e1df8c3166}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Compiler\Compiler.vcxproj">
       <Project>{7eaa87de-febd-47dc-a4ac-17e604ecedf4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\LexerLib\LexerLib.vcxproj">
+      <Project>{a4ec3b58-4d90-4c70-a06e-38be010c5009}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\RuntimeLib\RuntimeLib.vcxproj">
+      <Project>{9946e094-f343-4832-896d-3495c2db9a1e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Runtime\Runtime.vcxproj">
+      <Project>{42135f64-d04f-4755-97a6-da99d28f6ef1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Serializer\Serializer.vcxproj">
+      <Project>{e8b5f3f5-a2a4-4dde-b6da-a5900a9890a2}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

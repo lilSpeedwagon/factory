@@ -78,7 +78,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../../CatchTest;../RuntimeLib;../CommonLib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../CatchTest;../RuntimeLib;../CommonLib;../Serializer</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -133,6 +133,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonLib\CommonLib.vcxproj">
+      <Project>{229cd476-4504-4377-9408-c4e1df8c3166}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\RuntimeLib\RuntimeLib.vcxproj">
       <Project>{9946e094-f343-4832-896d-3495c2db9a1e}</Project>
     </ProjectReference>

@@ -98,6 +98,9 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -153,10 +156,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FileHelpers.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Serializer.h" />
+    <ClInclude Include="SerializerCommon.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FileHelpers.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -166,8 +172,8 @@
     <ClCompile Include="Serializer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RuntimeLib\RuntimeLib.vcxproj">
-      <Project>{9946e094-f343-4832-896d-3495c2db9a1e}</Project>
+    <ProjectReference Include="..\CommonLib\CommonLib.vcxproj">
+      <Project>{229cd476-4504-4377-9408-c4e1df8c3166}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

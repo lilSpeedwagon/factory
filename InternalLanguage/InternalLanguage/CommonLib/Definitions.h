@@ -1,6 +1,8 @@
 #pragma once
-#include "pch.h"
-#include "BaseException.h"
+#include <string>
+#include <vector>
+#include <array>
+
 #include "Utils.h"
 
 typedef void(__stdcall *LogDelegate)(const char*);
@@ -75,7 +77,7 @@ namespace Tokens
 namespace Operators
 {
 	typedef int Priority;
-	static const Priority max_priority = MAXINT;
+	static const Priority max_priority = INT32_MAX;
 	static const Priority min_priority = 0;
 	static const Priority brackets_priority = 50;
 	

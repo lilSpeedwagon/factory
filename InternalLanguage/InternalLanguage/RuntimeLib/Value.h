@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseException.h"
-#include "sstream"
+#include "SerializerCommon.h"
+#include <sstream>
 
 namespace runtime
 {
@@ -38,13 +39,13 @@ namespace runtime
 		 * So this way void* is appropriate for storing different data types. */
 		typedef void* _Value;
 
-		enum ValueType
+		enum ValueType : uint8_t
 		{
-			Undefined = -1,
-			Integer = 0,
-			Float = 1,
-			Boolean = 2,
-			String = 3,
+			Undefined = 0,
+			Integer = 1,
+			Float = 2,
+			Boolean = 3,
+			String = 4,
 		};
 
 		Value();
@@ -113,6 +114,9 @@ namespace runtime
 		{
 			return std::string(reinterpret_cast<char*>(m_value));
 		}
+
+		serializer::BinaryFile& operator>>(serializer::BinaryFile& file) const;
+		serializer::BinaryFile& operator<<(serializer::BinaryFile& file);
 
 	private:
 		void clear();
