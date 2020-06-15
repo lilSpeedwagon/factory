@@ -39,6 +39,7 @@ ExportedObj/
 *.booproj
 *.svd
 *.pdb
+*.ipdb
 *.mdb
 *.opendb
 *.VC.db
@@ -70,6 +71,7 @@ crashlytics-build.properties
 *.lo
 *.o
 *.obj
+*.iobj
 
 # Precompiled Headers
 *.gch
