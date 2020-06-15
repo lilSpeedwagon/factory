@@ -162,6 +162,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="RuntimeCommon.h" />
     <ClInclude Include="RuntimeContext.h" />
+    <ClInclude Include="RuntimeException.h" />
     <ClInclude Include="RuntimeExecutor.h" />
     <ClInclude Include="Value.h" />
   </ItemGroup>

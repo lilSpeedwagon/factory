@@ -46,10 +46,6 @@ bool runtime::RuntimeExecutor::run(Inputs const& in, size_t expectedOutputs, Out
 	{
 		Log("Exception: " + std::string(e.what()));
 	}
-	catch (...)
-	{
-		Log("Something went wrong. Termination...");
-	}
 
 	return result;
 }

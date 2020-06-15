@@ -8,18 +8,6 @@
 
 namespace runtime
 {
-	class RuntimeException : public BaseException
-	{
-	public:
-		RuntimeException() = default;
-		RuntimeException(std::string const& msg)
-		{
-			m_msg = msg;
-		}
-		virtual ~RuntimeException() = default;
-	};
-
-
 	typedef float IOType;
 	typedef std::vector<IOType> Inputs;
 	typedef std::vector<IOType> Outputs;

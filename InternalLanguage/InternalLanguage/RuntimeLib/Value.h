@@ -1,16 +1,17 @@
 #pragma once
-#include "BaseException.h"
+#include "RuntimeException.h"
 #include "SerializerCommon.h"
 #include <sstream>
 
 namespace runtime
 {
-	class UndefinedValueException : public BaseException
+	class UndefinedValueException : public RuntimeException
 	{
 	public:
 		virtual ~UndefinedValueException() = default;
 	};
-	class InvalidOperationException : public BaseException
+	
+	class InvalidOperationException : public RuntimeException
 	{
 	public:
 		virtual ~InvalidOperationException() = default;
@@ -23,7 +24,8 @@ namespace runtime
 			m_msg = ss.str();
 		}
 	};
-	class DivisionByZeroException : public BaseException
+	
+	class DivisionByZeroException : public RuntimeException
 	{
 	public:
 		DivisionByZeroException() { m_msg = "Division by zero"; }
