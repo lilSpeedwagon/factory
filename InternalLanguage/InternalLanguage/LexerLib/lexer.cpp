@@ -9,24 +9,24 @@ bool Lexer::Run()
 {
 	bool result = false;
 
-	Log("Running lexical analysis");
+	Log("Running lexical analysis.");
 	m_result.clear();
 	if (m_strCode.empty())
 	{
-		Log("Nothing to analyze");
+		Log("Nothing to analyze.");
 		return result;
 	}
 
-	Log("Code: " + m_strCode);
-	Log("Tokens:");
+	DebugLog("Code: " + m_strCode);
+	DebugLog("Tokens:");
 	m_result.reserve(m_strCode.length() / TOKEN_DENSITY);
 	tokenize();
 	m_result.shrink_to_fit();
-	Log("done");
+	Log("Done.");
 
 	std::stringstream ss;
 	ss << m_tokensFound << " tokens found. " << m_undefinedTokensFound << " undefined.";
-	Log(ss.str());
+	DebugLog(ss.str());
 
 	result = m_undefinedTokensFound == 0;
 	
@@ -160,7 +160,7 @@ void Lexer::tokenize()
 void Lexer::addToken(StrIter& begin, StrIter& end, Tokens::TokenType type)
 {
 	m_result.push_back({ std::string(begin, end), type});
-	Log(("\"" + std::string(begin, end) + "\" type: " + Tokens::GetTypeName(type)));
+	DebugLog(("\"" + std::string(begin, end) + "\" type: " + Tokens::GetTypeName(type)));
 	begin = end;
 	m_tokensFound++;
 	if (type == Tokens::Undefined)

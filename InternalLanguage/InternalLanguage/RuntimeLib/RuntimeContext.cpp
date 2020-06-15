@@ -21,3 +21,4 @@ runtime::RuntimeContext& runtime::RuntimeContext::GetInstance()
 	}
 	return *g_currentInstance;
 }
+

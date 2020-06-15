@@ -6,11 +6,7 @@
 class Logger
 {
 public:
-	Logger()
-	{
-		m_logName = "";
-		m_logDelegate = nullptr;
-	}
+	Logger() : m_logName(""), m_logDelegate(nullptr) {}
 
 protected:
 	void Log(std::string const& message) const;
@@ -23,3 +19,8 @@ private:
 };
 
 
+#ifdef _DEBUG
+	#define DebugLog(msg) Log(msg);
+#else
+	#define DebugLog(msg)
+#endif

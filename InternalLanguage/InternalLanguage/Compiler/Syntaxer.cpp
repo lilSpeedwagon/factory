@@ -3,19 +3,19 @@
 
 void Syntaxer::prepare_tokens()
 {
-	Log("Preparing tokens.");
+	DebugLog("Preparing tokens.");
 	
 	// remove delimiters
 	m_pTokens->erase(std::remove_if(m_pTokens->begin(), m_pTokens->end(),
 		[](Tokens::Token& t) {	return t.type == Tokens::Delimiter;	}),
 		m_pTokens->end());
 	
-	Log("Tokens are ready.");
+	DebugLog("Tokens are ready.");
 }
 
 bool Syntaxer::Run()
 {
-	Log("Running...");
+	Log("Compilation...");
 	prepare_tokens();
 
 	m_result.reset();
@@ -39,7 +39,7 @@ bool Syntaxer::Run()
 
 void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope)
 {
-	Log("Extending scope for: " + make_string_from_tokens(itBegin, itEnd));
+	DebugLog("Extending scope for: " + make_string_from_tokens(itBegin, itEnd));
 	
 	auto it = itBegin;
 	auto expr_begin = it, expr_end = it;;
@@ -50,14 +50,14 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 		{
 			if (it->value == KeyWords::IfElse.first)
 			{
-				Log("Extending if-else block.");
+				DebugLog("Extending if-else block.");
 				// find condition
 				ItToken itOpenBracket = it + 1;
 				if (itOpenBracket == itEnd || itOpenBracket->type != Tokens::Bracket || itOpenBracket->value != "(")
 					throw CompilationError("Missing condition expression.");
 
 				ItToken itCloseBracket = find_close_bracket<Tokens::Bracket>(itOpenBracket, itEnd);				
-				Log("Condition: " + Tokens::make_string_from_tokens(itOpenBracket + 1, itCloseBracket));
+				DebugLog("Condition: " + Tokens::make_string_from_tokens(itOpenBracket + 1, itCloseBracket));
 				ExpressionPtr pExprCondition = extend_expression(itOpenBracket + 1, itCloseBracket, pCurrentScope);
 
 				// find true scope
@@ -66,7 +66,7 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 					throw CompilationError("Missing brackets for if scope.");
 
 				ItToken itCloseTrueBracket = find_close_bracket<Tokens::CBracket>(itOpenTrueBracket, itEnd);
-				Log("If scope: " + Tokens::make_string_from_tokens(itOpenTrueBracket + 1, itCloseTrueBracket));
+				DebugLog("If scope: " + Tokens::make_string_from_tokens(itOpenTrueBracket + 1, itCloseTrueBracket));
 				OperationScopePtr pIfTrueScope = std::make_shared<OperationScope>();
 				extend_scope(itOpenTrueBracket + 1, itCloseTrueBracket, pIfTrueScope);
 
@@ -83,7 +83,7 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 						throw CompilationError("Missing brackets for else scope.");
 
 					const ItToken itCloseElseBracket = find_close_bracket<Tokens::CBracket>(itOpenElseBracket, itEnd);
-					Log("Else scope: " + Tokens::make_string_from_tokens(itOpenElseBracket + 1, itCloseElseBracket));
+					DebugLog("Else scope: " + Tokens::make_string_from_tokens(itOpenElseBracket + 1, itCloseElseBracket));
 					pElseScope = std::make_shared<OperationScope>();
 					extend_scope(itOpenElseBracket + 1, itCloseElseBracket, pElseScope);
 
@@ -97,14 +97,14 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 			}
 			else if (it->value == KeyWords::Loop)
 			{
-				Log("Extending loop block.");
+				DebugLog("Extending loop block.");
 				// find condition
 				ItToken itOpenBracket = it + 1;
 				if (itOpenBracket == itEnd || itOpenBracket->type != Tokens::Bracket || itOpenBracket->value != "(")
 					throw CompilationError("Missing condition expression.");
 
 				ItToken itCloseBracket = find_close_bracket<Tokens::Bracket>(itOpenBracket, itEnd);
-				Log("Condition: " + Tokens::make_string_from_tokens(itOpenBracket + 1, itCloseBracket));
+				DebugLog("Condition: " + Tokens::make_string_from_tokens(itOpenBracket + 1, itCloseBracket));
 				ExpressionPtr pExprCondition = extend_expression(itOpenBracket + 1, itCloseBracket, pCurrentScope);
 
 				// find loop scope
@@ -113,7 +113,7 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 					throw CompilationError("Missing brackets for if scope.");
 
 				ItToken itCloseLoopBracket = find_close_bracket<Tokens::CBracket>(itOpenLoopBracket, itEnd);
-				Log("Loop scope: " + Tokens::make_string_from_tokens(itOpenLoopBracket + 1, itCloseLoopBracket));
+				DebugLog("Loop scope: " + Tokens::make_string_from_tokens(itOpenLoopBracket + 1, itCloseLoopBracket));
 				OperationScopePtr pLoopScope = std::make_shared<OperationScope>();
 				extend_scope(itOpenLoopBracket + 1, itCloseLoopBracket, pLoopScope);
 
@@ -151,7 +151,7 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 
 void Syntaxer::extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope) const
 {
-	Log("Extending operation: " + make_string_from_tokens(itBegin, itEnd));
+	DebugLog("Extending operation: " + make_string_from_tokens(itBegin, itEnd));
 	
 	// assignment
 	ItToken itAssign = find_token_type(itBegin, itEnd, Tokens::Assignment);
@@ -186,7 +186,7 @@ void Syntaxer::extend_operation(ItToken itBegin, ItToken itEnd, OperationScopePt
 
 OperationAssignPtr Syntaxer::extend_assignment(ItToken itBegin, ItToken itEnd, ItToken itAssign, OperationScopePtr pCurrentScope) const
 {
-	Log("Extending assignment: " + Tokens::make_string_from_tokens(itBegin, itEnd));
+	DebugLog("Extending assignment: " + Tokens::make_string_from_tokens(itBegin, itEnd));
 	
 	if (std::distance(itBegin, itAssign) != 1 || itBegin->type != Tokens::Identifier)
 		throw CompilationError("Cannot assign value to non identifier", itBegin, itEnd);
@@ -194,10 +194,10 @@ OperationAssignPtr Syntaxer::extend_assignment(ItToken itBegin, ItToken itEnd, I
 	if (std::find(KeyWords::KeyWords.cbegin(), KeyWords::KeyWords.cend(), itBegin->value) != KeyWords::KeyWords.cend())
 		throw CompilationError("Unexpected keyword in the left part of assignment", itBegin, itEnd);
 	
-	Log("Left operand: " + itBegin->value);
+	DebugLog("Left operand: " + itBegin->value);
 	IdentifierExpressionPtr pIdentifier = std::make_shared<IdentifierExpression>(itBegin->value);
 	ItToken itRightOperand = itAssign + 1;
-	Log("Right operand: " + Tokens::make_string_from_tokens(itRightOperand, itEnd));
+	DebugLog("Right operand: " + Tokens::make_string_from_tokens(itRightOperand, itEnd));
 	ExpressionPtr pExpr = extend_expression(itRightOperand, itEnd, pCurrentScope);
 
 	return std::make_shared<OperationAssign>(pIdentifier, pExpr);
@@ -206,11 +206,13 @@ OperationAssignPtr Syntaxer::extend_assignment(ItToken itBegin, ItToken itEnd, I
 
 ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, OperationScopePtr pCurrentScope) const
 {
-	Log("Extending expression: " + Tokens::make_string_from_tokens(itBegin, itEnd));
+	DebugLog("Extending expression: " + Tokens::make_string_from_tokens(itBegin, itEnd));
 	ExpressionPtr pExpr;
 
 	if (reduce_brackets(itBegin, itEnd))
-		Log("Brackets reduced.");
+	{
+		DebugLog("Brackets reduced.");
+	}
 	
 	const size_t length = std::distance(itBegin, itEnd);
 
@@ -226,12 +228,12 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 		if (argType == Tokens::Number || argType == Tokens::Quote || 
 			argType == Tokens::Identifier && KeyWords::isBoolLiteral(strArg))
 		{
-			Log("Expression is a value: " + strArg);
+			DebugLog("Expression is a value: " + strArg);
 			pExpr = std::make_shared<ValueExpression>(strArg);
 		}
 		else if (argType == Tokens::Identifier)
 		{
-			Log("Expression is an identifier: " + strArg);
+			DebugLog("Expression is an identifier: " + strArg);
 			pExpr = std::make_shared<IdentifierExpression>(strArg);
 		}
 		else
@@ -243,7 +245,7 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 		 &&	(itBegin + 1)->type == Tokens::Bracket && (itBegin + 1)->value == "("
 		 && find_close_bracket<Tokens::Bracket>(itBegin + 1, itEnd) == itEnd - 1) // expression is a function call
 	{
-		Log("Expression is a function call");
+		DebugLog("Expression is a function call");
 		const ItToken itFunction = itBegin;
 		const ItToken itOpenBracket = itBegin + 1;
 		const ItToken itCloseBracket = itEnd - 1;
@@ -259,14 +261,14 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 			throw CompilationError("Error in expression: " + make_string_from_tokens(itBegin, itEnd));
 		}
 		const std::string strOperator = itLowestPriority->value;
-		Log("Extend arguments of operator: " + strOperator);
+		DebugLog("Extend arguments of operator: " + strOperator);
 
 		// 2. extend its operands
 		const bool hasLeftOperand = std::distance(itBegin, itLowestPriority) > 0;
 		const bool isUnaryOperation = Operators::isUnaryOperator(strOperator) && !hasLeftOperand;
 		if (isUnaryOperation)
 		{
-			Log("Unary operand: " + Tokens::make_string_from_tokens(itLowestPriority + 1, itEnd));
+			DebugLog("Unary operand: " + Tokens::make_string_from_tokens(itLowestPriority + 1, itEnd));
 			ExpressionPtr pOperand = extend_expression(itLowestPriority + 1, itEnd, pCurrentScope);
 			
 			runtime::FunctionUnary func = get_function_for_unary_operator(strOperator);
@@ -274,10 +276,10 @@ ExpressionPtr Syntaxer::extend_expression(ItToken itBegin, ItToken itEnd, Operat
 		}
 		else
 		{
-			Log("Left operand: " + Tokens::make_string_from_tokens(itBegin, itLowestPriority));
+			DebugLog("Left operand: " + Tokens::make_string_from_tokens(itBegin, itLowestPriority));
 			ExpressionPtr pLeftOperand = extend_expression(itBegin, itLowestPriority, pCurrentScope);
 			
-			Log("Right operand: " + Tokens::make_string_from_tokens(itLowestPriority + 1, itEnd));
+			DebugLog("Right operand: " + Tokens::make_string_from_tokens(itLowestPriority + 1, itEnd));
 			ExpressionPtr pRightOperand = extend_expression(itLowestPriority + 1, itEnd, pCurrentScope);
 
 			runtime::FunctionBinary func = get_function_for_binary_operator(strOperator);
@@ -293,7 +295,7 @@ ExpressionPtr Syntaxer::extend_function(ItToken itBegin, ItToken itEnd, Operatio
 	const ItToken itFunc = itBegin;
 	const ItToken itLeftBracket = itFunc + 1;
 	const std::string funcName = itFunc->value;
-	Log("Extending function " + funcName + " with arguments " + Tokens::make_string_from_tokens(itLeftBracket + 1, itEnd));
+	DebugLog("Extending function " + funcName + " with arguments " + Tokens::make_string_from_tokens(itLeftBracket + 1, itEnd));
 	
 	const size_t argsCount = count_arguments(itLeftBracket + 1, itEnd);
 

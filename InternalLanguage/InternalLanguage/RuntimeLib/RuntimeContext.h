@@ -14,7 +14,9 @@ namespace runtime
 		static RuntimeContext* g_currentInstance;
 		RuntimeContext()
 		{
+#ifdef _DEBUG
 			SetLogName("Runtime");
+#endif
 		}
 	};
 

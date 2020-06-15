@@ -8,7 +8,7 @@ bool runtime::RuntimeExecutor::run(Inputs const& in, size_t expectedOutputs, Out
 
 	try
 	{
-		Log("Executing...");
+		DebugLog("Executing...");
 
 		for (size_t i = 0; i < in.size(); i++)
 		{
@@ -36,7 +36,7 @@ bool runtime::RuntimeExecutor::run(Inputs const& in, size_t expectedOutputs, Out
 		}
 		
 		result = true;
-		Log("Done");
+		DebugLog("Done");
 	}
 	catch (RuntimeException const& e)
 	{

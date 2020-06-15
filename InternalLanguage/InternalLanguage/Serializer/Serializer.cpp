@@ -6,7 +6,7 @@ using namespace runtime;
 
 bool Serializer::Load()
 {
-	Log("Loading operations tree");
+	DebugLog("Loading operations tree...");
 	try
 	{
 		m_isReady = false;
@@ -30,13 +30,13 @@ bool Serializer::Load()
 		Log(e.Message());
 		return false;
 	}
-	Log("Operations tree is ready");
+	DebugLog("Operations tree is ready.");
 	return true;
 }
 
 bool Serializer::Store(OperationScopePtr pOperationTree) const
 {
-	Log("Storing operation tree to a file");
+	DebugLog("Storing operation tree to a file...");
 	try
 	{
 		BinaryFile file = openFile(m_fileName, false);
@@ -48,27 +48,27 @@ bool Serializer::Store(OperationScopePtr pOperationTree) const
 		Log(e.Message());
 		return false;
 	}
-	Log("Storing completed");
+	DebugLog("Storing completed.");
 	return true;
 }
 
 BinaryFile Serializer::openFile(std::string const& fileName, bool isReadOnly) const
 {
-	Log("Opening file " + fileName);
+	DebugLog("Opening file " + fileName + "...");
 	const std::ios_base::openmode mode = std::_Iosb<int>::binary | (isReadOnly ? std::_Iosb<int>::in : (std::_Iosb<int>::out | std::_Iosb<int>::trunc));
 	BinaryFile file(fileName, mode);
 
 	if (!file.is_open())
 	{
-		throw SerializationError("Cannot open file " + fileName);
+		throw SerializationError("Cannot open file " + fileName + ".");
 	}
-	Log(std::string("File opened for ") + (isReadOnly ? "reading" : "writing"));
+	DebugLog(std::string("File opened for ") + (isReadOnly ? "reading." : "writing."));
 	
 	return file;
 }
 
 void Serializer::closeFile(BinaryFile& file) const
 {
-	Log("Closing file");
+	DebugLog("Closing file...");
 	file.close();
 }
