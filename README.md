@@ -6,7 +6,7 @@ Factory is a game project about automatization and managment of modern fabrique.
 The game is developed as a Master Degree project in educational purposes.
 
 # Written in:
-Game - Unity / C# 
+Game - Unity / C#
 BeltScript - C++
 
 # Current status:
