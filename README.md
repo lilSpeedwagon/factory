@@ -7,8 +7,10 @@ The game is developed as a Master Degree project in educational purposes.
 
 # Written in:
 Game - Unity / C#
+
 BeltScript - C++
 
 # Current status:
 Game - prototype
+
 BeltScript - alpha version
