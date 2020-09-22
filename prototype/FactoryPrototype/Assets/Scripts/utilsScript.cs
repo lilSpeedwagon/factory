@@ -74,8 +74,8 @@ public class InputUtils
 
 public class MouseUtils
 {
-
     public const int PRIMARY_MOUSE_BUTTON = 0;
+    public const int ALTER_MOUSE_BUTTON = 1;
 }
 
 public class ColorUtils

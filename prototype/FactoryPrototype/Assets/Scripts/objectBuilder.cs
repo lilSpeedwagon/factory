@@ -9,14 +9,24 @@ using UnityEngine.UI;
 
 public class objectBuilder : MonoBehaviour
 {
+    private static objectBuilder g_instance;
+    public static objectBuilder Builder
+    {
+        get
+        {
+            if (g_instance == null)
+                g_instance = GameObject.FindWithTag("Player").GetComponent<objectBuilder>();
+            return g_instance;
+        }
+    }
+
+
     public List<BuildableObjectScript> Objects;
+    public GameObject BuilderPanel;
 
     public GameObject ShadowPrefab;
-    public GameObject PrefabToCreate = null;
-    public GameObject BuilderPanel;
-    public GameObject ButtonPrefab;
+    public GameObject PrefabToCreate;
     public GameObject RemoverPrefab;
-    public int ButtonsMargin = 10;
 
     delegate void OnBuildSignal(BuildableObjectScript obj);
     delegate void OnRemoveSignal(int sellCost);
@@ -87,7 +97,7 @@ public class objectBuilder : MonoBehaviour
             m_tileManager.RemoveObject(pos);
             m_onRemoveSignal(cost);
         }
-        catch (System.Exception)
+        catch (Exception)
         {
             Debug.Log("Nothing to remove");
         }
@@ -111,60 +121,11 @@ public class objectBuilder : MonoBehaviour
         BuilderPanel.SetActive(true);
     }
 
-    void InitButton(BuildableObjectScript obj, ref Vector2 position)
-    {
-        Sprite img = (obj.Image != null) ? obj.Image : obj.Prefab.GetComponent<SpriteRenderer>().sprite;
-        GameObject button = Instantiate(ButtonPrefab, m_builderPanelContent.transform);
-        RectTransform rectTransform = button.GetComponent<RectTransform>();
-        rectTransform.localPosition = position;
-        rectTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-        button.GetComponent<RawImage>().texture = img.texture;
-        button.GetComponent<Button>().onClick.AddListener(call: delegate () { Pick(obj.Prefab); });
-        position -= new Vector2(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height);
-    }
-
-    void InitBuilderPanel()
-    {
-        Vector2 localPos = new Vector3(BuilderPanel.GetComponent<RectTransform>().rect.width / 2, 0.0f);
-        GameObject viewPort = BuilderPanel.transform.Find("Viewport").gameObject;
-        m_builderPanelContent = viewPort.transform.Find("Content").gameObject;
-
-        // clear panel
-        for (var i = 0; i < m_builderPanelContent.transform.childCount; i++)
-        {
-            Destroy(m_builderPanelContent.transform.GetChild(i).gameObject);
-        }
-
-        float buttonHeight = ButtonPrefab.GetComponent<RectTransform>().rect.height;
-        float height = (ButtonsMargin + buttonHeight) * (Objects.Count + 1) + ButtonsMargin;
-        m_builderPanelContent.GetComponent<RectTransform>().sizeDelta = new Vector2(m_builderPanelContent.GetComponent<RectTransform>().sizeDelta.x, height);
-
-        GameObject button = Instantiate(ButtonPrefab, m_builderPanelContent.transform);
-        localPos -= new Vector2(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height / 2);
-        RectTransform rectTransform = button.GetComponent<RectTransform>();
-        rectTransform.localPosition = localPos;
-        rectTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-        button.GetComponent<RawImage>().texture = RemoverPrefab.GetComponent<SpriteRenderer>().sprite.texture;
-        button.GetComponent<Button>().onClick.AddListener(call: PickRemover);
-
-        localPos -= new Vector2(0, ButtonsMargin + buttonHeight);
-        foreach (var obj in Objects)
-        {
-            InitButton(obj, ref localPos);
-        }
-    }
 
     // Start is called before the first frame update
     void Start()
     {
-        InitBuilderPanel();
-
         m_tileManager = TileManagerScript.TileManager;
-        m_grid = GameObject.FindWithTag("grid");
-        if (m_grid != null)
-        {
-            m_gridLayout = m_grid.GetComponent<GridLayout>();
-        }
 
         m_onBuildSignal = delegate(BuildableObjectScript obj) { ResoucesScript.instance.OnBuild(obj); };
         m_onRemoveSignal = delegate (int sellCost) { ResoucesScript.instance.OnSell(sellCost); };
@@ -218,12 +179,12 @@ public class objectBuilder : MonoBehaviour
     public void Pick(GameObject prefab)
     {
         ChangePrefab(prefab);
-        BuilderPanel.SetActive(false);
+        Hide();
         try
         {
             m_currentZlevel = prefab.GetComponent<tileObjectScript>().ZPosition;
         }
-        catch (System.NullReferenceException e)
+        catch (NullReferenceException e)
         {
             Debug.LogWarning(e);
         }
@@ -231,17 +192,24 @@ public class objectBuilder : MonoBehaviour
 
     public void PickRemover()
     {
-        BuilderPanel.SetActive(false);
+        Show();
         m_isActive = true;
         m_isRemoverActive = true;
         CreateRemoverShadow();
     }
 
+    public void Hide()
+    {
+        BuilderPanel.SetActive(false);
+    }
+
+    public void Show()
+    {
+        BuilderPanel.SetActive(false);
+    }
+
     private TileManagerScript m_tileManager;
-    private GameObject m_grid;
-    private GridLayout m_gridLayout;
     private GameObject m_shadow;
-    private GameObject m_builderPanelContent;
 
     private OnBuildSignal m_onBuildSignal;
     private OnRemoveSignal m_onRemoveSignal;

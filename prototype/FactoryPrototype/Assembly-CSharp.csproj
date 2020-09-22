@@ -63,11 +63,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BuildableObjectScript.cs" />
+    <Compile Include="Assets\Scripts\BuilderMenu.cs" />
     <Compile Include="Assets\Scripts\InputConsumer.cs" />
     <Compile Include="Assets\Scripts\MaterialScript.cs" />
+    <Compile Include="Assets\Scripts\MenuManager.cs" />
     <Compile Include="Assets\Scripts\MotionScript.cs" />
     <Compile Include="Assets\Scripts\ObjectInfoHolderScript.cs" />
     <Compile Include="Assets\Scripts\OutputProducer.cs" />
+    <Compile Include="Assets\Scripts\Programmator.cs" />
+    <Compile Include="Assets\Scripts\ProgrammatorMenu.cs" />
     <Compile Include="Assets\Scripts\RecipeManager.cs" />
     <Compile Include="Assets\Scripts\ResoucesScript.cs" />
     <Compile Include="Assets\Scripts\TileManagerScript.cs" />

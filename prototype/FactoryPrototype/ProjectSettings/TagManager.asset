@@ -8,6 +8,8 @@ TagManager:
   - object
   - detail
   - TileManager
+  - MenuManager
+  - ProgrammerMenu
   layers:
   - Default
   - TransparentFX

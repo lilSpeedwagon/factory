@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class TileManagerScript : MonoBehaviour
 {
-    private static TileManagerScript m_instance;
+    private static TileManagerScript g_instance;
     public static TileManagerScript TileManager
     {
         get
         {
-            if (m_instance == null)
-                m_instance = GameObject.FindWithTag("TileManager").GetComponent<TileManagerScript>();
-            return m_instance;
+            if (g_instance == null)
+                g_instance = GameObject.FindWithTag("TileManager").GetComponent<TileManagerScript>();
+            return g_instance;
         }
     }
 
