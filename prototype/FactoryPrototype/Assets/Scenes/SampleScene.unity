@@ -276,6 +276,7 @@ GameObject:
   - component: {fileID: 68322896}
   - component: {fileID: 68322895}
   - component: {fileID: 68322894}
+  - component: {fileID: 68322897}
   m_Layer: 5
   m_Name: BuilderPanel
   m_TagString: Untagged
@@ -370,6 +371,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 68322892}
   m_CullTransparentMesh: 1
+--- !u!114 &68322897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 68322892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d7f04aa6a34bc34598d1d999ab76415, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ButtonPrefab: {fileID: 8570616906124108880, guid: 15b54d53c130e454fadbc5602ce8148a,
+    type: 3}
+  ButtonsMargin: 10
 --- !u!1 &137098991
 GameObject:
   m_ObjectHideFlags: 0
@@ -617,7 +633,7 @@ MonoBehaviour:
   MaxCameraSize: 5
   MinCameraSize: 0.5
   CursorOffsetToMoveScreen: 32
-  CameraSpeed: {x: 0.1, y: 0, z: 0}
+  CameraSpeed: {x: 0.02, y: 0, z: 0}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -1198,15 +1214,12 @@ MonoBehaviour:
   - {fileID: 4372548973974454222, guid: a1c7f09646e534346bd90698f1230bc9, type: 3}
   - {fileID: 5166025137282809209, guid: eb9a5b1d228a6654b80415fbb38a0075, type: 3}
   - {fileID: 8905209571401361151, guid: 653aa16d1e149ae4ba2e7b01fe39f774, type: 3}
+  BuilderPanel: {fileID: 68322892}
   ShadowPrefab: {fileID: 4172057517413125286, guid: a320cf30b8029fa4db9b621e22387ed8,
     type: 3}
   PrefabToCreate: {fileID: 0}
-  BuilderPanel: {fileID: 68322892}
-  ButtonPrefab: {fileID: 8570616906124108880, guid: 15b54d53c130e454fadbc5602ce8148a,
-    type: 3}
   RemoverPrefab: {fileID: 7526012882960554387, guid: 41ef41256fe5c1d46af6769f702c4d96,
     type: 3}
-  ButtonsMargin: 15
 --- !u!4 &1272473179
 Transform:
   m_ObjectHideFlags: 0
