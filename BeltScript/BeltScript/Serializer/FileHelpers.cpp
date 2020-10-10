@@ -2,6 +2,14 @@
 #include "FileHelpers.h"
 #include "Utils.h"
 
+#ifdef _WIN64
+	typedef uint64_t PtrSizeInteger;
+#else
+	typedef uint32_t PtrSizeInteger;
+#endif
+
+static_assert(sizeof(PtrSizeInteger) == sizeof(void*));
+
 serializer::BinaryFile& operator<<(serializer::BinaryFile& file, std::string const& str)
 {
 	const uint16_t size = static_cast<uint16_t>(str.size());
@@ -44,10 +52,10 @@ serializer::BinaryFile& operator>>(serializer::BinaryFile& file, std::string& st
 
 serializer::BinaryFile& operator<<(serializer::BinaryFile& file, void* const& pRaw)
 {
-	const uint32_t n = reinterpret_cast<uint32_t>(pRaw);
+	const PtrSizeInteger n = reinterpret_cast<PtrSizeInteger>(pRaw);
 	for (size_t i = 0; i < sizeof(void*); i++)
 	{
-		const uint8_t rawByte = n >> (i * 8);
+		const uint8_t rawByte = static_cast<uint8_t>(n >> (i * 8));
 		file << rawByte;
 	}
 	return file;
@@ -55,12 +63,12 @@ serializer::BinaryFile& operator<<(serializer::BinaryFile& file, void* const& pR
 
 serializer::BinaryFile& operator>>(serializer::BinaryFile& file, void*& pRaw)
 {
-	uint32_t n = 0;
+	PtrSizeInteger n = 0;
 	for (size_t i = 0; i < sizeof(void*); i++)
 	{
 		uint8_t rawByte = 0;
 		file >> rawByte;
-		n += static_cast<uint32_t>(rawByte) << (i * 8);
+		n += static_cast<PtrSizeInteger>(rawByte) << (i * 8);
 	}
 	pRaw = reinterpret_cast<void*>(n);
 	return file;

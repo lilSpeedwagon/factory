@@ -41,6 +41,14 @@ namespace runtime
 		 * So this way void* is appropriate for storing different data types. */
 		typedef void* _Value;
 
+#ifdef _WIN64
+		typedef double decimal;
+		typedef int64_t integer;
+#else
+		typedef float decimal;
+		typedef int32_t integer;
+#endif
+
 		enum ValueType : uint8_t
 		{
 			Undefined = 0,
@@ -94,15 +102,21 @@ namespace runtime
 		{
 			return reinterpret_cast<T>(m_value);
 		}
+
+		template<>
+		int getValue<int>() const
+		{
+			return static_cast<int>(reinterpret_cast<integer>(m_value));
+		}
 		
 		template<>
 		float getValue<float>() const
 		{
 			// DANGER ZONE
-			static_assert(sizeof(_Value) == sizeof(float));
-			float fValue;
-			memcpy_s(static_cast<void*>(&fValue), sizeof(float), &m_value, sizeof(_Value));
-			return fValue;
+			static_assert(sizeof(_Value) == sizeof(decimal));
+			decimal fValue;
+			memcpy_s(static_cast<void*>(&fValue), sizeof(decimal), &m_value, sizeof(_Value));
+			return static_cast<float>(fValue);
 		}
 		
 		template<>

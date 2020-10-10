@@ -151,9 +151,11 @@ runtime::Value& runtime::Value::operator=(float v)
 {
 	clear();
 
+	const decimal dVal = static_cast<decimal>(v);
+
 	m_type = Float;
-	static_assert(sizeof(_Value) == sizeof(float));
-	memcpy_s(static_cast<_Value>(&m_value), sizeof(_Value), &v, sizeof(float));
+	static_assert(sizeof(_Value) == sizeof(decimal));
+	memcpy_s(static_cast<_Value>(&m_value), sizeof(_Value), &dVal, sizeof(decimal));
 
 	return *this;
 }
@@ -285,13 +287,13 @@ runtime::Value runtime::Value::operator*(Value const& r_val) const
 			if (m_type == Integer)
 			{
 				const std::string r_strVal = r_val.getValue<std::string>();
-				for (int i = 0; i < getValue<int>(); i++)
+				for (integer i = 0; i < getValue<integer>(); i++)
 					str += r_strVal;
 			}
 			else
 			{
 				const std::string l_strVal = getValue<std::string>();
-				for (int i = 0; i < r_val.getValue<int>(); i++)
+				for (integer i = 0; i < r_val.getValue<integer>(); i++)
 					str += l_strVal;
 			}
 			val = str;
@@ -320,10 +322,10 @@ runtime::Value runtime::Value::operator/(Value const& r_val) const
 	case Boolean:
 	case Float:
 	{
-		const float r_floatValue = r_val.toFloat().getValue<float>();
-		if (r_floatValue == 0.0f)
+		const float r_fValue = r_val.toFloat().getValue<float>();
+		if (r_fValue == 0.0f)
 			throw DivisionByZeroException();
-		val = toFloat().getValue<float>() / r_floatValue;
+		val = toFloat().getValue<float>() / r_fValue;
 		break;
 	}
 	case String:
@@ -462,10 +464,10 @@ runtime::Value runtime::Value::toInt() const
 		val = static_cast<int>(getValue<float>());
 		break;
 	case Boolean:
-		val = getValue<bool>() ? 1 : 0;
+		val = static_cast<int>(getValue<bool>() ? 1 : 0);
 		break;
 	case String:
-		val = Utils::stringToInt(getValue<std::string>());
+		val = static_cast<int>(Utils::stringToInt(getValue<std::string>()));
 		break;
 	default:
 		throw UndefinedValueException();
@@ -488,7 +490,7 @@ runtime::Value runtime::Value::toFloat() const
 		val = getValue<bool>() ? 1.0f : 0.0f;
 		break;
 	case String:
-		val = Utils::stringToFloat(getValue<std::string>());
+		val = static_cast<float>(Utils::stringToFloat(getValue<std::string>()));
 		break;
 	default:
 		throw UndefinedValueException();
