@@ -10,6 +10,12 @@ bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), in
 {
 	bool result = false;
 
+	// don't let LogDelegate be empty
+	if (log == nullptr)
+	{
+		log = [](const char*) {};
+	}
+	
 	try
 	{
 		// upload runtime tree
@@ -49,7 +55,7 @@ bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), in
 		{
 			for (size_t i = 0; i < out.size() && i < static_cast<size_t>(outputsCount); i++)
 			{
-				*outputs[i] = out[i];
+				(*outputs)[i] = out[i];
 			}
 		}
 		
@@ -67,13 +73,16 @@ bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), in
 	return result;
 }
 
-bool __declspec(dllexport) __stdcall Run(const char * codeFileName, void(__stdcall* log)(const char*))
-{
-	return runInternal(codeFileName, log, 0, nullptr, 0, nullptr);
-}
 
-
-bool __declspec(dllexport) __stdcall RunIO(const char * codeFileName, void(__stdcall* log)(const char*), int inputsCount, float inputs[], int outputsCount, float* outputs[])
+extern "C"
 {
-	return runInternal(codeFileName, log, inputsCount, inputs, outputsCount, outputs);
+	bool __declspec(dllexport) __stdcall Run(const char * codeFileName, void(__stdcall* log)(const char*))
+	{
+		return runInternal(codeFileName, log, 0, nullptr, 0, nullptr);
+	}
+
+	bool __declspec(dllexport) __stdcall RunIO(const char * codeFileName, void(__stdcall* log)(const char*), int inputsCount, float inputs[], int outputsCount, float* outputs[])
+	{
+		return runInternal(codeFileName, log, inputsCount, inputs, outputsCount, outputs);
+	}
 }
