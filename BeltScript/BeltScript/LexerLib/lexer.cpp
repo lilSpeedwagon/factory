@@ -159,21 +159,26 @@ void Lexer::tokenize()
 
 void Lexer::addToken(StrIter& begin, StrIter& end, Tokens::TokenType type)
 {
-	m_result.push_back({ std::string(begin, end), type});
-	DebugLog(("\"" + std::string(begin, end) + "\" type: " + Tokens::GetTypeName(type)));
+	const std::string strToken(begin, end);
+	
+	m_result.push_back({ strToken, type});
+	DebugLog(("\"" + strToken + "\" type: " + Tokens::GetTypeName(type)));
 	begin = end;
 	m_tokensFound++;
 	if (type == Tokens::Undefined)
+	{
 		m_undefinedTokensFound++;
+		Log("Undefined token: " + strToken);
+	}
 }
 
 Tokens::TokenType Lexer::getTokenType(StrIter begin, StrIter end)
 {
 	std::string token(begin, end);
-	
-	bool isLetterFirst = isalpha(*begin) || *begin == '_';
-	int numOfDots = std::count<StrIter>(begin, end, '.');
-	int numOfAlphas = std::count_if<StrIter>(begin, end, isalpha);
+
+	const bool isLetterFirst = isalpha(*begin) || *begin == '_';
+	const size_t numOfDots = std::count<StrIter>(begin, end, '.');
+	const size_t numOfAlphas = std::count_if<StrIter>(begin, end, isalpha);
 	
 	if (isLetterFirst && numOfDots == 0)
 	{
