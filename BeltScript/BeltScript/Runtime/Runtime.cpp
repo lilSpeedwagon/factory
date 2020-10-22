@@ -6,7 +6,7 @@
 #include "RuntimeExecutor.h"
 
 
-bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), int inputsCount, float inputs[], int outputsCount, float* outputs[])
+bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), int inputsCount, float inputs[], int outputsCount, float** outputs)
 {
 	bool result = false;
 
@@ -81,7 +81,7 @@ extern "C"
 		return runInternal(codeFileName, log, 0, nullptr, 0, nullptr);
 	}
 
-	bool __declspec(dllexport) __stdcall RunIO(const char * codeFileName, void(__stdcall* log)(const char*), int inputsCount, float inputs[], int outputsCount, float* outputs[])
+	bool __declspec(dllexport) __stdcall RunIO(const char * codeFileName, void(__stdcall* log)(const char*), int inputsCount, float inputs[], int outputsCount, float** outputs)
 	{
 		return runInternal(codeFileName, log, inputsCount, inputs, outputsCount, outputs);
 	}
