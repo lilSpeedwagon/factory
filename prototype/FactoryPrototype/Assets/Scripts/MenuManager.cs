@@ -5,7 +5,7 @@ using UnityEngine;
 
 /*
  * Menus:
- *  1. Builder menu
+ *  1. Builder menu (visible by default)
  *  2. Programmer menu
  *  3. Main menu
  *  4. Wires menu
@@ -16,6 +16,9 @@ public interface IMenu
     void Show();
     void Hide();
 }
+
+// Menu Manager is responsible for holding ref to current active IMenu object
+// and hiding it in the case of call SetActive for another IMenu
 
 public class MenuManager : MonoBehaviour
 {
@@ -30,53 +33,45 @@ public class MenuManager : MonoBehaviour
     }
 
     public ProgrammatorMenu ProgrammerMenu;
-    // TODO public BuilderMenu;
+    public BuilderMenu BuilderMenu;
 
-    // Start is called before the first frame update
+    public void SetActive(IMenu activeMenu)
+    {
+        if (m_current != activeMenu)
+        {
+            m_current?.Hide();
+            m_current = activeMenu;
+        }
+    }
+
+    public bool IsActive => m_current != null;
+    
     void Start()
     {
-        
+        m_default = BuilderMenu;
+        m_current = m_default;
     }
-
-    // Update is called once per frame
-    void FixedUpdate()
+    
+    void Update()
     {
-        if (m_isActive)
+        // do not hide default menu by Esc
+        if (IsActive && m_current != m_default)
         {
+            // listen for Esc button and hide current active menu by pressing
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                hide();
+                hideActive();
             }
         }
-        else
-        {
-            if (Input.GetMouseButtonUp(MouseUtils.PRIMARY_MOUSE_BUTTON))
-            {
-                Vector2 mousePos = TileUtils.MouseCellPosition();
-                GameObject obj = TileManagerScript.TileManager.GetGameObject(mousePos);
-
-                if (obj != null)
-                {
-                    Programmator prog = obj.GetComponent<Programmator>();
-                    if (prog != null)
-                    {
-                        ProgrammerMenu?.ShowFor(prog);
-                        m_current = ProgrammerMenu;
-                    }
-                }
-            }
-        }
-
-        
     }
-
-    private void hide()
+    
+    private void hideActive()
     {
-        m_current.Hide();
-        m_current = null;
+        SetActive(m_default);
+        m_default.Show();
     }
 
-    private bool m_isActive => m_current != null;
+    private IMenu m_default;
     private IMenu m_current;
     private static MenuManager g_instance;
 }

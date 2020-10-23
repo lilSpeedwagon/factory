@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Programmator : tileObjectScript
 {
     public ProgrammatorMenu Menu;
+    public Guid Id => m_id;
 
     public bool IsActive
     {
@@ -18,6 +20,9 @@ public class Programmator : tileObjectScript
 
     void Start()
     {
+        m_id = Guid.NewGuid();
+
+        Menu = ProgrammatorMenu.Menu;
         initButton();
     }
 
@@ -26,17 +31,15 @@ public class Programmator : tileObjectScript
         
     }
 
+    void OnMouseDown()
+    {
+        ShowMenu();
+    }
+
     private void ShowMenu()
     {
-        Debug.Log("show menu");
-        if (Menu != null)
-        {
-            Menu.ShowFor(this);
-        }
-        else
-        {
-            Debug.LogWarning("There is no ProgrammatorMenu attached to Programmator!");
-        }
+        Debug.Log("show programmer menu");
+        Menu?.ShowFor(this);
     }
 
     private void initButton()
@@ -54,4 +57,5 @@ public class Programmator : tileObjectScript
 
 
     private bool m_isActive;
+    private Guid m_id;
 }

@@ -3,12 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BuilderMenu : MonoBehaviour
+public class BuilderMenu : MonoBehaviour, IMenu
 {
     public GameObject ButtonPrefab;
     public int ButtonsMargin = 10;
 
-    void InitButton(BuildableObjectScript obj, ref Vector2 position)
+
+    public void Show()
+    {
+        GetComponent<Image>().enabled = true;
+        GetComponent<ScrollRect>().enabled = true;
+        setActiveForChildren(true);
+    }
+
+    public void Hide()
+    {
+        GetComponent<Image>().enabled = false;
+        GetComponent<ScrollRect>().enabled = false;
+        setActiveForChildren(false);
+    }
+
+    private void InitButton(BuildableObjectScript obj, ref Vector2 position)
     {
         Sprite img = (obj.Image != null) ? obj.Image : obj.Prefab.GetComponent<SpriteRenderer>().sprite;
         GameObject button = Instantiate(ButtonPrefab, m_builderPanelContent.transform);
@@ -20,7 +35,7 @@ public class BuilderMenu : MonoBehaviour
         position -= new Vector2(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height);
     }
 
-    void InitBuilderPanel()
+    private void InitBuilderPanel()
     {
         Vector2 localPos = new Vector3(GetComponent<RectTransform>().rect.width / 2, 0.0f);
         GameObject viewPort = transform.Find("Viewport").gameObject;
@@ -53,20 +68,31 @@ public class BuilderMenu : MonoBehaviour
         }
     }
 
-    void Pick(GameObject prefab)
+    private void Pick(GameObject prefab)
     {
         objectBuilder.Builder.Pick(prefab);
     }
 
-    void PickRemover()
+    private void PickRemover()
     {
         objectBuilder.Builder.PickRemover();
     }
     
     void Start()
     {
-        InitBuilderPanel();   
+        InitBuilderPanel();  
+        m_menuManager = MenuManager.Manager;
     }
-    
+
+    private void setActiveForChildren(bool isActive)
+    {
+        foreach (Transform t in GetComponent<Transform>())
+        {
+            if (t != gameObject)
+                t.gameObject?.SetActive(isActive);
+        }
+    }
+
     private GameObject m_builderPanelContent;
+    private MenuManager m_menuManager;
 }

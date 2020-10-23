@@ -205,7 +205,7 @@ public class objectBuilder : MonoBehaviour
 
     public void Show()
     {
-        BuilderPanel.SetActive(false);
+        BuilderPanel.SetActive(true);
     }
 
     private TileManagerScript m_tileManager;
