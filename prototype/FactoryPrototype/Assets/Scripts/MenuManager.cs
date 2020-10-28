@@ -45,6 +45,7 @@ public class MenuManager : MonoBehaviour
     }
 
     public bool IsActive => m_current != null;
+    public bool IsNonDefaultActive => IsActive && m_current != m_default;
     
     void Start()
     {
@@ -60,12 +61,12 @@ public class MenuManager : MonoBehaviour
             // listen for Esc button and hide current active menu by pressing
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                hideActive();
+                HideActive();
             }
         }
     }
     
-    private void hideActive()
+    private void HideActive()
     {
         SetActive(m_default);
         m_default.Show();

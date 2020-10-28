@@ -7,7 +7,6 @@ using UnityEngine.UI;
 public class ProgrammatorMenu : MonoBehaviour, IMenu
 {
     private ProgrammatorMenu() {}
-    private static ProgrammatorMenu g_instance;
     public static ProgrammatorMenu Menu
     {
         get
@@ -20,9 +19,53 @@ public class ProgrammatorMenu : MonoBehaviour, IMenu
         }
     }
 
-    public InputField CodeField;
+    public InputField CodeInputField;
     public Button CompileButton;
-    
+    public Text TopLabel;
+    public InputField ScriptNameInputField;
+    public Text ScriptListText;
+    public Button SelectButton;
+    public Button RemoveButton;
+    public Scrollbar LogScrollbar;
+    public Text LogText;
+
+
+    public void OnCompile()
+    {
+        Debug.Log("ProgrammerMenu: OnCompile()");
+
+        if (ScriptNameInputField == null || CodeInputField == null)
+        {
+            Debug.LogWarning("Missing programmer menu element reference");
+            return;
+        }
+
+        string fileName = ScriptNameInputField.text;
+        string code = CodeInputField.text;
+        if (fileName.Length == 0)
+        {
+            Debug.LogWarning("ProgrammerMenu: empty script name");
+            return;
+        }
+
+        LogBorder();
+        if (BeltScriptCodeManager.Instance.Compile(fileName, code, Log))
+        {
+            UpdateFileList();
+        }
+    }
+
+    public void OnSelect()
+    {
+        Debug.Log("ProgrammerMenu: OnSelect()");
+
+    }
+
+    public void OnDelete()
+    {
+        Debug.Log("ProgrammerMenu: OnDelete()");
+
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -43,23 +86,11 @@ public class ProgrammatorMenu : MonoBehaviour, IMenu
         }
     }
 
-    public void Compile()
-    {
-        string code = CodeField.GetComponent<InputField>().text;
-
-    }
-
-    public void ShowFor(Programmator prog)
-    {
-        m_currentObject = prog;
-        Show();
-        Debug.Log(prog.Id);
-    }
-
+    // IMenu implementation
     public void Show()
     {
         GetComponent<Image>().enabled = true;
-        setActiveForChildren(true);
+        SetActiveForChildren(true);
 
         m_isActive = true;
 
@@ -69,12 +100,19 @@ public class ProgrammatorMenu : MonoBehaviour, IMenu
     public void Hide()
     {
         GetComponent<Image>().enabled = false;
-        setActiveForChildren(false);
+        SetActiveForChildren(false);
         
         m_isActive = false;
     }
 
-    private void setActiveForChildren(bool isActive)
+    public void ShowFor(Programmator prog)
+    {
+        m_currentObject = prog;
+        Show();
+        Debug.Log(prog.Id);
+    }
+
+    private void SetActiveForChildren(bool isActive)
     {
         foreach (Transform t in GetComponent<Transform>())
         {
@@ -83,7 +121,41 @@ public class ProgrammatorMenu : MonoBehaviour, IMenu
         }
     }
 
+    // Menu handlers
+    private void ClearLog()
+    {
+        if (LogText != null)
+        {
+            LogText.text = "";
+        }
+    }
 
+    private void Log(string message)
+    {
+        if (LogText != null)
+        {
+            LogText.text += message + '\n';
+
+            // move scroll handler to the bottom
+            LogScrollbar.value = 1.0f;
+        }
+    }
+
+    private void LogBorder()
+    {
+        Log("--------------------------------------------");
+    }
+
+    private void UpdateFileList()
+    {
+        Debug.Log("Files:");
+        foreach (var script in BeltScriptCodeManager.Instance.ScriptList)
+        {
+            Debug.Log(script);
+        }
+    }
+    
     private bool m_isActive = false;
     private Programmator m_currentObject;
+    private static ProgrammatorMenu g_instance;
 }

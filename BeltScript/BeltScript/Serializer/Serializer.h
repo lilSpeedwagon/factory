@@ -9,7 +9,7 @@ namespace serializer
 	{
 	public:
 		Serializer(std::string const& fileName, LogDelegate log) :
-			m_fileName(Utils::makeBltFileName(fileName)), m_pTree(nullptr), m_isReady(false)
+			m_fileName(fileName), m_pTree(nullptr), m_isReady(false)
 		{
 			SetLogDelegate(log);
 			SetLogName("Serializer");

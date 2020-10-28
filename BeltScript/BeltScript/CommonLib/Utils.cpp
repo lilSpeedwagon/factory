@@ -1,11 +1,11 @@
 #include "Utils.h"
+#include <algorithm>
 
 std::string Utils::makeBltFileName(std::string const& fileName)
 {
-	const auto dot = fileName.find_last_of('.');
-	std::string str = (dot != std::string::npos) ? fileName.substr(0, dot) : fileName;
-	str.append(".blt");
-	return str;
+	const auto lastSlash = std::max(fileName.find_last_of('/'), fileName.find_last_of('\\'));
+	const auto lastDot = fileName.find_last_of('.', lastSlash);	// dot after slashes (to avoid ./ and ../)
+	return ((lastDot != std::string::npos) ? fileName.substr(0, lastDot) : fileName) + ".blt";
 }
 
 std::string Utils::toString(int n)

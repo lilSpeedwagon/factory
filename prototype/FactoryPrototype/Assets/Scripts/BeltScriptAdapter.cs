@@ -8,9 +8,13 @@ using System.Text;
 using UnityEngine;
 
 
-
+// responsible for managing BeltScript DLLs
 public class BeltScriptAdapter : MonoBehaviour
 {
+    // singleton
+    private BeltScriptAdapter() { }
+    public static BeltScriptAdapter Instance => g_instance ?? (g_instance = GameObject.FindWithTag("BeltScriptAdapter").GetComponent<BeltScriptAdapter>());
+
     public bool Compile(string codeFileName, string code, Logger.LogDelegate log)
     {
         return CompilerDll.Instance.Compile(codeFileName, code, log);
@@ -26,12 +30,6 @@ public class BeltScriptAdapter : MonoBehaviour
         return RuntimeDll.Instance.RunIo(codeFileName, log, inputs.Length, inputs, outputs.Length, ref outputs);
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
     void OnApplicationQuit()
     {
         // always dispatch DLLs on quit
@@ -43,6 +41,8 @@ public class BeltScriptAdapter : MonoBehaviour
     {
          Debug.Log(s);
     };
+
+    private static BeltScriptAdapter g_instance;
 }
 
 

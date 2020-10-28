@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BeltScriptAdapter.cs" />
+    <Compile Include="Assets\Scripts\BeltScriptCodeManager.cs" />
     <Compile Include="Assets\Scripts\BuildableObjectScript.cs" />
     <Compile Include="Assets\Scripts\BuilderMenu.cs" />
     <Compile Include="Assets\Scripts\InputConsumer.cs" />

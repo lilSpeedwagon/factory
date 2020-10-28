@@ -48,6 +48,9 @@ public class cameraScript : MonoBehaviour
 
     void Update()
     {
+        // if non default menu opened disable scrolling
+        if (MenuManager.Manager.IsNonDefaultActive) return;
+
         var scroll = Input.mouseScrollDelta.y;
         if (Math.Abs(scroll) > 0.1f)
             ZoomCamera(scroll);
