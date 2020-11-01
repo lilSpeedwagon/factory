@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,20 +26,20 @@ public class BeltScriptCodeManager
     {
         if (scriptName.Length == 0)
         {
-            Debug.LogWarning("Attempt to call Compile with empty script name");
+            Debug.LogWarning("BeltScriptCodeManager: Attempt to call Compile with empty script name");
             return false;
         }
 
-        string bltPath = CodeDirectory + scriptName + BeltScriptExtension;
-        Debug.Log($"Compiling \"{bltPath}\"...");
+        string bltPath = GetBeltScriptPath(scriptName);
+        Debug.Log($"BeltScriptCodeManager: Compiling \"{bltPath}\"...");
 
         bool result = BeltScriptAdapter.Instance.Compile(bltPath, code, log);
 
         // save code file in the case of successful compilation
         if (result)
         {
-            string sourceCodePath = CodeDirectory + scriptName + SourceCodeExtension;
-            Debug.Log($"Saving code sources with name {sourceCodePath}");
+            string sourceCodePath = GetSourceCodePath(scriptName);
+            Debug.Log($"BeltScriptCodeManager: Saving code sources with name {sourceCodePath}");
 
             try
             {
@@ -57,10 +58,69 @@ public class BeltScriptCodeManager
         }
         else
         {
-            Debug.Log("Compilation failed.");
+            Debug.Log("BeltScriptCodeManager: Compilation failed.");
         }
 
         return result;
+    }
+
+    public string LoadSourceCode(string scriptName)
+    {
+        string sourceCodePath = GetSourceCodePath(scriptName);
+
+        try
+        {
+            return File.ReadAllText(sourceCodePath);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+        }
+
+        return "";
+    }
+
+    public void DeleteScript(string scriptName)
+    {
+        if (!m_scriptList.ContainsKey(scriptName))
+        {
+            Debug.LogWarning($"No such script '{scriptName}' found");
+        }
+        
+        try
+        {
+            File.Delete(GetSourceCodePath(scriptName));
+            File.Delete(GetBeltScriptPath(scriptName));
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+        }
+
+        m_scriptList.Remove(scriptName);
+    }
+
+    public string GetHashForScript(string scriptName)
+    {
+        string hash = "";
+
+        if (m_scriptList.ContainsKey(scriptName))
+        {
+            hash = m_scriptList[scriptName];
+        }
+        else
+        {
+            try
+            {
+                hash = GetCodeFileHash(GetSourceCodePath(scriptName));
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
+        return hash;
     }
 
     // return list of file names
@@ -80,26 +140,22 @@ public class BeltScriptCodeManager
         {
             if (file.EndsWith(BeltScriptExtension))
             {
-                bltFiles.Add(file);
+                Debug.Log(file);
+                bltFiles.Add(GetScriptName(file));
             }
             else if (file.EndsWith(SourceCodeExtension))
             {
-                codeFiles.Add(file);
+                Debug.Log(file);
+                codeFiles.Add(GetScriptName(file));
             }
         }
-
+        
         foreach (var file in bltFiles)
         {
             if (codeFiles.Contains(file))
             {
-                try
-                {
-                    m_scriptList.Add(file, GetCodeFileHash(CodeDirectory + file));
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError(e);
-                }
+                string hash = GetHashForScript(file);
+                m_scriptList.Add(file, hash);
             }
         }
     }
@@ -111,11 +167,11 @@ public class BeltScriptCodeManager
             if (!Directory.Exists(CodeDirectory))
             {
                 Directory.CreateDirectory(CodeDirectory);
-                Debug.Log("Code directory has been created");
+                Debug.Log("BeltScriptCodeManager: Code directory has been created");
             }
             else
             {
-                Debug.Log("Code directory already exists");
+                Debug.Log("BeltScriptCodeManager: Code directory already exists");
             }
         }
         catch (Exception e)
@@ -124,25 +180,31 @@ public class BeltScriptCodeManager
         }
     }
 
-    private bool IsBeltScriptFilesExist(string name)
+    private bool IsBeltScriptFilesExist(string scriptName)
     {
-        string pureName = RemoveExtension(name);
-
-        string codeFile = pureName + SourceCodeExtension;
-        string beltFile = pureName + BeltScriptExtension;
-
-        return File.Exists(codeFile) && File.Exists(beltFile);
+        return File.Exists(GetSourceCodePath(scriptName)) && File.Exists(GetBeltScriptPath(scriptName));
     }
 
     static string RemoveExtension(string name)
     {
-        int dotIndex = name.IndexOf('.');
-        if (dotIndex == -1)
+        int lastDotIndex = name.LastIndexOf('.');
+
+        if (lastDotIndex != -1)
         {
-            return name;
+            bool gotSlashesAfterDot = (name.IndexOf('/', lastDotIndex) != -1) || (name.IndexOf('\\', lastDotIndex) != -1);
+            if (!gotSlashesAfterDot)
+            {
+                return name.Remove(lastDotIndex);
+            }
         }
 
-        return name.Remove(dotIndex);
+        return name;
+    }
+
+    static string RemovePath(string path)
+    {
+        int lastSlashIndex = Math.Max(path.LastIndexOf('/'), path.LastIndexOf('\\'));
+        return path.Substring(lastSlashIndex + 1);
     }
 
     static string GetCodeFileHash(string filePath)
@@ -162,6 +224,10 @@ public class BeltScriptCodeManager
         
         return sBuilder.ToString();
     }
+
+    static string GetScriptName(string path) => RemoveExtension(RemovePath(path));
+    static string GetSourceCodePath(string name) => CodeDirectory + name + SourceCodeExtension;
+    static string GetBeltScriptPath(string name) => CodeDirectory + name + BeltScriptExtension;
 
     // fileName -> hash
     private Dictionary<string, string> m_scriptList;

@@ -9,6 +9,6 @@ public class MaterialScript : MonoBehaviour, IProcessable
     public MaterialType Type { set => m_type = value; get => m_type; }
 
     [SerializeField]
-    private int m_cost;
+    private int m_cost = 0;
     public int Cost => m_cost;
 }

@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\BeltScriptAdapter.cs" />
     <Compile Include="Assets\Scripts\BeltScriptCodeManager.cs" />
+    <Compile Include="Assets\Scripts\BeltScriptMenu.cs" />
     <Compile Include="Assets\Scripts\BuildableObjectScript.cs" />
     <Compile Include="Assets\Scripts\BuilderMenu.cs" />
     <Compile Include="Assets\Scripts\InputConsumer.cs" />
@@ -73,7 +74,6 @@
     <Compile Include="Assets\Scripts\ObjectInfoHolderScript.cs" />
     <Compile Include="Assets\Scripts\OutputProducer.cs" />
     <Compile Include="Assets\Scripts\Programmator.cs" />
-    <Compile Include="Assets\Scripts\ProgrammatorMenu.cs" />
     <Compile Include="Assets\Scripts\RecipeManager.cs" />
     <Compile Include="Assets\Scripts\ResoucesScript.cs" />
     <Compile Include="Assets\Scripts\TileManagerScript.cs" />

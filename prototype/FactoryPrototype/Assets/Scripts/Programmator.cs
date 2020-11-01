@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class Programmator : tileObjectScript
 {
-    public ProgrammatorMenu Menu;
     public Guid Id => m_id;
 
     public bool IsActive
@@ -16,14 +15,17 @@ public class Programmator : tileObjectScript
         set => m_isActive = value;
     }
 
-
+    public string CurrentScriptHash
+    {
+        get => m_currentScriptHash;
+        set => m_currentScriptHash = value;
+    }
 
     void Start()
     {
         m_id = Guid.NewGuid();
-
-        Menu = ProgrammatorMenu.Menu;
-        initButton();
+        
+        InitButton();
     }
 
     void Update()
@@ -39,10 +41,10 @@ public class Programmator : tileObjectScript
     private void ShowMenu()
     {
         Debug.Log("show programmer menu");
-        Menu?.ShowFor(this);
+        // TODO
     }
 
-    private void initButton()
+    private void InitButton()
     {
         Button button = GetComponent<Button>();
         if (button != null)
@@ -51,11 +53,11 @@ public class Programmator : tileObjectScript
         }
         else
         {
-            Debug.LogWarning("There is no UI.Button component for Programmator!");
+            Debug.LogWarning("There is no UI.Button component for Programmer!");
         }
     }
 
-
+    private string m_currentScriptHash;
     private bool m_isActive;
     private Guid m_id;
 }

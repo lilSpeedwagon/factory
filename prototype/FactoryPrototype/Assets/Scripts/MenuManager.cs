@@ -32,7 +32,7 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    public ProgrammatorMenu ProgrammerMenu;
+    public BeltScriptMenu BeltScriptMenu;
     public BuilderMenu BuilderMenu;
 
     public void SetActive(IMenu activeMenu)
