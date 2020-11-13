@@ -12,6 +12,13 @@ using UnityEngine;
 // managing BeltScript code files
 public class BeltScriptCodeManager
 {
+    public static void ForceInit()
+    {
+        Debug.Log("BeltScript force init");
+        var beltScriptCodeManager = Instance;
+        var beltScriptAdapter = BeltScriptAdapter.Instance;
+    }
+
     // singleton
     private BeltScriptCodeManager()
     {
@@ -21,6 +28,19 @@ public class BeltScriptCodeManager
         RefreshScriptList();
     }
     public static BeltScriptCodeManager Instance => g_instance ?? (g_instance = new BeltScriptCodeManager());
+
+    public bool Run(string scriptName, Logger.LogDelegate log)
+    {
+        string bltPath = GetBeltScriptPath(scriptName);
+        Debug.Log($"BeltScriptCodeManager: running {bltPath}");
+        return BeltScriptAdapter.Instance.Run(bltPath, log);
+    }
+
+    public bool RunWithHash(string hash, Logger.LogDelegate log)
+    {
+        // TODO 
+        throw new NotImplementedException();
+    }
 
     public bool Compile(string scriptName, string code, Logger.LogDelegate log)
     {
@@ -140,12 +160,10 @@ public class BeltScriptCodeManager
         {
             if (file.EndsWith(BeltScriptExtension))
             {
-                Debug.Log(file);
                 bltFiles.Add(GetScriptName(file));
             }
             else if (file.EndsWith(SourceCodeExtension))
             {
-                Debug.Log(file);
                 codeFiles.Add(GetScriptName(file));
             }
         }

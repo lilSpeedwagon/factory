@@ -74,6 +74,7 @@
     <Compile Include="Assets\Scripts\ObjectInfoHolderScript.cs" />
     <Compile Include="Assets\Scripts\OutputProducer.cs" />
     <Compile Include="Assets\Scripts\Programmator.cs" />
+    <Compile Include="Assets\Scripts\ProgrammerMenu.cs" />
     <Compile Include="Assets\Scripts\RecipeManager.cs" />
     <Compile Include="Assets\Scripts\ResoucesScript.cs" />
     <Compile Include="Assets\Scripts\TileManagerScript.cs" />

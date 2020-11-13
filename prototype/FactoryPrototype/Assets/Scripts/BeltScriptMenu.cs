@@ -18,7 +18,7 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
         {
             if (g_instance == null)
             {
-                g_instance = GameObject.FindWithTag("ProgrammerMenu").GetComponent<BeltScriptMenu>();
+                g_instance = GameObject.FindWithTag("BeltScriptMenu").GetComponent<BeltScriptMenu>();
             }
             return g_instance;
         }
@@ -36,7 +36,7 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
 
     public void OnCompile()
     {
-        Debug.Log("ProgrammerMenu: OnCompile()");
+        Debug.Log("BeltScriptMenu: OnCompile()");
 
         if (ScriptNameInputField == null || CodeInputField == null)
         {
@@ -48,7 +48,7 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
         string code = CodeInputField.text;
         if (fileName.Length == 0)
         {
-            Debug.LogWarning("ProgrammerMenu: empty script name");
+            Debug.LogWarning("BeltScriptMenu: empty script name");
             return;
         }
 
@@ -70,7 +70,7 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
 
     public void OnDelete()
     {
-        Debug.Log("ProgrammerMenu: OnDelete()");
+        Debug.Log("BeltScriptMenu: OnDelete()");
 
         if (!String.IsNullOrEmpty(m_currentSelection))
         {
@@ -80,32 +80,11 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        Hide();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (m_isActive)
-        {
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                Hide();
-                return;
-            }
-        }
-    }
-
     // IMenu implementation
     public void Show()
     {
         GetComponent<Image>().enabled = true;
         SetActiveForChildren(true);
-
-        m_isActive = true;
 
         MenuManager.Manager.SetActive(this);
 
@@ -116,8 +95,6 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
     {
         GetComponent<Image>().enabled = false;
         SetActiveForChildren(false);
-        
-        m_isActive = false;
     }
 
     private void SetActiveForChildren(bool isActive)
@@ -127,6 +104,12 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
             if (t != gameObject)
                 t.gameObject?.SetActive(isActive);
         }
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        Hide();
     }
 
     // Menu handlers
@@ -158,15 +141,14 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
     {
         if (ScriptListContent == null)
         {
-            Debug.LogWarning("Script list content is not specified.");
+            Debug.LogWarning("BeltScriptMenu: Script list content is not specified.");
+            return;
         }
 
         ClearScriptList();
         
-        Debug.Log("Files:");
         foreach (var script in BeltScriptCodeManager.Instance.ScriptList)
         {
-            Debug.Log(script);
             AddScriptListItem(script);
         }
     }
@@ -187,7 +169,7 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
         {
             if (val)
             {
-                Debug.Log($"Selected {scriptName}");
+                Debug.Log($"BeltScriptMenu: Selected {scriptName}");
                 m_currentSelection = scriptName;
             }
             else
@@ -213,6 +195,5 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
 
     private List<RectTransform> m_scriptListItems = new List<RectTransform>();
     private string m_currentSelection;
-    private bool m_isActive = false;
     private static BeltScriptMenu g_instance;
 }

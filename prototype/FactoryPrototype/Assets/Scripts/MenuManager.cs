@@ -34,6 +34,7 @@ public class MenuManager : MonoBehaviour
 
     public BeltScriptMenu BeltScriptMenu;
     public BuilderMenu BuilderMenu;
+    public ProgrammerMenu ProgrammerMenu;
 
     public void SetActive(IMenu activeMenu)
     {

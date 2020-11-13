@@ -11,6 +11,7 @@ TagManager:
   - MenuManager
   - ProgrammerMenu
   - BeltScriptAdapter
+  - BeltScriptMenu
   layers:
   - Default
   - TransparentFX

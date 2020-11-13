@@ -125,3 +125,31 @@ public class Range
     }
 }
 
+public class LogUtils
+{
+    public class DebugLogger
+    {
+        public DebugLogger(string name = "")
+        {
+            Name = name;
+        }
+
+        public string Name;
+
+        public void Log(string message)
+        {
+            Debug.Log(Name + ": " + message);
+        }
+
+        public void Warn(string message)
+        {
+            Debug.LogWarning(Name + ": " + message);
+        }
+
+        public void Error(string message)
+        {
+            Debug.LogError(Name + ": " + message);
+        }
+
+    }
+}

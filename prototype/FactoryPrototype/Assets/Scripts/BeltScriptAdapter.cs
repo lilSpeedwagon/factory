@@ -12,37 +12,42 @@ using UnityEngine;
 public class BeltScriptAdapter : MonoBehaviour
 {
     // singleton
-    private BeltScriptAdapter() { }
+    private BeltScriptAdapter()
+    {
+        m_runtime = new RuntimeDll();
+        m_runtime.Load();
+
+        m_compiler = new CompilerDll();
+        m_compiler.Load();
+    }
     public static BeltScriptAdapter Instance => g_instance ?? (g_instance = GameObject.FindWithTag("BeltScriptAdapter").GetComponent<BeltScriptAdapter>());
 
     public bool Compile(string codeFileName, string code, Logger.LogDelegate log)
     {
-        return CompilerDll.Instance.Compile(codeFileName, code, log);
+        return m_compiler.Compile(codeFileName, code, log);
     }
 
     public bool Run(string codeFileName, Logger.LogDelegate log)
     {
-        return RuntimeDll.Instance.Run(codeFileName, log);
+        return m_runtime.Run(codeFileName, log);
     }
 
     public bool RunIo(string codeFileName, float[] inputs, ref float[] outputs, Logger.LogDelegate log)
     {
-        return RuntimeDll.Instance.RunIo(codeFileName, log, inputs.Length, inputs, outputs.Length, ref outputs);
+        return m_runtime.RunIo(codeFileName, log, inputs.Length, inputs, outputs.Length, ref outputs);
     }
 
     void OnApplicationQuit()
     {
         // always dispatch DLLs on quit
-        RuntimeDll.Instance.Unload();
-        CompilerDll.Instance.Unload();
+        m_compiler.Unload();
+        m_runtime.Unload();
     }
 
-    private readonly Logger.LogDelegate m_log = (string s) =>
-    {
-         Debug.Log(s);
-    };
-
     private static BeltScriptAdapter g_instance;
+
+    private readonly RuntimeDll m_runtime;
+    private readonly CompilerDll m_compiler;
 }
 
 
@@ -67,8 +72,6 @@ internal abstract class DllLoader
 
 internal class RuntimeDll : DllLoader
 {
-    public static RuntimeDll Instance => g_instance ?? (g_instance = new RuntimeDll());
-
     public bool IsLoaded => m_handle != IntPtr.Zero;
 
     public bool Run(string codeFileName, Logger.LogDelegate log)
@@ -150,13 +153,6 @@ internal class RuntimeDll : DllLoader
         Debug.Log("Runtime.dll has been unloaded");
     }
 
-    // private constructor (singleton)
-    private RuntimeDll()
-    {
-    }
-
-    private static RuntimeDll g_instance;
-
     private delegate bool RunDelegate(string codeFileName, IntPtr logDelegate);
     private delegate bool RunIoDelegate(string codeFileName, IntPtr logDelegate, int inputsCount, float[] inputs, int outputsCount, ref float[] outputs);
 
@@ -167,8 +163,6 @@ internal class RuntimeDll : DllLoader
 
 internal class CompilerDll : DllLoader
 {
-    public static CompilerDll Instance => g_instance ?? (g_instance = new CompilerDll());
-
     public bool IsLoaded => m_handle != IntPtr.Zero;
 
     public bool Compile(string codeFileName, string code, Logger.LogDelegate log)
@@ -231,13 +225,6 @@ internal class CompilerDll : DllLoader
 
         Debug.Log("Compiler.dll has been unloaded");
     }
-
-    // private constructor (singleton)
-    private CompilerDll()
-    {
-    }
-
-    private static CompilerDll g_instance;
 
     private delegate bool CompileDelegate(string codeFileName, string code, IntPtr logDelegate);
 
