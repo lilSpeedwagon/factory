@@ -20,6 +20,8 @@ while (i < 100)
 }
 ```
 
+Building the solution with Release|x86 configuration.
+
 ### Purposes
 The game is developed as a Master Degree project in educational purposes.
 
