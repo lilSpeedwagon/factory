@@ -58,7 +58,7 @@ namespace runtime
 	};
 
 	const std::map<std::string, FunctionBinary> mapBinaryFunctions = {
-		{ "pow", [](Value const& l_arg, Value const& r_arg) { return Value(pow(l_arg.toFloat().getValue<float>(), r_arg.toInt().getValue<int>())); } },
+		{ "pow", [](Value const& l_arg, Value const& r_arg) { return Value(static_cast<float>(pow(l_arg.toFloat().getValue<float>(), r_arg.toInt().getValue<int>()))); } },
 	};
 
 	template<typename T>

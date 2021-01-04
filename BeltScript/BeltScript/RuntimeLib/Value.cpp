@@ -105,6 +105,8 @@ serializer::BinaryFile& runtime::Value::operator<<(serializer::BinaryFile& file)
 	return file;
 }
 
+/* Some optimizations of MSVS compiler with Release|x64 make that code crashing. */
+#pragma optimize( "", off )
 void runtime::Value::clear()
 {
 	if (m_type == String && reinterpret_cast<char*>(m_value) != nullptr)
@@ -113,6 +115,7 @@ void runtime::Value::clear()
 		m_value = nullptr;
 	}
 }
+#pragma optimize( "", on )
 
 runtime::Value& runtime::Value::operator=(Value const& v)
 {
@@ -142,7 +145,7 @@ runtime::Value& runtime::Value::operator=(int v)
 	clear();
 
 	m_type = Integer;
-	m_value = reinterpret_cast<_Value>(v);
+	m_value = reinterpret_cast<_Value>(static_cast<integer>(v));
 
 	return *this;
 }
@@ -165,7 +168,7 @@ runtime::Value& runtime::Value::operator=(bool v)
 	clear();
 
 	m_type = Boolean;
-	m_value = reinterpret_cast<_Value>(v == true ? 1 : 0);
+	m_value = reinterpret_cast<_Value>(static_cast<integer>(v == true ? 1 : 0));
 
 	return *this;
 }
