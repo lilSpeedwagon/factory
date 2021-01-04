@@ -20,7 +20,9 @@ while (i < 100)
 }
 ```
 
-Building the solution with Release|x86 configuration.
+Building the solution with Release|x86 or Release|x64 configuration.
+
+GitHub Actions pipeline is configured to build, test and publish BeltScript binaries after every commit to master.
 
 ### Purposes
 The game is developed as a Master Degree project in educational purposes.
