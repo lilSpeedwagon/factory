@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +16,7 @@ public class Programmator : tileObjectScript
 
     public int Id => m_id;
 
-    public bool IsActive { get; set; }
+    public bool IsActive => m_state != ProgrammerState.Idle;
 
     public string CurrentScript
     {
@@ -26,7 +28,20 @@ public class Programmator : tileObjectScript
         }
     }
 
-    public float Frequency { get; set; }
+    public float Frequency
+    {
+        get => m_frequency;
+        set
+        {
+            m_frequency = value;
+            if (IsActive)
+            {
+                ReconfigureTimer();
+            }
+        }
+    }
+
+    public string LogHistory => m_logContainer.ToString();
 
     public void Run()
     {
@@ -38,101 +53,90 @@ public class Programmator : tileObjectScript
         m_state = ProgrammerState.Runnable;
         ReconfigureTimer();
         m_execTimer.Start();
-        //ExecuteScript();
     }
 
     public void Stop()
     {
         m_debugLogger.Log("Stop");
-
         m_execTimer.Stop();
         m_state = ProgrammerState.Idle;
     }
 
-    private void ReconfigureTimer()
+    private void Update()
     {
-        m_execTimer.Stop();
-        double timerInterval = 1.0d / Frequency * 1000.0d; // in milliseconds
-        m_execTimer.Interval = timerInterval;
-
-        m_debugLogger.Log($"Timer was reconfigured with new interval {timerInterval}");
-    }
-
-    private Task OnTimerElapsed(ElapsedEventArgs e)
-    {
-        m_debugLogger.Log($"OnTimerElapsed {e.SignalTime}");
-
         if (m_state == ProgrammerState.Running)
         {
-            m_debugLogger.Warn("timer elapsed while programmer was in 'Running' state");
-            return Task.CompletedTask;
+            if (string.IsNullOrEmpty(m_currentScript))
+            {
+                m_debugLogger.Error("No script specified!");
+                return;
+            }
+
+            bool result = ExecuteScript();
+            m_state = ProgrammerState.Runnable;
+
+            m_debugLogger.Log($"execution result {result}");
+
+            if (!result)
+            {
+                Log("Execution finished with errors.");
+                m_failedExecutionInRow++;
+
+                if (m_failedExecutionInRow >= MaxFailedExecutionsInRow)
+                {
+                    Log("Failure execution limit exceeded.");
+                    Log("Failure execution limit exceeded.");
+                    m_failedExecutionInRow = 0;
+                    Stop();
+                }
+            }
+            else
+            {
+                m_failedExecutionInRow = 0;
+            }
         }
-
-        m_state = ProgrammerState.Running;
-        ExecuteScript();
-        m_state = ProgrammerState.Runnable;
-
-        return Task.CompletedTask;
     }
-
-    private void ExecuteScript()
+    private bool ExecuteScript()
     {
-        if (string.IsNullOrEmpty(m_currentScript))
-        {
-            m_debugLogger.Error("No script specified!");
-        }
-
         m_debugLogger.Log($"running {m_currentScript}");
 
         bool result = false;
         try
         {
-            result = BeltScriptCodeManager.Instance.Run(m_currentScript, ProgrammerMenu.Menu.Log);
+            result = BeltScriptCodeManager.Instance.Run(m_currentScript, Log);
         }
         catch (Exception e)
         {
             m_debugLogger.Warn(e.Message);
         }
 
-        m_debugLogger.Log($"execution result {result}");
+        return result;
+    }
 
-        if (!result)
-        {
-            ProgrammerMenu.Menu.Log("Execution finished with errors.");
-            m_failedExecutionInRow++;
+    private void Log(string message)
+    {
+        m_logContainer.AppendLine(message);
+        ProgrammerMenu.Menu.Log(this, message);
+    }
 
-            if (m_failedExecutionInRow >= MaxFailedExecutionsInRow)
-            {
-                m_debugLogger.Log("Failure execution limit exceeded.");
-                ProgrammerMenu.Menu.Log("Failure execution limit exceeded.");
-                m_failedExecutionInRow = 0;
-                Stop();
-            }
-        }
-        else
-        {
-            m_failedExecutionInRow = 0;
-        }
+    private void ReconfigureTimer()
+    {
+        //m_execTimer.Stop();
+        float timerInterval = 1000.0f / m_frequency; // in milliseconds
+        m_execTimer.Interval = timerInterval;
+
+        m_debugLogger.Log($"Timer was reconfigured with new interval {timerInterval}");
     }
 
     void Start()
     {
         m_id = NextId++;
-
         m_debugLogger = new LogUtils.DebugLogger($"Programmer{m_id}");
-        
+
         InitButton();
 
-        Frequency = 1.0f;
-        ReconfigureTimer();
         m_execTimer.AutoReset = true;
-        
-        m_execTimer.Elapsed += async (sender, e ) => await OnTimerElapsed(e);
-    }
-
-    void Update()
-    {
-        
+        m_execTimer.Elapsed += (sender, e) => { m_state = ProgrammerState.Running; };
     }
 
     void OnApplicationQuit()
@@ -142,7 +146,7 @@ public class Programmator : tileObjectScript
         {
             m_execTimer.Stop();
         }
-        
+
         m_execTimer.Close();
     }
 
@@ -181,7 +185,11 @@ public class Programmator : tileObjectScript
     private const int MaxFailedExecutionsInRow = 4;
     private int m_failedExecutionInRow = 0;
     private ProgrammerState m_state = ProgrammerState.Idle;
-    private Timer m_execTimer = new Timer();
+    private readonly Timer m_execTimer = new Timer();
+    private float m_frequency = 1.0f;
+
+    private static int LogCapacity = 10000;
+    private readonly StringBuilder m_logContainer = new StringBuilder(LogCapacity);
 
     private LogUtils.DebugLogger m_debugLogger;
 }

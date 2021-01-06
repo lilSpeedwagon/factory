@@ -33,7 +33,7 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
     {
         m_currentProgrammer = prog;
 
-        SetProgrammerLabel(prog.Id.ToString());
+        SetProgrammerLabel("Programmable Unit " + prog.Id);
         SetCurrentScriptLabel(prog.CurrentScript);
         SetFreqSliderValue(prog.Frequency);
         SetFreqLabelValue(prog.Frequency.ToString());
@@ -46,6 +46,8 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         UpdateScriptList();
 
         Show();
+
+        RestoreLog(prog);
     }
 
     // IMenu implementation
@@ -82,13 +84,22 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         }
     }
 
-    public void Log(string message)
+    public void Log(Programmator prog, string message)
     {
-        // write log only if menu is visible
-        if (m_isVisible && LogText != null)
+        // write log only if menu is visible and only for selected programmer
+        if (m_isVisible && LogText != null && prog == m_currentProgrammer)
         {
             LogText.text += '\n' + message;
-            LogScrollbar.value = 1.0f;
+            LogScrollbar.value = 0.0f;
+        }
+    }
+
+    public void RestoreLog(Programmator prog)
+    {
+        if (m_isVisible && LogText != null)
+        {
+            LogText.text = prog.LogHistory;
+            LogScrollbar.value = 0.0f;
         }
     }
 
