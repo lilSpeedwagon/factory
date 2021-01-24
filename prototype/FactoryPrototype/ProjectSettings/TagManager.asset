@@ -12,6 +12,7 @@ TagManager:
   - ProgrammerMenu
   - BeltScriptAdapter
   - BeltScriptMenu
+  - WiresMenu
   layers:
   - Default
   - TransparentFX

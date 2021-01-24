@@ -70,6 +70,8 @@
     <Compile Include="Assets\Scripts\BuildableObjectScript.cs" />
     <Compile Include="Assets\Scripts\BuilderMenu.cs" />
     <Compile Include="Assets\Scripts\DataPipe.cs" />
+    <Compile Include="Assets\Scripts\DataPipeMenu.cs" />
+    <Compile Include="Assets\Scripts\DataTypes.cs" />
     <Compile Include="Assets\Scripts\InputConsumer.cs" />
     <Compile Include="Assets\Scripts\MaterialScript.cs" />
     <Compile Include="Assets\Scripts\MenuManager.cs" />
