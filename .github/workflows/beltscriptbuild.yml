@@ -35,14 +35,12 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Compiler.dll
-        path: |
-          ${{ env.GITHUB_WORKSPACE }}/BeltScript/BeltScript/x64/Release/Compiler.dll
-          ${{ env.GITHUB_WORKSPACE }}/BeltScript/BeltScript/Release/Compiler.dll
+        path: .\BeltScript\BeltScript\Release\Compiler.dll |
+          .\BeltScript\BeltScript\x64\Release\Compiler.dll
           
     - name: Upload Runtime.dll
       uses: actions/upload-artifact@v2
       with:
         name: Runtime.dll
-        path: |
-          ${{ env.GITHUB_WORKSPACE }}/BeltScript/BeltScript/x64/Release/Runtime.dll
-          ${{ env.GITHUB_WORKSPACE }}/BeltScript/BeltScript/Release/Runtime.dll
+        path: .\BeltScript\BeltScript\Release\Runtime.dll |
+          .\BeltScript\BeltScript\x64\Release\Runtime.dll
