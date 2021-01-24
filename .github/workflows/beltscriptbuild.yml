@@ -35,12 +35,10 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Compiler.dll
-        path: .\BeltScript\BeltScript\Release\Compiler.dll |
-          .\BeltScript\BeltScript\x64\Release\Compiler.dll
+        path: .\BeltScript\BeltScript\x64\Release\Compiler.dll
           
     - name: Upload Runtime.dll
       uses: actions/upload-artifact@v2
       with:
         name: Runtime.dll
-        path: .\BeltScript\BeltScript\Release\Runtime.dll |
-          .\BeltScript\BeltScript\x64\Release\Runtime.dll
+        path: .\BeltScript\BeltScript\x64\Release\Runtime.dll
