@@ -176,17 +176,14 @@ public class DataPipeMenu : MonoBehaviour, IMenu
         if (m_line == null && WirePrefab != null)
         {
             m_line = Instantiate(WirePrefab, new Vector2(), Quaternion.identity);
-            Color color = GetRandomColor();
+            Color color = ColorUtils.GetRandomColor();
             m_line.startColor = color;
             m_line.endColor = color;
         }
         m_line.SetPositions(new[] { (Vector3)m_fromPosition, (Vector3)to });
     }
 
-    private Color GetRandomColor()
-    {
-        return Random.ColorHSV();
-    }
+    
 
     private void SetActiveForChildren(bool isActive)
     {
