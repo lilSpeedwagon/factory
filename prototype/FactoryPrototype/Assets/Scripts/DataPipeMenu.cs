@@ -119,7 +119,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
 
     private void ShowPortList(Vector2 pos, List<DataPublisher.DataPort> portList)
     {
-        PortList.GetComponent<RectTransform>().SetPositionAndRotation(pos, Quaternion.identity);
+        GetComponent<RectTransform>().SetPositionAndRotation(pos, Quaternion.identity);
 
         foreach (var port in portList)
         {
