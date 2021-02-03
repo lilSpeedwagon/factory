@@ -97,6 +97,11 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
         SetActiveForChildren(false);
     }
 
+    public bool IsCameraZoomAllowed()
+    {
+        return false;
+    }
+
     private void SetActiveForChildren(bool isActive)
     {
         foreach (Transform t in GetComponent<Transform>())

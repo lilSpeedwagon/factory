@@ -69,6 +69,11 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         ClearLog();
     }
 
+    public bool IsCameraZoomAllowed()
+    {
+        return false;
+    }
+
     // toggle callback
     public void OnRunToggle(bool value)
     {

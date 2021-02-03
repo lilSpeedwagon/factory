@@ -1,20 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 
 /*
  * Menus:
  *  1. Builder menu (visible by default)
- *  2. Programmer menu
- *  3. Main menu
- *  4. Wires menu
+ *  2. Builder mode
+ *  3. Programmer menu
+ *  4. Main menu
+ *  5. Wires menu
  */
 
 public interface IMenu
 {
     void Show();
     void Hide();
+    bool IsCameraZoomAllowed();
 }
 
 // Menu Manager is responsible for holding ref to current active IMenu object
@@ -48,6 +51,8 @@ public class MenuManager : MonoBehaviour
 
     public bool IsActive => m_current != null;
     public bool IsNonDefaultActive => IsActive && m_current != m_default;
+
+    public bool IsCameraZoomAllowed => IsActive && m_current.IsCameraZoomAllowed();
     
     void Start()
     {

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 
 
-public class objectBuilder : MonoBehaviour
+public class objectBuilder : MonoBehaviour, IMenu
 {
     private static objectBuilder g_instance;
     public static objectBuilder Builder
@@ -22,19 +22,58 @@ public class objectBuilder : MonoBehaviour
 
 
     public List<BuildableObjectScript> Objects;
-    public GameObject BuilderPanel;
+    public BuilderMenu BuilderPanel;
 
     public GameObject ShadowPrefab;
     public GameObject PrefabToCreate;
     public GameObject RemoverPrefab;
 
-    delegate void OnBuildSignal(BuildableObjectScript obj);
-    delegate void OnRemoveSignal(int sellCost);
+    private delegate void OnBuildSignal(BuildableObjectScript obj);
+    private delegate void OnRemoveSignal(int sellCost);
 
-    bool IsPossibleToCreate => m_isActive && m_tileManager.IsEmpty(TileUtils.MouseCellPosition()) && 
-                               ResoucesScript.instance.CanBeBuilt(PrefabToCreate.GetComponent<BuildableObjectScript>());
+    // IMenu implementation
+    public void Hide()
+    {
+    }
 
-    void RotateShadow(bool bClockwise = true)
+    public void Show()
+    {
+        MenuManager.Manager.SetActive(this);
+        HidePanel();
+    }
+
+    public bool IsCameraZoomAllowed()
+    {
+        return false;
+    }
+
+    // builder
+    public void Pick(GameObject prefab)
+    {
+        ChangePrefab(prefab);
+        try
+        {
+            m_currentZlevel = prefab.GetComponent<tileObjectScript>().ZPosition;
+        }
+        catch (NullReferenceException e)
+        {
+            Debug.LogWarning(e);
+        }
+        Show();
+    }
+
+    public void PickRemover()
+    {
+        m_isActive = true;
+        m_isRemoverActive = true;
+        CreateRemoverShadow();
+        Show();
+    }
+
+    private bool IsPossibleToCreate => m_isActive && m_tileManager.IsEmpty(TileUtils.MouseCellPosition()) && 
+                                       ResoucesScript.instance.CanBeBuilt(PrefabToCreate.GetComponent<BuildableObjectScript>());
+
+    private void RotateShadow(bool bClockwise = true)
     {
         if (m_shadow == null)
             return;
@@ -42,7 +81,7 @@ public class objectBuilder : MonoBehaviour
         m_shadow.GetComponent<tileObjectScript>().Rotate(bClockwise);
     }
 
-    void CreateShadow()
+    private void CreateShadow()
     {
         if (PrefabToCreate != null)
         {
@@ -60,7 +99,7 @@ public class objectBuilder : MonoBehaviour
         }
     }
 
-    void CreateRemoverShadow()
+    private void CreateRemoverShadow()
     {
         if (m_shadow != null)
         {
@@ -70,7 +109,7 @@ public class objectBuilder : MonoBehaviour
         m_shadow = Instantiate(RemoverPrefab, TileUtils.MouseCellPosition(), TileUtils.qInitRotation);
     }
 
-    void CreateObject()
+    private void CreateObject()
     {
         if (m_isActive && PrefabToCreate != null)
         {
@@ -82,12 +121,12 @@ public class objectBuilder : MonoBehaviour
         }
     }
 
-    int GetSellCost(GameObject removable)
+    private int GetSellCost(GameObject removable)
     {
         return removable.GetComponent<BuildableObjectScript>()?.SellCost ?? 0;
     }
 
-    void RemoveObject()
+    private void RemoveObject()
     {
         try
         {
@@ -103,7 +142,7 @@ public class objectBuilder : MonoBehaviour
         }
     }
 
-    void ChangePrefab(GameObject p)
+    private void ChangePrefab(GameObject p)
     {
         m_isActive = true;
         m_isRemoverActive = false;
@@ -111,14 +150,15 @@ public class objectBuilder : MonoBehaviour
         CreateShadow();
     }
 
-    void Disable()
+    private void Disable()
     {
         m_isActive = false;
         m_isRemoverActive = false;
         PrefabToCreate = null;
         Destroy(m_shadow);
         m_shadow = null;
-        BuilderPanel.SetActive(true);
+
+        ShowPanel();
     }
 
 
@@ -176,36 +216,15 @@ public class objectBuilder : MonoBehaviour
         }
     }
 
-    public void Pick(GameObject prefab)
+    private void HidePanel()
     {
-        ChangePrefab(prefab);
-        Hide();
-        try
-        {
-            m_currentZlevel = prefab.GetComponent<tileObjectScript>().ZPosition;
-        }
-        catch (NullReferenceException e)
-        {
-            Debug.LogWarning(e);
-        }
+        BuilderPanel.Hide();
     }
 
-    public void PickRemover()
+    private void ShowPanel()
     {
-        Show();
-        m_isActive = true;
-        m_isRemoverActive = true;
-        CreateRemoverShadow();
-    }
-
-    public void Hide()
-    {
-        BuilderPanel.SetActive(false);
-    }
-
-    public void Show()
-    {
-        BuilderPanel.SetActive(true);
+        MenuManager.Manager.SetActive(BuilderPanel);
+        BuilderPanel.Show();
     }
 
     private TileManagerScript m_tileManager;

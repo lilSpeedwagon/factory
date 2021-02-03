@@ -109,3 +109,5 @@ crashlytics-build.properties
 # BeltScript specific
 *.code
 *.blt
+*.recipe
+*.vcxproj.FileListAbsolute.txt

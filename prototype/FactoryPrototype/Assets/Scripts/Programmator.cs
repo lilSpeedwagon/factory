@@ -62,6 +62,67 @@ public class Programmator : tileObjectScript
         m_state = ProgrammerState.Idle;
     }
 
+    private bool ExecuteScript()
+    {
+        m_debugLogger.Log($"running {m_currentScript}");
+
+        bool result = false;
+        try
+        {
+            result = BeltScriptCodeManager.Instance.Run(m_currentScript, Log);
+        }
+        catch (Exception e)
+        {
+            m_debugLogger.Warn(e.Message);
+        }
+
+        return result;
+    }
+
+    private void Log(string message)
+    {
+        m_logContainer.AppendLine(message);
+        ProgrammerMenu.Menu.Log(this, message);
+    }
+
+    private void ReconfigureTimer()
+    {
+        //m_execTimer.Stop();
+        float timerInterval = 1000.0f / m_frequency; // in milliseconds
+        m_execTimer.Interval = timerInterval;
+
+        m_debugLogger.Log($"Timer was reconfigured with new interval {timerInterval}");
+    }
+
+    private void InitDataPublisher()
+    {
+        m_publisher = GetComponent<DataPublisher>();
+        if (m_publisher == null)
+        {
+            m_debugLogger.Warn("Data Publisher component not found for the programmer");
+            return;
+        }
+
+        for (int i = 0; i < DataPortsCount; i++)
+        {
+            m_publisher.SetPort(new DataPublisher.DataPort("Port" + i));
+        }
+    }
+
+    // MonoBehavior implementation
+    private void Start()
+    {
+        m_id = NextId++;
+        m_debugLogger = new LogUtils.DebugLogger($"Programmer{m_id}");
+
+        InitButton();
+
+        m_execTimer.AutoReset = true;
+        m_execTimer.Elapsed += (sender, e) => { m_state = ProgrammerState.Running; };
+
+        InitDataPublisher();
+    }
+
     private void Update()
     {
         if (m_state == ProgrammerState.Running)
@@ -96,50 +157,8 @@ public class Programmator : tileObjectScript
             }
         }
     }
-    private bool ExecuteScript()
-    {
-        m_debugLogger.Log($"running {m_currentScript}");
 
-        bool result = false;
-        try
-        {
-            result = BeltScriptCodeManager.Instance.Run(m_currentScript, Log);
-        }
-        catch (Exception e)
-        {
-            m_debugLogger.Warn(e.Message);
-        }
-
-        return result;
-    }
-
-    private void Log(string message)
-    {
-        m_logContainer.AppendLine(message);
-        ProgrammerMenu.Menu.Log(this, message);
-    }
-
-    private void ReconfigureTimer()
-    {
-        //m_execTimer.Stop();
-        float timerInterval = 1000.0f / m_frequency; // in milliseconds
-        m_execTimer.Interval = timerInterval;
-
-        m_debugLogger.Log($"Timer was reconfigured with new interval {timerInterval}");
-    }
-
-    void Start()
-    {
-        m_id = NextId++;
-        m_debugLogger = new LogUtils.DebugLogger($"Programmer{m_id}");
-
-        InitButton();
-
-        m_execTimer.AutoReset = true;
-        m_execTimer.Elapsed += (sender, e) => { m_state = ProgrammerState.Running; };
-    }
-
-    void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
         // dispose timer (not managed by unity)
         if (m_execTimer.Enabled)
@@ -151,9 +170,12 @@ public class Programmator : tileObjectScript
     }
 
     // menu logic
-    void OnMouseDown()
+    private void OnMouseDown()
     {
-        ProgrammerMenu.Menu.ShowFor(this);
+        if (!MenuManager.Manager.IsNonDefaultActive)
+        {
+            ProgrammerMenu.Menu.ShowFor(this);
+        }
     }
 
     private void InitButton()
@@ -188,7 +210,10 @@ public class Programmator : tileObjectScript
     private readonly Timer m_execTimer = new Timer();
     private float m_frequency = 1.0f;
 
-    private static int LogCapacity = 10000;
+    private DataPublisher m_publisher;
+    private const int DataPortsCount = 4;
+
+    private const int LogCapacity = 10000;
     private readonly StringBuilder m_logContainer = new StringBuilder(LogCapacity);
 
     private LogUtils.DebugLogger m_debugLogger;

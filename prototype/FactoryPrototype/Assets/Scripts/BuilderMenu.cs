@@ -8,7 +8,7 @@ public class BuilderMenu : MonoBehaviour, IMenu
     public GameObject ButtonPrefab;
     public int ButtonsMargin = 10;
 
-
+    // IMenu implementation
     public void Show()
     {
         GetComponent<Image>().enabled = true;
@@ -21,6 +21,11 @@ public class BuilderMenu : MonoBehaviour, IMenu
         GetComponent<Image>().enabled = false;
         GetComponent<ScrollRect>().enabled = false;
         setActiveForChildren(false);
+    }
+
+    public bool IsCameraZoomAllowed()
+    {
+        return true;
     }
 
     private void InitButton(BuildableObjectScript obj, ref Vector2 position)

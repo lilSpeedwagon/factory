@@ -25,7 +25,7 @@ TagManager:
   - floor
   - objects
   - details
-  - 
+  - wires
   - 
   - 
   - 
@@ -61,6 +61,9 @@ TagManager:
     locked: 0
   - name: shadow
     uniqueID: 573397833
+    locked: 0
+  - name: wires
+    uniqueID: 558403989
     locked: 0
   - name: UI
     uniqueID: 3241108617

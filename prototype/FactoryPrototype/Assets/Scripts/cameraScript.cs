@@ -8,6 +8,23 @@ public class cameraScript : MonoBehaviour
     public float CursorOffsetToMoveScreen = 32;
     public Vector3 CameraSpeed = new Vector3(0.4f, 0, 0);
 
+    public static void SetLayerVisibility(string layerName, bool visible)
+    {
+        Camera camera = Camera.main;
+
+        if (camera != null)
+        {
+            if (visible)
+            {
+                camera.cullingMask |= 1 << LayerMask.NameToLayer(layerName);
+            }
+            else
+            {
+                camera.cullingMask &= ~(1 << LayerMask.NameToLayer(layerName));
+            }
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -48,8 +65,7 @@ public class cameraScript : MonoBehaviour
 
     void Update()
     {
-        // if non default menu opened disable scrolling
-        if (MenuManager.Manager.IsNonDefaultActive) return;
+        if (!MenuManager.Manager.IsCameraZoomAllowed) return;
 
         var scroll = Input.mouseScrollDelta.y;
         if (Math.Abs(scroll) > 0.1f)

@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6524838035053906607}
   - component: {fileID: 5039594855127689937}
   - component: {fileID: -9126141973758652429}
+  - component: {fileID: 4796084332010057159}
   m_Layer: 0
   m_Name: programmator
   m_TagString: Untagged
@@ -161,7 +162,6 @@ MonoBehaviour:
   isShadow: 0
   ZPosition: 1
   OnlyXFlip: 1
-  Menu: {fileID: 0}
 --- !u!114 &-9126141973758652429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -216,3 +216,15 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 1
+--- !u!114 &4796084332010057159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2153529958082496891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b7dc149402ac6e4a893122971ebd981, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
