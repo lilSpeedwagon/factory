@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Numerics;
-using UnityEditor.Experimental.GraphView;
-using UnityEditorInternal.VersionControl;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 using Quaternion = UnityEngine.Quaternion;
-using Random = UnityEngine.Random;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
@@ -39,6 +33,15 @@ public class DataPipeMenu : MonoBehaviour, IMenu
         }
 
         HidePortList();
+    }
+
+    public void OnPortReleased(DataPublisher.DataPort port)
+    {
+        port.Reset();
+        Reset();
+        HidePortList();
+
+        m_logger.Log($"Release port {port.Name}.");
     }
 
     // IMenu implementation
@@ -104,13 +107,14 @@ public class DataPipeMenu : MonoBehaviour, IMenu
 
     private void WirePorts()
     {
-        if (m_selectedPortFrom == null || m_selectedPortTo == null)
+        if (m_selectedPortFrom == null || m_selectedPortTo == null || m_line == null)
         {
+            m_logger.Warn("Port wiring error. One of the ends or line renderer is null.");
             return;
         }
 
-        m_selectedPortFrom.SetDestination(m_selectedPortTo);
-        m_selectedPortTo.SetSource(m_selectedPortFrom);
+        m_logger.Log($"Wiring ports {m_selectedPortFrom.Name} and {m_selectedPortTo.Name}");
+        DataPublisher.DataPort.WirePorts(m_selectedPortFrom, m_selectedPortTo, m_line);
     }
 
     private void ShowPortList(Vector2 pos, List<DataPublisher.DataPort> portList)
@@ -134,11 +138,27 @@ public class DataPipeMenu : MonoBehaviour, IMenu
                         OnPortSelected(port);
                     }
                 });
+
+                buttonLabel += " (connect)";
             }
             else
             {
-                toggle.enabled = false;
-                buttonLabel += " (connected)";
+                if (m_state == State.SelectPortFrom)
+                {
+                    toggle.onValueChanged.AddListener((val) =>
+                    {
+                        if (val)
+                        {
+                            OnPortReleased(port);
+                        }
+                    });
+                }
+                else
+                {
+                    toggle.enabled = false;
+                }
+
+                buttonLabel += " (release)";
             }
 
             var text = item.GetComponent<Text>();
@@ -176,6 +196,12 @@ public class DataPipeMenu : MonoBehaviour, IMenu
         if (m_line == null && WirePrefab != null)
         {
             m_line = Instantiate(WirePrefab, new Vector2(), Quaternion.identity);
+            if (m_line == null)
+            {
+                m_logger.Warn("Cannot instantiate line renderer.");
+                return;
+            }
+
             Color color = ColorUtils.GetRandomColor();
             m_line.startColor = color;
             m_line.endColor = color;

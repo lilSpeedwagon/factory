@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using TMPro;
 using UnityEngine;
 
 
@@ -9,44 +10,58 @@ public class DataPublisher : MonoBehaviour
 {
     public float PipeConnectionRadius = 1.0f;
 
-    public class DataPipeRenderer
-    {
-        public Vector2 Position;
-        public float Radius;
-    }
-
     public class DataPort
     {
         public string Name;
         public DataValue CurrentValue;
-        public bool IsPublisher => m_source == null && m_destination != null;
-        public bool IsConnected => m_source != null || m_destination != null;
+        public bool IsPublisher => m_isSource && m_otherEnd != null;
+        public bool IsConnected => m_otherEnd != null;
 
         public DataPort(string name)
         {
             Name = name;
         }
 
-        public void SetSource(DataPort source)
+        public static void WirePorts(DataPort from, DataPort to, LineRenderer line)
         {
-            m_destination = null;
-            m_source = source;
-        }
+            from.SetDestination(to);
+            to.SetSource(from);
 
-        public void SetDestination(DataPort dest)
-        {
-            m_destination = dest;
-            m_source = null;
+            from.m_line = line;
+            to.m_line = line;
         }
 
         public void Reset()
         {
-            m_destination = null;
-            m_source = null;
+            if (m_otherEnd != null)
+            {
+                m_otherEnd.m_otherEnd = null;
+                m_otherEnd.m_line = null;
+            }
+            m_otherEnd = null;
+
+            if (m_line != null)
+            {
+                Destroy(m_line);
+                m_line = null;
+            }
         }
 
-        private DataPort m_source;
-        private DataPort m_destination;
+        private void SetSource(DataPort source)
+        {
+            m_otherEnd = source;
+            m_isSource = false;
+        }
+
+        private void SetDestination(DataPort dest)
+        {
+            m_otherEnd = dest;
+            m_isSource = true;
+        }
+
+        private DataPort m_otherEnd;
+        private bool m_isSource;
+        private LineRenderer m_line;
     }
 
     public void SetPort(DataPort port)
@@ -68,12 +83,6 @@ public class DataPublisher : MonoBehaviour
 
     public int PortCount => m_ports.Count;
 
-    private void Start()
-    {
-        m_renderer = new DataPipeRenderer { Radius = PipeConnectionRadius, Position = transform.position };
-    }
-
     private readonly Dictionary<string, DataPort> m_ports = new Dictionary<string, DataPort>();
-    private DataPipeRenderer m_renderer;
 }
 
