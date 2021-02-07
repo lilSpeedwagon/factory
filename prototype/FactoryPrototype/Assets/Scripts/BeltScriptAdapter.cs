@@ -12,15 +12,19 @@ using UnityEngine;
 public class BeltScriptAdapter : MonoBehaviour
 {
     // singleton
-    private BeltScriptAdapter()
+    private BeltScriptAdapter() { }
+    public static BeltScriptAdapter Instance
     {
-        m_runtime = new RuntimeDll();
-        m_runtime.Load();
+        get
+        {
+            if (g_instance == null)
+            {
+                g_instance = GameObject.FindWithTag("BeltScriptAdapter").GetComponent<BeltScriptAdapter>();
+            }
 
-        m_compiler = new CompilerDll();
-        m_compiler.Load();
+            return g_instance;
+        }
     }
-    public static BeltScriptAdapter Instance => g_instance ?? (g_instance = GameObject.FindWithTag("BeltScriptAdapter").GetComponent<BeltScriptAdapter>());
 
     public bool Compile(string codeFileName, string code, Logger.LogDelegate log)
     {
@@ -37,7 +41,16 @@ public class BeltScriptAdapter : MonoBehaviour
         return m_runtime.RunIo(codeFileName, log, inputs.Length, inputs, outputs.Length, ref outputs);
     }
 
-    void OnApplicationQuit()
+    private void Start()
+    {
+        m_runtime = new RuntimeDll();
+        m_runtime.Load();
+
+        m_compiler = new CompilerDll();
+        m_compiler.Load();
+    }
+
+    private void OnApplicationQuit()
     {
         // always dispatch DLLs on quit
         m_compiler.Unload();
@@ -46,8 +59,8 @@ public class BeltScriptAdapter : MonoBehaviour
 
     private static BeltScriptAdapter g_instance;
 
-    private readonly RuntimeDll m_runtime;
-    private readonly CompilerDll m_compiler;
+    private RuntimeDll m_runtime;
+    private CompilerDll m_compiler;
 }
 
 
@@ -78,7 +91,8 @@ internal class RuntimeDll : DllLoader
     {
         if (!IsLoaded)
         {
-            Load();
+            Debug.LogWarning("Runtime.dll isn't loaded.");
+            return false;
         }
 
         return m_runDelegate(codeFileName, Marshal.GetFunctionPointerForDelegate(log));
@@ -88,7 +102,7 @@ internal class RuntimeDll : DllLoader
     {
         if (!IsLoaded)
         {
-            Load();
+            return false;
         }
         
         return m_runIoDelegate(codeFileName, Marshal.GetFunctionPointerForDelegate(log), inputsCount, inputs, outputsCount, ref outputs);
@@ -169,7 +183,8 @@ internal class CompilerDll : DllLoader
     {
         if (!IsLoaded)
         {
-            Load();
+            Debug.LogWarning("Compiler.dll isn't loaded.");
+            return false;
         }
 
         return m_compileDelegate(codeFileName, code, Marshal.GetFunctionPointerForDelegate(log));
