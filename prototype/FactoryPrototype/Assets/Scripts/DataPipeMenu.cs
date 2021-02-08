@@ -87,7 +87,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
             {
                 DrawLine(mousePos);
 
-                if (Input.GetMouseButtonUp(MouseUtils.PRIMARY_MOUSE_BUTTON) && publisher != null)
+                if (Input.GetMouseButtonUp(MouseUtils.PRIMARY_MOUSE_BUTTON) && publisher != null && m_publisherFrom != publisher)
                 {
                     m_state = State.SelectPortTo;
                     ShowPortList(mousePos, publisher.PortList);
@@ -99,6 +99,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
                 {
                     m_fromPosition = mousePos;
                     m_state = State.SelectPortFrom;
+                    m_publisherFrom = publisher;
                     ShowPortList(mousePos, publisher.PortList);
                 }
             }
@@ -225,6 +226,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
         m_state = State.Idle;
         m_selectedPortFrom = null;
         m_selectedPortTo = null;
+        m_publisherFrom = null;
 
         if (m_line != null)
         {
@@ -247,6 +249,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
     private Vector2 m_fromPosition;
     private DataPublisher.DataPort m_selectedPortFrom;
     private DataPublisher.DataPort m_selectedPortTo;
+    private DataPublisher m_publisherFrom;
 
     LogUtils.DebugLogger m_logger = new LogUtils.DebugLogger("DataPipeMenu");
 
