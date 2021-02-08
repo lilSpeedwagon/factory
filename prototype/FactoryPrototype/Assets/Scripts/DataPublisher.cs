@@ -13,13 +13,26 @@ public class DataPublisher : MonoBehaviour
     public class DataPort
     {
         public string Name;
-        public DataValue CurrentValue;
+
+        public DataValue CurrentValue
+        {
+            set => m_value = value;
+            get
+            {
+                if (!m_isSource && m_otherEnd != null)
+                {
+                    return m_otherEnd.m_value;
+                }
+                return m_value;
+            }
+        }
         public bool IsPublisher => m_isSource && m_otherEnd != null;
         public bool IsConnected => m_otherEnd != null;
 
         public DataPort(string name)
         {
             Name = name;
+            m_value = new DataValue(0.0f);
         }
 
         public static void WirePorts(DataPort from, DataPort to, LineRenderer line)
@@ -62,6 +75,7 @@ public class DataPublisher : MonoBehaviour
         private DataPort m_otherEnd;
         private bool m_isSource;
         private LineRenderer m_line;
+        private DataValue m_value;
     }
 
     public void SetPort(DataPort port)

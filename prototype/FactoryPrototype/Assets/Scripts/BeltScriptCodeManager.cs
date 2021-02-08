@@ -36,6 +36,13 @@ public class BeltScriptCodeManager
         return BeltScriptAdapter.Instance.Run(bltPath, log);
     }
 
+    public bool RunIo(string scriptName, Logger.LogDelegate log, float[] inputs, ref float[] outputs)
+    {
+        string bltPath = GetBeltScriptPath(scriptName);
+        Debug.Log($"BeltScriptCodeManager: running IO {bltPath}");
+        return BeltScriptAdapter.Instance.RunIo(bltPath, inputs, ref outputs, log);
+    }
+
     public bool RunWithHash(string hash, Logger.LogDelegate log)
     {
         // TODO 

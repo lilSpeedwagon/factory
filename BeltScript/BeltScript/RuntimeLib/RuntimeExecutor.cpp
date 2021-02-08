@@ -29,10 +29,10 @@ bool runtime::RuntimeExecutor::run(Inputs const& in, size_t expectedOutputs, Out
 				const Value val = m_pOperationTree->GetVariableValue(ss.str());
 				out.push_back(val.toFloat().getValue<float>());
 			}
-			else
+			/*else
 			{
 				throw RuntimeException("Cannot find output \"" + ss.str() + "\"");
-			}
+			}*/
 		}
 		
 		result = true;

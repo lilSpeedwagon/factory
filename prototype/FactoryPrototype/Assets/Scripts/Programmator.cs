@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -43,6 +44,11 @@ public class Programmator : tileObjectScript
 
     public string LogHistory => m_logContainer.ToString();
 
+    public void ClearLogHistory()
+    {
+        m_logContainer.Clear();
+    }
+
     public void Run()
     {
         m_debugLogger.Log("Run");
@@ -69,7 +75,11 @@ public class Programmator : tileObjectScript
         bool result = false;
         try
         {
-            result = BeltScriptCodeManager.Instance.Run(m_currentScript, Log);
+            //result = BeltScriptCodeManager.Instance.Run(m_currentScript, Log);
+            float[] inputs = GetCurrentValues();
+            float[] outputs = new float[DataPortsCount];
+            result = BeltScriptCodeManager.Instance.RunIo(m_currentScript, Log, inputs, ref outputs);
+            SetCurrentValues(outputs);
         }
         catch (Exception e)
         {
@@ -109,6 +119,29 @@ public class Programmator : tileObjectScript
         }
     }
 
+    private float[] GetCurrentValues()
+    {
+        float[] values = new float[DataPortsCount];
+
+        foreach (var (port, i) in m_publisher.PortList.Select((port, i) => (port, i)))
+        {
+            values[i] = (port.IsConnected && !port.IsPublisher) ? port.CurrentValue.GetNumber() : 0.0f;
+        }
+
+        return values;
+    }
+
+    private void SetCurrentValues(float[] values)
+    {
+        foreach (var (port, i) in m_publisher.PortList.Select((port, i) => (port, i)))
+        {
+            if (port.IsPublisher)
+            {
+                port.CurrentValue = new DataValue(values[i]);
+            }
+        }
+    }
+
     // MonoBehavior implementation
     private void Start()
     {
@@ -145,7 +178,6 @@ public class Programmator : tileObjectScript
 
                 if (m_failedExecutionInRow >= MaxFailedExecutionsInRow)
                 {
-                    Log("Failure execution limit exceeded.");
                     Log("Failure execution limit exceeded.");
                     m_failedExecutionInRow = 0;
                     Stop();
