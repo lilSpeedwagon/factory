@@ -26,7 +26,8 @@ public class DataPublisher : MonoBehaviour
                 return m_value;
             }
         }
-        public bool IsPublisher => m_isSource && m_otherEnd != null;
+        public bool IsSource => m_isSource && m_otherEnd != null;
+        public bool IsPublisher => !m_isSource && m_otherEnd != null;
         public bool IsConnected => m_otherEnd != null;
 
         public DataPort(string name)

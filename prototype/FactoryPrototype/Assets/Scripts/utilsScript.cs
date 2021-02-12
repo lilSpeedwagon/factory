@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class PlayerUtils
 {
@@ -57,6 +59,22 @@ public class TileUtils
         return new Vector2(0, zLevel * gridLayout.cellSize.y / 2);
     }
 
+    public static Direction GetReversedDirection(Direction dir)
+    {
+        switch (dir)
+        {
+            case Direction.UpLeft:
+                return Direction.DownRight;
+            case Direction.DownRight:
+                return Direction.UpLeft;
+            case Direction.DownLeft:
+                return Direction.UpRight;
+            case Direction.UpRight:
+                return Direction.DownLeft;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(dir), dir, "Invalid TileUtils.Direction value");
+        }
+    }
 }
 
 public class TimeUtils

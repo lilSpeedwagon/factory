@@ -125,7 +125,7 @@ public class Programmator : tileObjectScript
 
         foreach (var (port, i) in m_publisher.PortList.Select((port, i) => (port, i)))
         {
-            values[i] = (port.IsConnected && !port.IsPublisher) ? port.CurrentValue.GetNumber() : 0.0f;
+            values[i] = port.IsPublisher ? port.CurrentValue.GetNumber() : 0.0f;
         }
 
         return values;
@@ -135,7 +135,7 @@ public class Programmator : tileObjectScript
     {
         foreach (var (port, i) in m_publisher.PortList.Select((port, i) => (port, i)))
         {
-            if (port.IsPublisher)
+            if (port.IsSource)
             {
                 port.CurrentValue = new DataValue(values[i]);
             }
