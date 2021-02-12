@@ -46,6 +46,7 @@ namespace runtime
 
 	const std::map<std::string, FunctionZeroArgs> mapZeroArgsFunctions = {
 		{ "pi", []() { return Value(static_cast<float>(M_PI)); } },
+		{ "rand", []() { return Value(static_cast<float>(rand()) / static_cast<float>(RAND_MAX)); } },
 	};
 
 	const std::map<std::string, FunctionUnary> mapUnaryFunctions = {
