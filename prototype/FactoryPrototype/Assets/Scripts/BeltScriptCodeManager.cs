@@ -22,6 +22,7 @@ public class BeltScriptCodeManager
     // singleton
     private BeltScriptCodeManager()
     {
+        m_logger = new LogUtils.DebugLogger("BeltScriptCodeManager");
         InitCodeDirectory();
 
         m_scriptList = new Dictionary<string, string>();
@@ -32,33 +33,27 @@ public class BeltScriptCodeManager
     public bool Run(string scriptName, Logger.LogDelegate log)
     {
         string bltPath = GetBeltScriptPath(scriptName);
-        Debug.Log($"BeltScriptCodeManager: running {bltPath}");
+        m_logger.Log($"Running {bltPath}");
         return BeltScriptAdapter.Instance.Run(bltPath, log);
     }
 
     public bool RunIo(string scriptName, Logger.LogDelegate log, float[] inputs, ref float[] outputs)
     {
         string bltPath = GetBeltScriptPath(scriptName);
-        Debug.Log($"BeltScriptCodeManager: running IO {bltPath}");
+        m_logger.Log($"Running IO {bltPath}");
         return BeltScriptAdapter.Instance.RunIo(bltPath, inputs, ref outputs, log);
-    }
-
-    public bool RunWithHash(string hash, Logger.LogDelegate log)
-    {
-        // TODO 
-        throw new NotImplementedException();
     }
 
     public bool Compile(string scriptName, string code, Logger.LogDelegate log)
     {
         if (scriptName.Length == 0)
         {
-            Debug.LogWarning("BeltScriptCodeManager: Attempt to call Compile with empty script name");
+            m_logger.Warn("Attempt to call Compile with empty script name");
             return false;
         }
 
         string bltPath = GetBeltScriptPath(scriptName);
-        Debug.Log($"BeltScriptCodeManager: Compiling \"{bltPath}\"...");
+        m_logger.Log($"Compiling \"{bltPath}\"...");
 
         bool result = BeltScriptAdapter.Instance.Compile(bltPath, code, log);
 
@@ -66,7 +61,7 @@ public class BeltScriptCodeManager
         if (result)
         {
             string sourceCodePath = GetSourceCodePath(scriptName);
-            Debug.Log($"BeltScriptCodeManager: Saving code sources with name {sourceCodePath}");
+            m_logger.Log($"Saving code sources with name {sourceCodePath}");
 
             try
             {
@@ -82,10 +77,13 @@ public class BeltScriptCodeManager
                 Debug.LogError(e);
                 return false;
             }
+
+            // remove cashed code from Runtime.dll
+            BeltScriptAdapter.Instance.Reset(bltPath);
         }
         else
         {
-            Debug.Log("BeltScriptCodeManager: Compilation failed.");
+            m_logger.Log("Compilation failed.");
         }
 
         return result;
@@ -260,6 +258,8 @@ public class BeltScriptCodeManager
     private const string CodeDirectory = "./code/";
     private const string SourceCodeExtension = ".code";
     private const string BeltScriptExtension = ".blt";
+
+    private LogUtils.DebugLogger m_logger;
 
     private static readonly SHA256 g_sha256 = SHA256.Create();
 

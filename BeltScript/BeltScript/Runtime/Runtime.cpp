@@ -83,6 +83,12 @@ bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), in
 	return result;
 }
 
+bool removeFromCashInternal(const char* codeFileName)
+{
+	RuntimeStorage::GetInstance().RemoveTree(codeFileName);
+	return true;
+}
+
 
 extern "C"
 {
@@ -94,5 +100,10 @@ extern "C"
 	bool __declspec(dllexport) __stdcall RunIO(const char * codeFileName, void(__stdcall* log)(const char*), int inputsCount, float inputs[], int outputsCount, float** outputs)
 	{
 		return runInternal(codeFileName, log, inputsCount, inputs, outputsCount, outputs);
+	}
+
+	bool __declspec(dllexport) __stdcall RemoveFromCash(const char* codeFileName)
+	{
+		return removeFromCashInternal(codeFileName);
 	}
 }

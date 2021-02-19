@@ -11,6 +11,7 @@ public:
 
 	OperationScopePtr GetTree(std::string const& fileName);
 	void StoreTree(std::string const& fileName, OperationScopePtr operationTree);
+	void RemoveTree(std::string const& fileName);
 
 private:
 	RuntimeStorage() = default;

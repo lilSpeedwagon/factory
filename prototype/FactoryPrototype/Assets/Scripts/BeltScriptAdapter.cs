@@ -41,6 +41,11 @@ public class BeltScriptAdapter : MonoBehaviour
         return m_runtime.RunIo(codeFileName, log, inputs.Length, inputs, outputs.Length, ref outputs);
     }
 
+    public bool Reset(string codeFileName)
+    {
+        return m_runtime.Reset(codeFileName);
+    }
+
     private void Start()
     {
         m_runtime = new RuntimeDll();
@@ -108,6 +113,11 @@ internal class RuntimeDll : DllLoader
         return m_runIoDelegate(codeFileName, Marshal.GetFunctionPointerForDelegate(log), inputsCount, inputs, outputsCount, ref outputs);
     }
 
+    public bool Reset(string codeFileName)
+    {
+        return m_resetDelegate(codeFileName);
+    }
+
     public override void Load()
     {
         Debug.Log("Loading Runtime.dll");
@@ -138,12 +148,19 @@ internal class RuntimeDll : DllLoader
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
 
+            IntPtr methodResetHandle = GetProcAddress(m_handle, "RemoveFromCash");
+            if (methodResetHandle == IntPtr.Zero)
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
+
             m_runDelegate = (RunDelegate)Marshal.GetDelegateForFunctionPointer(methodRunHandle, typeof(RunDelegate));
             m_runIoDelegate = (RunIoDelegate)Marshal.GetDelegateForFunctionPointer(methodRunIoHandle, typeof(RunIoDelegate));
+            m_resetDelegate = (ResetDelegate) Marshal.GetDelegateForFunctionPointer(methodResetHandle, typeof(ResetDelegate));
         }
         catch (Exception)
         {
-            Debug.LogError("Error has occured during loading Runtime.dll.");
+            Debug.LogError("An error has occurred during loading Runtime.dll.");
             Unload();
             throw;
         }
@@ -163,16 +180,19 @@ internal class RuntimeDll : DllLoader
 
         m_runDelegate = null;
         m_runIoDelegate = null;
+        m_resetDelegate = null;
 
         Debug.Log("Runtime.dll has been unloaded");
     }
 
     private delegate bool RunDelegate(string codeFileName, IntPtr logDelegate);
     private delegate bool RunIoDelegate(string codeFileName, IntPtr logDelegate, int inputsCount, float[] inputs, int outputsCount, ref float[] outputs);
+    private delegate bool ResetDelegate(string codeFileName);
 
     private IntPtr m_handle = IntPtr.Zero;
     private RunDelegate m_runDelegate;
     private RunIoDelegate m_runIoDelegate;
+    private ResetDelegate m_resetDelegate;
 }
 
 internal class CompilerDll : DllLoader
@@ -218,7 +238,7 @@ internal class CompilerDll : DllLoader
         }
         catch (Exception)
         {
-            Debug.LogError("Error has occured during loading Compiler.dll.");
+            Debug.LogError("An error has occurred during loading Compiler.dll.");
             Unload();
             throw;
         }

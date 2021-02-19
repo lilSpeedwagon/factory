@@ -28,4 +28,9 @@ void RuntimeStorage::StoreTree(std::string const& fileName, OperationScopePtr op
 	m_storage[fileName] = operationTree;
 }
 
+void RuntimeStorage::RemoveTree(std::string const& fileName)
+{
+	m_storage.erase(fileName);
+}
+
 
