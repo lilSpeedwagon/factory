@@ -8,8 +8,10 @@ bool runtime::RuntimeExecutor::run(Inputs const& in, size_t expectedOutputs, Out
 
 	try
 	{
+		DebugLog("Reset operations tree");
+		m_pOperationTree->Reset();
+		
 		DebugLog("Executing...");
-
 		for (size_t i = 0; i < in.size(); i++)
 		{
 			const IOType val = in[i];

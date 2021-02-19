@@ -122,6 +122,25 @@ void Syntaxer::extend_scope(ItToken itBegin, ItToken itEnd, OperationScopePtr pC
 
 				it = itCloseLoopBracket + 1;
 			}
+			else if (it->value == KeyWords::Static)
+			{
+				DebugLog("Static statement found.");
+				
+				const ItToken itIdentifier = it + 1;
+				const ItToken itExprEnd = find_token_type_throw(it, itEnd, Tokens::Semicolon);
+				
+				if (itIdentifier->type == Tokens::Identifier && std::distance(itIdentifier, itExprEnd) == 1)
+				{
+					std::string const& name = itIdentifier->value;
+					DebugLog(name + " is a static variable.");
+					pCurrentScope->AddStaticVariable(name);
+					it = itExprEnd + 1;
+				}
+				else
+				{
+					throw CompilationError("Invalid static definition", it, itExprEnd);
+				}
+			}
 			else
 			{
 				ItToken itExprEnd = find_token_type_throw(it, itEnd, Tokens::Semicolon);

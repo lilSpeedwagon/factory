@@ -119,7 +119,8 @@ namespace KeyWords
 {
 	static const std::pair<std::string, std::string> IfElse = { "if", "else" };
 	static const std::string Loop = "while";
-	constexpr std::array KeyWords = { "if", "else", "for", "true", "false" };
+	static const std::string Static = "static";
+	constexpr std::array KeyWords = { "if", "else", "for", "true", "false", "static" };
 
 	const static std::string BoolLiteralTrue = "true";
 	const static std::string BoolLiteralFalse = "false";

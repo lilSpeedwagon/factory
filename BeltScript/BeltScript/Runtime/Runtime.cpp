@@ -4,6 +4,7 @@
 #include "RuntimeContext.h"
 #include "Serializer.h"
 #include "RuntimeExecutor.h"
+#include "RuntimeStorage.h"
 
 
 bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), int inputsCount, float inputs[], int outputsCount, float** outputs)
@@ -18,14 +19,20 @@ bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), in
 	
 	try
 	{
-		// upload runtime tree
-		serializer::Serializer s(codeFileName, log);
-		const bool serRes = s.Load();
-		if (!serRes)
+		// try to find cashed runtime tree
+		OperationScopePtr pOperationTree = RuntimeStorage::GetInstance().GetTree(codeFileName);
+
+		// upload from file if not found
+		if (pOperationTree == nullptr)
 		{
-			return false;
+			serializer::Serializer s(codeFileName, log);
+			const bool serRes = s.Load();
+			if (!serRes)
+			{
+				return false;
+			}
+			pOperationTree = s.GetTree();
 		}
-		OperationScopePtr pOperationTree = s.GetTree();
 
 		// set inputs and outputs
 		runtime::Inputs vIn;
@@ -58,6 +65,9 @@ bool runInternal(const char* codeFileName, void(__stdcall* log)(const char*), in
 				(*outputs)[i] = out[i];
 			}
 		}
+
+		// store tree to cash
+		RuntimeStorage::GetInstance().StoreTree(codeFileName, pOperationTree);
 		
 		result = true;
 	}

@@ -172,6 +172,7 @@
     <ClInclude Include="RuntimeContext.h" />
     <ClInclude Include="RuntimeException.h" />
     <ClInclude Include="RuntimeExecutor.h" />
+    <ClInclude Include="RuntimeStorage.h" />
     <ClInclude Include="Value.h" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +186,7 @@
     <ClCompile Include="RuntimeCommon.cpp" />
     <ClCompile Include="RuntimeContext.cpp" />
     <ClCompile Include="RuntimeExecutor.cpp" />
+    <ClCompile Include="RuntimeStorage.cpp" />
     <ClCompile Include="Value.cpp" />
   </ItemGroup>
   <ItemGroup>

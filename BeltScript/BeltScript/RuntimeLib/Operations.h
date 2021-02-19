@@ -53,6 +53,7 @@ class Operation : public serializer::Serializable
 public:
 	virtual ~Operation() = default;
 	virtual void Execute() = 0;
+	virtual void Reset() {}
 	virtual void SetParentScope(OperationScope* pScope) { m_pParentScope = pScope; }
 	OperationScope* GetParentScope() const { return m_pParentScope; }
 	
@@ -74,7 +75,9 @@ public:
 	runtime::Value GetVariableValue(std::string const& varName) const;
 	void SetVariableValue(std::string const& varName, runtime::Value const& val);
 	bool IsVariableExist(std::string const& varName) const;
+	void AddStaticVariable(std::string const& name);
 	void AddOperation(OperationPtr pOperation);
+	void Reset() override;
 	bool IsRoot() const { return m_pParentScope == nullptr; }
 
 	void SetParentScope(OperationScope* pScope) override;
@@ -87,6 +90,7 @@ protected:
 	
 private:
 	std::map<std::string, runtime::Value> m_mapVariables;
+	std::map<std::string, runtime::Value> m_mapStaticVariables;
 	std::list<OperationPtr> m_listOperations;
 };
 

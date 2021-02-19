@@ -44,6 +44,13 @@ runtime::Value OperationScope::GetVariableValue(std::string const& varName) cons
 		{
 			return it->second;
 		}
+
+		auto itStatic = pScope->m_mapStaticVariables.find(varName);
+		if (itStatic != pScope->m_mapStaticVariables.end())
+		{
+			return itStatic->second;
+		}
+		
 		pScope = pScope->GetParentScope();
 	} while (pScope != nullptr);
 
@@ -62,6 +69,14 @@ void OperationScope::SetVariableValue(std::string const& varName, runtime::Value
 			pScope->m_mapVariables[varName] = val;
 			return;
 		}
+
+		auto itStatic = pScope->m_mapStaticVariables.find(varName);
+		if (itStatic != pScope->m_mapStaticVariables.end())
+		{
+			pScope->m_mapStaticVariables[varName] = val;
+			return;
+		}
+		
 		pScope = pScope->GetParentScope();
 	} while (pScope != nullptr);
 
@@ -79,10 +94,22 @@ bool OperationScope::IsVariableExist(std::string const& varName) const
 		{
 			return true;
 		}
+
+		auto itStatic = pScope->m_mapStaticVariables.find(varName);
+		if (itStatic != pScope->m_mapStaticVariables.end())
+		{
+			return true;
+		}
+		
 		pScope = pScope->GetParentScope();
 	} while (pScope != nullptr);
 
 	return false;
+}
+
+void OperationScope::AddStaticVariable(std::string const& name)
+{
+	m_mapStaticVariables[name] = runtime::Value();
 }
 
 void OperationScope::AddOperation(OperationPtr pOperation)
@@ -90,12 +117,21 @@ void OperationScope::AddOperation(OperationPtr pOperation)
 	m_listOperations.push_back(pOperation);
 }
 
+void OperationScope::Reset()
+{
+	m_mapVariables.clear();
+	for (OperationPtr operation : m_listOperations)
+	{
+		operation->Reset();
+	}
+}
+
 serializer::BinaryFile& OperationScope::operator<<(serializer::BinaryFile& file)
 {
-	uint16_t size = 0;
-	file >> size;
+	uint16_t operationsCount = 0;
+	file >> operationsCount;
 
-	for (uint16_t i = 0; i < size; i++)
+	for (uint16_t i = 0; i < operationsCount; i++)
 	{
 		uint8_t raw_type;
 		file >> raw_type;
@@ -124,18 +160,36 @@ serializer::BinaryFile& OperationScope::operator<<(serializer::BinaryFile& file)
 		m_listOperations.push_back(pOper);
 	}
 
+	uint16_t staticVariablesCount = 0;
+	file >> staticVariablesCount;
+
+	for (uint16_t i = 0; i < staticVariablesCount; i++)
+	{
+		std::string name;
+		file >> name;
+		m_mapStaticVariables[name] = runtime::Value();
+	}
+
 	return file;
 }
 
 serializer::BinaryFile& OperationScope::operator>>(serializer::BinaryFile& file)
 {
 	file << raw_type();	
-	const uint16_t size = static_cast<uint16_t>(m_listOperations.size());
-	file << size;
+	const uint16_t operationsCount = static_cast<uint16_t>(m_listOperations.size());
+	file << operationsCount;
 
 	for (OperationPtr pOper : m_listOperations)
 	{
 		pOper->operator>>(file);
+	}
+
+	const uint16_t staticVariablesCount = static_cast <uint16_t> (m_mapStaticVariables.size());
+	file << staticVariablesCount;
+
+	for (auto const& [name, value] : m_mapStaticVariables)
+	{
+		file << name;
 	}
 
 	return file;
