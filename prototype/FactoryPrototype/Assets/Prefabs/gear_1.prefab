@@ -134,5 +134,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8002f07b18b51514794adc27f97b8b7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_type: 1
-  m_cost: 1
+  m_cost: 2
+  SellCost: 1
+  Name: gear1

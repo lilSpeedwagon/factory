@@ -40,7 +40,7 @@ public class InputConsumer : MonoBehaviour, IInput, IMover
 
     public void Consume(MotionScript obj)
     {
-        int cost = obj.GetComponent<MaterialScript>()?.Cost ?? 0;
+        int cost = obj.GetComponent<Material>()?.Cost ?? 0;
         Destroy(obj.gameObject);
         ResoucesScript.instance.Earn(cost);
     }

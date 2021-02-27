@@ -65,6 +65,11 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
         {
             string code = BeltScriptCodeManager.Instance.LoadSourceCode(m_currentSelection);
             CodeInputField.text = code;
+
+            if (ScriptNameInputField != null)
+            {
+                ScriptNameInputField.text = m_currentSelection;
+            }
         }
     }
 

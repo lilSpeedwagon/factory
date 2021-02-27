@@ -9,19 +9,33 @@ public class processorScript : tileObjectScript, IProcessor, IMover
     public float ProcessTriggerOffset = 0.3f;
 
     // IProcessor implementation
-    public ProcessorType Type;
+    public string Name;
 
-    public GameObject Process(IProcessable processableObj)
+    public Material Process(Material processable)
     {
-        Destroy(processableObj.gameObject);
+        Recipe recipe = RecipeManager.Instance.FindRecipe(processable.Name, Name);
+        if (recipe == null)
+        {
+            Debug.LogWarning($"Processor: cannot process {processable.Name} via {Name}.");
+            return null;
+        }
+
+        Material toMaterial = MaterialInfoHolder.Instance.GetMaterialPrefab(recipe.To);
+        if (toMaterial == null)
+        {
+            Debug.LogWarning($"Processor: cannot find material info for {recipe.To}.");
+            return null;
+        }
+
+        Destroy(processable.gameObject);
 
         try
         {
-            TimeUtils.Delay(RecipeManager.instance.ProcessingTime(processableObj, Type));
+            TimeUtils.Delay(recipe.ProcessingTime);
         }
         catch (Exception e) { Debug.LogWarning(e.Message); }
         
-        GameObject newInstance = Instantiate(RecipeManager.instance.FindPrefab(Type, processableObj.Type), GetPosition(), TileUtils.qInitRotation);
+        GameObject newInstance = Instantiate(toMaterial.gameObject, GetPosition(), TileUtils.qInitRotation);
 
         try
         {
@@ -32,17 +46,17 @@ public class processorScript : tileObjectScript, IProcessor, IMover
                 Move(obj);
             }
         }
-        catch (System.NullReferenceException e)
+        catch (NullReferenceException e)
         {
             Debug.LogError(e.Message);
         }
 
-        return newInstance;
+        return newInstance.GetComponent<Material>();
     }
 
-    public bool CanProcess(MaterialType type)
+    public bool CanProcess(string material)
     {     
-        return RecipeManager.instance.CanBeProcessed(Type, type);
+        return RecipeManager.Instance.CanBeProcessed(material, Name);
     }
     // IProcessor implementation end
 
@@ -87,10 +101,10 @@ public class processorScript : tileObjectScript, IProcessor, IMover
     {
         if (m_currentObjectToProcess != null && m_currentObjectToProcess.IsFinished)
         {
-            var proc = m_currentObjectToProcess.GetComponent<IProcessable>();
-            if (proc != null && CanProcess(proc.Type))
+            var material = m_currentObjectToProcess.GetComponent<Material>();
+            if (material != null && CanProcess(material.Name))
             {
-                Process(proc);
+                Process(material);
             }
             else
             {

@@ -4,6 +4,6 @@ using UnityEngine;
 
 public interface IProcessor
 {
-    bool CanProcess(MaterialType type);
-    GameObject Process(IProcessable obj);
+    bool CanProcess(string material);
+    Material Process(Material obj);
 }

@@ -101,7 +101,7 @@ MonoBehaviour:
   OnlyXFlip: 1
   ConveerSpeed: 0.6
   ProcessTriggerOffset: 0.5
-  Type: 1
+  Name: proc1
 --- !u!60 &6907948641447400956
 PolygonCollider2D:
   m_ObjectHideFlags: 0

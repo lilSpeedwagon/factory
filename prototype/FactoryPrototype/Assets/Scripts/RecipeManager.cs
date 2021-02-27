@@ -1,66 +1,66 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using UnityEngine;
 
 public class RecipeManager : MonoBehaviour
 {
-    public static RecipeManager instance { get; private set; }
+    public static RecipeManager Instance
+    {
+        get
+        {
+            if (g_instance == null)
+            {
+                g_instance = GameObject.Find("RecipeManager").GetComponent<RecipeManager>();
+            }
+
+            return g_instance;
+        }
+    }
 
     public List<Recipe> Recipes;
 
-    public float ProcessingTime(IProcessable obj, ProcessorType proc)
+    public Recipe FindRecipe(string from, string processor)
     {
-        foreach (var r in Recipes)
+        try
         {
-            if (obj.Type == r.From && proc == r.Processor)
-                return r.ProcessingTime;
+            return m_recipesByFrom[from]?.Find(recipe => recipe.Processor == processor);
+
         }
-
-        throw new InvalidExpressionException();
+        catch (KeyNotFoundException)
+        {
+            return null;
+        }
     }
 
-    public bool CanBeProcessed(ProcessorType proc, MaterialType mat)
+    public bool CanBeProcessed(string from, string processor)
     {
-        foreach (var r in Recipes)        
-            if (r.Processor == proc && r.From == mat)
-                return true;
-        return false;
-    }
-
-    public GameObject FindPrefab(ProcessorType proc, MaterialType mat)
-    {
-        foreach (var r in Recipes)
-            if (r.Processor == proc && r.From == mat)
-                return r.Prefab;
-        return null;
+        return FindRecipe(from, processor) != null;
     }
 
     private void Start()
     {
-        if (instance == null)
-            instance = this;
+        m_recipesByFrom = new Dictionary<string, List<Recipe>>();
+        foreach (var recipe in Recipes)
+        {
+            if (!m_recipesByFrom.ContainsKey(recipe.From))
+            {
+                m_recipesByFrom[recipe.From] = new List<Recipe>();
+            }
+            m_recipesByFrom[recipe.From].Add(recipe);
+        }
     }
+
+    private Dictionary<string, List<Recipe>> m_recipesByFrom;
+
+    private static RecipeManager g_instance;
 }
 
 [System.Serializable]
 public class Recipe
 {
-    public MaterialType From, To;
-    public ProcessorType Processor;
-    public GameObject Prefab;
+    public string From, To;
+    public string Processor;
     public float ProcessingTime;
-}
-
-public enum MaterialType
-{
-    Undefined,
-    Gear,
-    Gear2
-}
-
-public enum ProcessorType
-{
-    Undefined,
-    Processor,
 }
