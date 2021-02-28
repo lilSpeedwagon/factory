@@ -13,14 +13,14 @@ public class BuilderMenu : MonoBehaviour, IMenu
     {
         GetComponent<Image>().enabled = true;
         GetComponent<ScrollRect>().enabled = true;
-        setActiveForChildren(true);
+        GameObjectUtils.SetActiveForChildren(gameObject, true);
     }
 
     public void Hide()
     {
         GetComponent<Image>().enabled = false;
         GetComponent<ScrollRect>().enabled = false;
-        setActiveForChildren(false);
+        GameObjectUtils.SetActiveForChildren(gameObject, false);
     }
 
     public bool IsCameraZoomAllowed()
@@ -75,7 +75,7 @@ public class BuilderMenu : MonoBehaviour, IMenu
 
     private void Pick(GameObject prefab)
     {
-        objectBuilder.Builder.Pick(prefab);
+        objectBuilder.Builder.Pick(prefab.GetComponent<BuildableObjectScript>());
     }
 
     private void PickRemover()
@@ -87,15 +87,6 @@ public class BuilderMenu : MonoBehaviour, IMenu
     {
         InitBuilderPanel();  
         m_menuManager = MenuManager.Manager;
-    }
-
-    private void setActiveForChildren(bool isActive)
-    {
-        foreach (Transform t in GetComponent<Transform>())
-        {
-            if (t != gameObject)
-                t.gameObject?.SetActive(isActive);
-        }
     }
 
     private GameObject m_builderPanelContent;

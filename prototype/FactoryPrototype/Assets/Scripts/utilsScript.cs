@@ -202,3 +202,16 @@ public class LogUtils
 
     }
 }
+
+public class GameObjectUtils
+{
+    public static void SetActiveForChildren(GameObject obj, bool isActive)
+    {
+        obj.SetActive(isActive);
+        foreach (Transform t in obj.GetComponent<Transform>())
+        {
+            if (t != obj)
+                t.gameObject?.SetActive(isActive);
+        }
+    }
+}

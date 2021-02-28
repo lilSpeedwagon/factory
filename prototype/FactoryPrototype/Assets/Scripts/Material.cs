@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Net.Mime;
 using UnityEngine;
-
-
+using UnityEngine.UI;
 
 
 public class Material : MonoBehaviour
@@ -14,4 +14,6 @@ public class Material : MonoBehaviour
     public int SellCost;
 
     public string Name;
+
+    public Sprite Image;
 }

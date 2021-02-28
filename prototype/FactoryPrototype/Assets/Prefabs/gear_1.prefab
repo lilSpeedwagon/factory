@@ -137,3 +137,4 @@ MonoBehaviour:
   m_cost: 2
   SellCost: 1
   Name: gear1
+  Image: {fileID: 21300000, guid: 0fcededab282c0740ae53bea235595f4, type: 3}

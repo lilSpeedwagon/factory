@@ -25,7 +25,7 @@ public class objectBuilder : MonoBehaviour, IMenu
     public BuilderMenu BuilderPanel;
 
     public GameObject ShadowPrefab;
-    public GameObject PrefabToCreate;
+    public BuildableObjectScript PrefabToCreate;
     public GameObject RemoverPrefab;
 
     private delegate void OnBuildSignal(BuildableObjectScript obj);
@@ -48,7 +48,7 @@ public class objectBuilder : MonoBehaviour, IMenu
     }
 
     // builder
-    public void Pick(GameObject prefab)
+    public void Pick(BuildableObjectScript prefab)
     {
         ChangePrefab(prefab);
         try
@@ -71,7 +71,7 @@ public class objectBuilder : MonoBehaviour, IMenu
     }
 
     private bool IsPossibleToCreate => m_isActive && m_tileManager.IsEmpty(TileUtils.MouseCellPosition()) && 
-                                       ResoucesScript.instance.CanBeBuilt(PrefabToCreate.GetComponent<BuildableObjectScript>());
+                                       ResoucesScript.instance.IsPossibleToSpent(PrefabToCreate.Cost);
 
     private void RotateShadow(bool bClockwise = true)
     {
@@ -113,11 +113,19 @@ public class objectBuilder : MonoBehaviour, IMenu
     {
         if (m_isActive && PrefabToCreate != null)
         {
-            GameObject newObj = m_tileManager.InstantiateObject(PrefabToCreate, TileUtils.MouseCellPosition());
+            try
+            {
+                ResoucesScript.instance.Spend(PrefabToCreate.Cost);
+            }
+            catch (ArgumentException e)
+            {
+                Debug.LogWarning($"Cannot build. Error: {e.Message}.");
+                return;
+            }
+
+            GameObject newObj = m_tileManager.InstantiateObject(PrefabToCreate.gameObject, TileUtils.MouseCellPosition());
             newObj.GetComponent<tileObjectScript>().direction = m_shadow.GetComponent<tileObjectScript>().direction;
             newObj.transform.position += (Vector3) TileUtils.LevelOffset(m_currentZlevel);
-
-            m_onBuildSignal(newObj.GetComponent<BuildableObjectScript>());
         }
     }
 
@@ -134,7 +142,7 @@ public class objectBuilder : MonoBehaviour, IMenu
             var removableObject = m_tileManager.GetGameObject(pos);
             int cost = GetSellCost(removableObject);
             m_tileManager.RemoveObject(pos);
-            m_onRemoveSignal(cost);
+            ResoucesScript.instance.Earn(cost);
         }
         catch (Exception)
         {
@@ -142,7 +150,7 @@ public class objectBuilder : MonoBehaviour, IMenu
         }
     }
 
-    private void ChangePrefab(GameObject p)
+    private void ChangePrefab(BuildableObjectScript p)
     {
         m_isActive = true;
         m_isRemoverActive = false;
@@ -166,9 +174,6 @@ public class objectBuilder : MonoBehaviour, IMenu
     void Start()
     {
         m_tileManager = TileManagerScript.TileManager;
-
-        m_onBuildSignal = delegate(BuildableObjectScript obj) { ResoucesScript.instance.OnBuild(obj); };
-        m_onRemoveSignal = delegate (int sellCost) { ResoucesScript.instance.OnSell(sellCost); };
     }
 
     // Update is called once per frame
@@ -229,9 +234,6 @@ public class objectBuilder : MonoBehaviour, IMenu
 
     private TileManagerScript m_tileManager;
     private GameObject m_shadow;
-
-    private OnBuildSignal m_onBuildSignal;
-    private OnRemoveSignal m_onRemoveSignal;
 
     private bool m_isActive = false;
     private bool m_isRemoverActive = false;

@@ -83,6 +83,7 @@
     <Compile Include="Assets\Scripts\RecipeManager.cs" />
     <Compile Include="Assets\Scripts\ResoucesScript.cs" />
     <Compile Include="Assets\Scripts\StorageManager.cs" />
+    <Compile Include="Assets\Scripts\StorageMenu.cs" />
     <Compile Include="Assets\Scripts\TileManagerScript.cs" />
     <Compile Include="Assets\Scripts\cameraScript.cs" />
     <Compile Include="Assets\Scripts\conveyerScript.cs" />

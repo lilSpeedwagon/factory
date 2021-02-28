@@ -54,7 +54,7 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
     public void Show()
     {
         GetComponent<Image>().enabled = true;
-        SetActiveForChildren(true);
+        GameObjectUtils.SetActiveForChildren(gameObject, true);
 
         MenuManager.Manager.SetActive(this);
 
@@ -64,7 +64,7 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
     public void Hide()
     {
         GetComponent<Image>().enabled = false;
-        SetActiveForChildren(false);
+        GameObjectUtils.SetActiveForChildren(gameObject, false);
         m_isVisible = false;
         ClearLog();
     }
@@ -113,15 +113,6 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         if (LogText != null)
         {
             LogText.text = "";
-        }
-    }
-
-    private void SetActiveForChildren(bool isActive)
-    {
-        foreach (Transform t in GetComponent<Transform>())
-        {
-            if (t != gameObject)
-                t.gameObject?.SetActive(isActive);
         }
     }
 

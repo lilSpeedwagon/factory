@@ -89,7 +89,7 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
     public void Show()
     {
         GetComponent<Image>().enabled = true;
-        SetActiveForChildren(true);
+        GameObjectUtils.SetActiveForChildren(gameObject, true);
 
         MenuManager.Manager.SetActive(this);
 
@@ -99,21 +99,12 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
     public void Hide()
     {
         GetComponent<Image>().enabled = false;
-        SetActiveForChildren(false);
+        GameObjectUtils.SetActiveForChildren(gameObject, false);
     }
 
     public bool IsCameraZoomAllowed()
     {
         return false;
-    }
-
-    private void SetActiveForChildren(bool isActive)
-    {
-        foreach (Transform t in GetComponent<Transform>())
-        {
-            if (t != gameObject)
-                t.gameObject?.SetActive(isActive);
-        }
     }
 
     // Start is called before the first frame update

@@ -11,6 +11,7 @@ using UnityEngine;
  *  3. Programmer menu
  *  4. Main menu
  *  5. Wires menu
+ *  6. Storage menu
  */
 
 public interface IMenu
