@@ -19,6 +19,8 @@ public class DataPipeMenu : MonoBehaviour, IMenu
 
     public void OnPortSelected(DataPublisher.DataPort port)
     {
+        m_mouseEventReady = false;
+
         if (m_state == State.SelectPortFrom)
         {
             m_selectedPortFrom = port;
@@ -77,7 +79,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
 
     private void Update()
     {
-        if (IsActive)
+        if (IsActive && m_mouseEventReady)
         {
             Vector2 mousePos = TileUtils.MouseCellPosition();
             GameObject obj = TileManagerScript.TileManager.GetGameObject(mousePos);
@@ -87,7 +89,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
             {
                 DrawLine(mousePos);
 
-                if (Input.GetMouseButtonUp(MouseUtils.PRIMARY_MOUSE_BUTTON) && publisher != null && m_publisherFrom != publisher)
+                if (m_mouseEventReady && Input.GetMouseButtonUp(MouseUtils.PRIMARY_MOUSE_BUTTON) && publisher != null && m_publisherFrom != publisher)
                 {
                     m_state = State.SelectPortTo;
                     ShowPortList(mousePos, publisher.PortList);
@@ -104,6 +106,8 @@ public class DataPipeMenu : MonoBehaviour, IMenu
                 }
             }
         }
+
+        m_mouseEventReady = true;
     }
 
     private void WirePorts()
@@ -245,13 +249,14 @@ public class DataPipeMenu : MonoBehaviour, IMenu
     }
     private State m_state = State.Inactive;
 
+    private bool m_mouseEventReady;
     private LineRenderer m_line;
     private Vector2 m_fromPosition;
     private DataPublisher.DataPort m_selectedPortFrom;
     private DataPublisher.DataPort m_selectedPortTo;
     private DataPublisher m_publisherFrom;
 
-    LogUtils.DebugLogger m_logger = new LogUtils.DebugLogger("DataPipeMenu");
+    readonly LogUtils.DebugLogger m_logger = new LogUtils.DebugLogger("DataPipeMenu");
 
     private const string WireLayer = "wires";
 }
