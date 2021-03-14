@@ -50,6 +50,12 @@ public class MenuManager : MonoBehaviour
         }
     }
 
+    public void HideActive()
+    {
+        SetActive(m_default);
+        m_default.Show();
+    }
+
     public bool IsActive => m_current != null;
     public bool IsNonDefaultActive => IsActive && m_current != m_default;
 
@@ -74,11 +80,6 @@ public class MenuManager : MonoBehaviour
         }
     }
     
-    private void HideActive()
-    {
-        SetActive(m_default);
-        m_default.Show();
-    }
 
     private IMenu m_default;
     private IMenu m_current;

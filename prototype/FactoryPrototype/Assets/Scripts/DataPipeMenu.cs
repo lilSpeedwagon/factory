@@ -196,12 +196,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
                 Destroy(t.gameObject);
         }
 
-        // hide port list panel and label
-        foreach (RectTransform t in GetComponent<RectTransform>())
-        {
-            if (t != gameObject)
-                t.gameObject?.SetActive(false);
-        }
+        GameObjectUtils.SetActiveForChildren(gameObject, false);
     }
 
     private void DrawLine(Vector2 to)
@@ -266,15 +261,6 @@ public class DataPipeMenu : MonoBehaviour, IMenu
         points[curveSize - 1] = to;
 
         return points;
-    }
-
-    private void SetActiveForChildren(bool isActive)
-    {
-        foreach (Transform t in PortList.GetComponent<Transform>())
-        {
-            if (t != gameObject)
-                t.gameObject?.SetActive(isActive);
-        }
     }
 
     private void Reset()

@@ -6,4 +6,5 @@ public interface IOutput : IMover
 {
     bool IsReadyToEmit { get; }
     void Emit();
+    string MaterialToEmit { get; set; }
 }

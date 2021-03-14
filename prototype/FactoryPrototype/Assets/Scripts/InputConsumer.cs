@@ -40,9 +40,17 @@ public class InputConsumer : MonoBehaviour, IInput, IMover
 
     public void Consume(MotionScript obj)
     {
-        int cost = obj.GetComponent<Material>()?.Cost ?? 0;
+        Material material = obj.GetComponent<Material>();
+        if (material != null)
+        {
+            StorageManager.Instance.StoreMaterial(material.Name, 1);
+        }
+        else
+        {
+            Debug.LogWarning("Material component not found for consumable.");
+        }
+
         Destroy(obj.gameObject);
-        ResoucesScript.instance.Earn(cost);
     }
     // IConsumer end
 

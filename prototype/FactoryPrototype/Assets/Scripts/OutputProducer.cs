@@ -5,7 +5,6 @@ using UnityEngine;
 public class OutputProducer : MonoBehaviour, IOutput
 {
     public float Speed = 0.2f;
-    public GameObject PrefabToEmit;
     public float DelayBetweenEmissions = 0.5f;
 
     // IMover
@@ -42,11 +41,40 @@ public class OutputProducer : MonoBehaviour, IOutput
     // end IMover
 
     // IOutput
-    public bool IsReadyToEmit => m_currentMotion == null;
+    public string MaterialToEmit
+    {
+        get => m_materialToEmit != null ? m_materialToEmit.Name : "";
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                m_isEnabled = false;
+                m_materialToEmit = null;
+                return;
+            }
+
+            if (!MaterialInfoHolder.Instance.Exist(value))
+            {
+                throw new KeyNotFoundException($"Cannot emit '{value}'. Material is unknown.");
+            }
+
+            m_materialToEmit = MaterialInfoHolder.Instance.GetMaterialPrefab(value);
+            m_isEnabled = true;
+        }
+    }
+
+    public bool IsReadyToEmit => m_currentMotion == null && m_isEnabled;
 
     public void Emit()
     {
-        var obj = Instantiate(PrefabToEmit, m_tile.GetPosition(), TileUtils.qInitRotation);
+        if (m_materialToEmit == null || !StorageManager.Instance.RemoveMaterial(m_materialToEmit.Name, 1))
+        {
+            Debug.LogWarning($"Cannot emit '{m_materialToEmit}'");
+            m_isEnabled = false;
+            return;
+        }
+
+        var obj = Instantiate(m_materialToEmit.gameObject, m_tile.GetPosition(), TileUtils.qInitRotation);
         m_currentMotion = obj.GetComponent<MotionScript>(); // could be null
         Move(m_currentMotion);
     }
@@ -65,6 +93,7 @@ public class OutputProducer : MonoBehaviour, IOutput
     {
         m_tile = GetComponent<tileObjectScript>();
         InvokeRepeating("EmitInternal", DelayBetweenEmissions, DelayBetweenEmissions);
+        m_isEnabled = false;
     }
 
     private void FixedUpdate()
@@ -75,12 +104,22 @@ public class OutputProducer : MonoBehaviour, IOutput
             Move(m_currentMotion);
     }
 
+    private void OnMouseDown()
+    {
+        if (!MenuManager.Manager.IsNonDefaultActive)
+        {
+            ProducerMenu.Instance.ShowFor(this);
+        }
+    }
+
     private void OnDestroy()
     {
         if (m_currentMotion != null)
             Destroy(m_currentMotion.gameObject);
     }
 
+    private bool m_isEnabled;
+    private Material m_materialToEmit;
     private tileObjectScript m_tile;
     private MotionScript m_currentMotion;
 }

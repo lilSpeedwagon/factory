@@ -31,6 +31,10 @@ public class MaterialInfoHolder : MonoBehaviour
         }
     }
 
+    public bool Exist(string name)
+    {
+        return m_materials.ContainsKey(name);
+    }
 
     // MonoBehavior
     private void Start()
