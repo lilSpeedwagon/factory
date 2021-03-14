@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Xml.Xsl;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using Quaternion = UnityEngine.Quaternion;
@@ -92,6 +95,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
                 if (m_mouseEventReady && Input.GetMouseButtonUp(MouseUtils.PRIMARY_MOUSE_BUTTON) && publisher != null && m_publisherFrom != publisher)
                 {
                     m_state = State.SelectPortTo;
+                    m_selectedPortIndex = -1;
                     ShowPortList(mousePos, publisher.PortList);
                 }
             }
@@ -125,9 +129,11 @@ public class DataPipeMenu : MonoBehaviour, IMenu
     private void ShowPortList(Vector2 pos, List<DataPublisher.DataPort> portList)
     {
         GetComponent<RectTransform>().SetPositionAndRotation(pos, Quaternion.identity);
-
-        foreach (var port in portList)
+        
+        for (int i = 0; i < portList.Count; i++)
         {
+            var port = portList[i];
+
             var item = Instantiate(ListItemPrefab, pos, Quaternion.identity, PortList);
             item.localScale = new Vector3(1.0f, 1.0f, 1.0f); // prevent wrong scaling
 
@@ -136,11 +142,13 @@ public class DataPipeMenu : MonoBehaviour, IMenu
 
             if (!port.IsConnected)
             {
+                var index = i;
                 toggle.onValueChanged.AddListener((val) =>
                 {
                     if (val)
                     {
                         OnPortSelected(port);
+                        m_selectedPortIndex = index;
                     }
                 });
 
@@ -211,10 +219,54 @@ public class DataPipeMenu : MonoBehaviour, IMenu
             m_line.startColor = color;
             m_line.endColor = color;
         }
-        m_line.SetPositions(new[] { (Vector3)m_fromPosition, (Vector3)to });
+
+        Vector3[] points = GetCurvePoints(m_fromPosition, to, GetCurveShift(m_selectedPortIndex));
+        m_line.positionCount = points.Length;
+        m_line.SetPositions(points);
     }
 
-    
+    private static float GetCurveShift(int index)
+    {
+        float curveShift = (index - 2) / 2.0f;
+        if (curveShift >= 0)
+        {
+            curveShift += 0.5f;
+        }
+        return curveShift;
+    }
+
+    private static Vector3[] GetCurvePoints(Vector2 from, Vector2 to, float curveShift = 1.0f)
+    {
+        if (from == to)
+        {
+            return new Vector3[] { to } ;
+        }
+
+        Vector2 line = to - from;
+        float angleSin = line.y / line.magnitude;
+        float angleCos = line.x / line.magnitude;
+
+        Vector2 shiftLine = new Vector2(-curveShift * angleSin, curveShift * angleCos);
+        Vector2 middlePoint = new Vector3((from.x + to.x) / 2.0f, (from.y + to.y) / 2.0f);
+        Vector2 referencePoint = middlePoint + shiftLine;
+
+        // Bezier curve: P0(1 - t)^2 + 2tP1(1 - t) + P2t^2, where t in [0, 1]
+        float t = 0.0f;
+        const float curveStep = 0.1f;
+        const int curveSize = (int) (1.0f / curveStep) + 1;
+        Vector3[] points = new Vector3[curveSize];
+
+        for (int i = 0; t <= 1.0f && i < curveSize; i++, t += curveStep)
+        {
+            float x = (float) (Math.Pow(1 - t, 2) * from.x + 2 * t * (1 - t) * referencePoint.x + Math.Pow(t, 2) * to.x);
+            float y = (float) (Math.Pow(1 - t, 2) * from.y + 2 * t * (1 - t) * referencePoint.y + Math.Pow(t, 2) * to.y);
+            points[i] = new Vector3(x, y);
+        }
+
+        points[curveSize - 1] = to;
+
+        return points;
+    }
 
     private void SetActiveForChildren(bool isActive)
     {
@@ -231,6 +283,8 @@ public class DataPipeMenu : MonoBehaviour, IMenu
         m_selectedPortFrom = null;
         m_selectedPortTo = null;
         m_publisherFrom = null;
+        m_mouseEventReady = true;
+        m_selectedPortIndex = -1;
 
         if (m_line != null)
         {
@@ -250,6 +304,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
     private State m_state = State.Inactive;
 
     private bool m_mouseEventReady;
+    private int m_selectedPortIndex;
     private LineRenderer m_line;
     private Vector2 m_fromPosition;
     private DataPublisher.DataPort m_selectedPortFrom;
