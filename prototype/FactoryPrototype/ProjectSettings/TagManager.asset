@@ -7,12 +7,7 @@ TagManager:
   - grid
   - object
   - detail
-  - TileManager
-  - MenuManager
-  - ProgrammerMenu
-  - BeltScriptAdapter
-  - BeltScriptMenu
-  - WiresMenu
+  - Menu
   layers:
   - Default
   - TransparentFX
