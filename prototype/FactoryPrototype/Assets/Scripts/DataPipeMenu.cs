@@ -10,7 +10,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
 {
     private DataPipeMenu() {}
     private static DataPipeMenu g_instance;
-    public static DataPipeMenu Menu => g_instance ?? (g_instance = GameObject.FindWithTag("WiresMenu").GetComponent<DataPipeMenu>());
+    public static DataPipeMenu Menu => g_instance ?? (g_instance = GameObject.Find("WiresMenu").GetComponent<DataPipeMenu>());
 
     public RectTransform PortList;
     public LineRenderer WirePrefab;

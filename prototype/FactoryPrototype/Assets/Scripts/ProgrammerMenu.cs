@@ -12,7 +12,8 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         {
             if (g_instance == null)
             {
-                g_instance = GameObject.FindWithTag("ProgrammerMenu").GetComponent<ProgrammerMenu>();
+                //g_instance = GameObject.Find("ProgrammerMenu").GetComponent<ProgrammerMenu>();
+                g_instance = Resources.FindObjectsOfTypeAll<ProgrammerMenu>()[0]; // workaround for inactive objects
             }
             return g_instance;
         }

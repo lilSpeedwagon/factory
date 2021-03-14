@@ -31,7 +31,7 @@ public class MenuManager : MonoBehaviour
         get
         {
             if (g_instance == null)
-                g_instance = GameObject.FindWithTag("MenuManager").GetComponent<MenuManager>();
+                g_instance = GameObject.Find("MenuManager").GetComponent<MenuManager>();
             return g_instance;
         }
     }

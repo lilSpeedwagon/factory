@@ -10,7 +10,7 @@ public class TileManagerScript : MonoBehaviour
         get
         {
             if (g_instance == null)
-                g_instance = GameObject.FindWithTag("TileManager").GetComponent<TileManagerScript>();
+                g_instance = GameObject.Find("TileManager").GetComponent<TileManagerScript>();
             return g_instance;
         }
     }

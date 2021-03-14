@@ -19,7 +19,7 @@ public class BeltScriptAdapter : MonoBehaviour
         {
             if (g_instance == null)
             {
-                g_instance = GameObject.FindWithTag("BeltScriptAdapter").GetComponent<BeltScriptAdapter>();
+                g_instance = GameObject.Find("BeltScriptAdapter").GetComponent<BeltScriptAdapter>();
             }
 
             return g_instance;

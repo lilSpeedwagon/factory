@@ -18,7 +18,7 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
         {
             if (g_instance == null)
             {
-                g_instance = GameObject.FindWithTag("BeltScriptMenu").GetComponent<BeltScriptMenu>();
+                g_instance = GameObject.Find("BeltScriptMenu").GetComponent<BeltScriptMenu>();
             }
             return g_instance;
         }
