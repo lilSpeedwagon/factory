@@ -38,14 +38,17 @@ public class TileManagerScript : MonoBehaviour
         return new Range(Width).In(position.x) && new Range(Height).In(position.y);
     }
 
-    public void RemoveObject(Vector2 position)
+    public bool RemoveObject(Vector2 position)
     {
         Vector2Int localPos = WorldToLocal(position);
-        if (IsValidCoords(localPos) && (m_tiles[localPos.x, localPos.y].IsExist))
+        if (IsValidCoords(localPos) && m_tiles[localPos.x, localPos.y].IsExist)
         {
             Destroy(m_tiles[localPos.x, localPos.y].Object);
             m_tiles[localPos.x, localPos.y].IsExist = false;
+            return true;
         }
+
+        return false;
     }
 
     public GameObject InstantiateObject(GameObject instance, Vector2 position)

@@ -28,9 +28,6 @@ public class objectBuilder : MonoBehaviour, IMenu
     public BuildableObjectScript PrefabToCreate;
     public GameObject RemoverPrefab;
 
-    private delegate void OnBuildSignal(BuildableObjectScript obj);
-    private delegate void OnRemoveSignal(int sellCost);
-
     // IMenu implementation
     public void Hide()
     {
@@ -126,6 +123,8 @@ public class objectBuilder : MonoBehaviour, IMenu
             GameObject newObj = m_tileManager.InstantiateObject(PrefabToCreate.gameObject, TileUtils.MouseCellPosition());
             newObj.GetComponent<tileObjectScript>().direction = m_shadow.GetComponent<tileObjectScript>().direction;
             newObj.transform.position += (Vector3) TileUtils.LevelOffset(m_currentZlevel);
+
+            TryAddEnergyObject(newObj);
         }
     }
 
@@ -140,14 +139,12 @@ public class objectBuilder : MonoBehaviour, IMenu
         {
             var pos = m_shadow.transform.position;
             var removableObject = m_tileManager.GetGameObject(pos);
+            TryRemoveEnergyObject(removableObject);
             int cost = GetSellCost(removableObject);
-            m_tileManager.RemoveObject(pos);
             ResoucesScript.instance.Earn(cost);
+            m_tileManager.RemoveObject(pos);
         }
-        catch (Exception)
-        {
-            Debug.Log("Nothing to remove");
-        }
+        catch (NullReferenceException) { }
     }
 
     private void ChangePrefab(BuildableObjectScript p)
@@ -169,15 +166,40 @@ public class objectBuilder : MonoBehaviour, IMenu
         ShowPanel();
     }
 
+    private void TryAddEnergyObject(GameObject obj)
+    {
+        EnergyConsumer consumer = obj.GetComponent<EnergyConsumer>();
+        EnergySource source = obj.GetComponent<EnergySource>();
+        if (consumer != null)
+        {
+            EnergyManager.Instance.AddConsumer(consumer);
+        }
+        else if (source != null)
+        {
+            EnergyManager.Instance.AddSource(source);
+        }
+    }
 
-    // Start is called before the first frame update
-    void Start()
+    private void TryRemoveEnergyObject(GameObject obj)
+    {
+        EnergyConsumer consumer = obj.GetComponent<EnergyConsumer>();
+        EnergySource source = obj.GetComponent<EnergySource>();
+        if (consumer != null)
+        {
+            EnergyManager.Instance.RemoveConsumer(consumer);
+        }
+        else if (source != null)
+        {
+            EnergyManager.Instance.RemoveSource(source);
+        }
+    }
+
+    private void Start()
     {
         m_tileManager = TileManagerScript.TileManager;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (m_isActive && m_shadow != null)
         {

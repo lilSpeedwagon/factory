@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 5039594855127689937}
   - component: {fileID: -9126141973758652429}
   - component: {fileID: 4796084332010057159}
+  - component: {fileID: 824093282860044123}
   m_Layer: 0
   m_Name: programmator
   m_TagString: Untagged
@@ -52,6 +53,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -176,6 +178,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Navigation:
     m_Mode: 3
+    m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -206,6 +209,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
         m_MethodName: 
         m_Mode: 1
         m_Arguments:
@@ -228,3 +232,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b7dc149402ac6e4a893122971ebd981, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PipeConnectionRadius: 1
+--- !u!114 &824093282860044123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2153529958082496891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 513ff0fc5e4b73640b14c76e46549b2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Power: 2

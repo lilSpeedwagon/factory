@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4372548973974454222}
   - component: {fileID: 3940211286026458273}
   - component: {fileID: 8662245390015776693}
+  - component: {fileID: 7715493245482316388}
   m_Layer: 0
   m_Name: output_1
   m_TagString: Untagged
@@ -50,6 +51,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -160,6 +162,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Speed: 0.6
-  PrefabToEmit: {fileID: 2478132065190534643, guid: c1cd9257ad5a72340a384ade06dbe868,
-    type: 3}
   DelayBetweenEmissions: 3
+--- !u!114 &7715493245482316388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1205611058772889948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 513ff0fc5e4b73640b14c76e46549b2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Power: 5

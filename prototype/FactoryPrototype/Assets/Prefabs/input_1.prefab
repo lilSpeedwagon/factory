@@ -21,6 +21,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 952019038169308428, guid: a1c7f09646e534346bd90698f1230bc9,
         type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 952019038169308428, guid: a1c7f09646e534346bd90698f1230bc9,
+        type: 3}
       propertyPath: m_LocalPosition.x
       value: 2.011
       objectReference: {fileID: 0}
@@ -36,6 +41,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 952019038169308428, guid: a1c7f09646e534346bd90698f1230bc9,
         type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 952019038169308428, guid: a1c7f09646e534346bd90698f1230bc9,
+        type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
@@ -47,16 +57,6 @@ PrefabInstance:
     - target: {fileID: 952019038169308428, guid: a1c7f09646e534346bd90698f1230bc9,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 952019038169308428, guid: a1c7f09646e534346bd90698f1230bc9,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 952019038169308428, guid: a1c7f09646e534346bd90698f1230bc9,
-        type: 3}
-      propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 952019038169308428, guid: a1c7f09646e534346bd90698f1230bc9,
@@ -81,8 +81,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2596727320512995921, guid: a1c7f09646e534346bd90698f1230bc9,
         type: 3}
-      propertyPath: m_Color.r
-      value: 1
+      propertyPath: m_Color.b
+      value: 0.99361604
       objectReference: {fileID: 0}
     - target: {fileID: 2596727320512995921, guid: a1c7f09646e534346bd90698f1230bc9,
         type: 3}
@@ -91,8 +91,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2596727320512995921, guid: a1c7f09646e534346bd90698f1230bc9,
         type: 3}
-      propertyPath: m_Color.b
-      value: 0.99361604
+      propertyPath: m_Color.r
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8662245390015776693, guid: a1c7f09646e534346bd90698f1230bc9, type: 3}
