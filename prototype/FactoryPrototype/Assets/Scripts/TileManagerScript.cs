@@ -33,19 +33,15 @@ public class TileManagerScript : MonoBehaviour
         return new Vector2Int(localCoords.x / TILES_PER_CELL.x, localCoords.y / TILES_PER_CELL.y) + m_worldGridStart;
     }
 
-    private void ValidateCoords(Vector2Int position)
+    private bool IsValidCoords(Vector2Int position)
     {
-        if (!new Range(Width).In(position.x) || !new Range(Height).In(position.y))
-        {
-            throw new System.IndexOutOfRangeException();
-        }
+        return new Range(Width).In(position.x) && new Range(Height).In(position.y);
     }
 
     public void RemoveObject(Vector2 position)
     {
         Vector2Int localPos = WorldToLocal(position);
-        ValidateCoords(localPos);
-        if (m_tiles[localPos.x, localPos.y].IsExist)
+        if (IsValidCoords(localPos) && (m_tiles[localPos.x, localPos.y].IsExist))
         {
             Destroy(m_tiles[localPos.x, localPos.y].Object);
             m_tiles[localPos.x, localPos.y].IsExist = false;
@@ -57,9 +53,7 @@ public class TileManagerScript : MonoBehaviour
         Vector2Int localPos = WorldToLocal(position);
         Debug.Log("Creating obj in pos " + position.ToString() + " (tile " + localPos.ToString() + ")");
 
-        ValidateCoords(localPos);
-
-        if (m_tiles[localPos.x, localPos.y].IsExist)
+        if (IsValidCoords(localPos) && m_tiles[localPos.x, localPos.y].IsExist)
         {
             throw new System.Exception("Cannot create object in pos " + localPos.x + " : " + localPos.y + ". Tile is not vacant.");
         }
@@ -74,29 +68,16 @@ public class TileManagerScript : MonoBehaviour
     public bool IsEmpty(Vector2 position)
     {
         Vector2Int localPos = WorldToLocal(position);
-        try
-        {
-            ValidateCoords(localPos);
-        }
-        catch (System.Exception)
-        {
-            return false;
-        }
-        return !m_tiles[localPos.x, localPos.y].IsExist;        
+        return IsValidCoords(localPos) && !m_tiles[localPos.x, localPos.y].IsExist;
     }
 
     public GameObject GetGameObject(Vector2 position)
     {
         Vector2Int localPos = WorldToLocal(position);
-        try
-        {
-            ValidateCoords(localPos);
-        }
-        catch (System.Exception)
-        {
+        if (!IsValidCoords(localPos) || !m_tiles[localPos.x, localPos.y].IsExist)
             return null;
-        }
-        return m_tiles[localPos.x, localPos.y].IsExist ? m_tiles[localPos.x, localPos.y].Object : null;
+
+        return  m_tiles[localPos.x, localPos.y].Object;
     }
 
     private void Awake()
