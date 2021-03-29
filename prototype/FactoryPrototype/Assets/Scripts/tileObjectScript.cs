@@ -69,12 +69,12 @@ public class tileObjectScript : MonoBehaviour
 
     public Vector2 GetNextPostion()
     {
-        return GetPosition() + GetVector() * TileUtils.tileSize;
+        return GetPosition() + GetVector() * TileUtils.TileSideSize;
     }
 
     public Vector2 GetPrevPostion()
     {
-        return GetPosition() - GetVector() * TileUtils.tileSize;
+        return GetPosition() - GetVector() * TileUtils.TileSideSize;
     }
 
     public void Rotate(bool bClockwise = true)

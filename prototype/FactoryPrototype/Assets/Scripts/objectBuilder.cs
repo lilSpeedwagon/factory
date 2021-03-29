@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-
+using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 
 public class objectBuilder : MonoBehaviour, IMenu
@@ -25,6 +28,7 @@ public class objectBuilder : MonoBehaviour, IMenu
     public BuilderMenu BuilderPanel;
 
     public GameObject ShadowPrefab;
+    public GameObject EnergyAreaPrefab;
     public BuildableObjectScript PrefabToCreate;
     public GameObject RemoverPrefab;
 
@@ -54,7 +58,7 @@ public class objectBuilder : MonoBehaviour, IMenu
         }
         catch (NullReferenceException e)
         {
-            Debug.LogWarning(e);
+            m_logger.Warn(e.Message);
         }
         Show();
     }
@@ -67,7 +71,7 @@ public class objectBuilder : MonoBehaviour, IMenu
         Show();
     }
 
-    private bool IsPossibleToCreate => m_isActive && m_tileManager.IsEmpty(TileUtils.MouseCellPosition()) && 
+    private bool IsPossibleToCreate => m_isActive && m_tileManager.IsEmpty(TileUtils.NormalizedMousePosition()) && 
                                        ResoucesScript.instance.IsPossibleToSpent(PrefabToCreate.Cost);
 
     private void RotateShadow(bool bClockwise = true)
@@ -87,7 +91,7 @@ public class objectBuilder : MonoBehaviour, IMenu
                 Destroy(m_shadow);
             }
 
-            m_shadow = Instantiate(ShadowPrefab, TileUtils.MouseCellPosition() + TileUtils.LevelOffset(m_currentZlevel), TileUtils.qInitRotation);
+            m_shadow = Instantiate(ShadowPrefab, TileUtils.NormalizedMousePosition() + TileUtils.LevelOffset(m_currentZlevel), TileUtils.InitRotation);
             m_shadow.GetComponent<SpriteRenderer>().sprite = PrefabToCreate.GetComponent<SpriteRenderer>().sprite;
             m_shadow.GetComponent<SpriteRenderer>().color = ColorUtils.colorTransparentGreen;
             m_shadow.GetComponent<SpriteRenderer>().sortingLayerName = "shadow";
@@ -103,7 +107,7 @@ public class objectBuilder : MonoBehaviour, IMenu
             Destroy(m_shadow);
         }
 
-        m_shadow = Instantiate(RemoverPrefab, TileUtils.MouseCellPosition(), TileUtils.qInitRotation);
+        m_shadow = Instantiate(RemoverPrefab, TileUtils.NormalizedMousePosition(), TileUtils.InitRotation);
     }
 
     private void CreateObject()
@@ -116,11 +120,11 @@ public class objectBuilder : MonoBehaviour, IMenu
             }
             catch (ArgumentException e)
             {
-                Debug.LogWarning($"Cannot build. Error: {e.Message}.");
+                m_logger.Error($"Cannot build. Error: {e.Message}.");
                 return;
             }
 
-            GameObject newObj = m_tileManager.InstantiateObject(PrefabToCreate.gameObject, TileUtils.MouseCellPosition());
+            GameObject newObj = m_tileManager.InstantiateObject(PrefabToCreate.gameObject, TileUtils.NormalizedMousePosition());
             newObj.GetComponent<tileObjectScript>().direction = m_shadow.GetComponent<tileObjectScript>().direction;
             newObj.transform.position += (Vector3) TileUtils.LevelOffset(m_currentZlevel);
 
@@ -153,6 +157,12 @@ public class objectBuilder : MonoBehaviour, IMenu
         m_isRemoverActive = false;
         PrefabToCreate = p;
         CreateShadow();
+
+        EnergySource source = PrefabToCreate.GetComponent<EnergySource>();
+        if (source != null)
+        {
+            ShowEnergyArea(source);
+        }
     }
 
     private void Disable()
@@ -162,6 +172,7 @@ public class objectBuilder : MonoBehaviour, IMenu
         PrefabToCreate = null;
         Destroy(m_shadow);
         m_shadow = null;
+        HideEnergyArea();
 
         ShowPanel();
     }
@@ -194,9 +205,66 @@ public class objectBuilder : MonoBehaviour, IMenu
         }
     }
 
+    private void ShowEnergyArea(EnergySource source)
+    {
+        if (m_energySourceSelected)
+        {
+            HideEnergyArea();
+        }
+
+        if (EnergyAreaPrefab == null)
+        {
+            m_logger.Warn("Cannot show energy area. Tile prefab not found.");
+            return;
+        }
+
+        int radius = (int) source.EnergyDistributionCellRadius;
+        Vector2 mouseWorldPosition = TileUtils.NormalizedMousePosition();
+        Vector2 cellStep = TileUtils.TileSizeRelative;
+
+        for (float i = -radius * cellStep.y; i <= radius * cellStep.y; i += cellStep.y)
+        {
+            for (float j = - radius * cellStep.x; j <= radius * cellStep.x; j += cellStep.x)
+            {
+                Vector2 tilePosition = TileManagerScript.TileManager.CellToWorld(new Vector2(j, i)) + mouseWorldPosition;
+                var energyAreaTile = Instantiate(EnergyAreaPrefab, tilePosition, Quaternion.identity);
+                m_energyAreaTiles.Add(energyAreaTile);
+            }
+        }
+
+        m_energyAreaPosition = mouseWorldPosition;
+        m_energySourceSelected = true;
+    }
+
+    private void MoveEnergyArea()
+    {
+        Vector2 mousePosition = TileUtils.NormalizedMousePosition();
+        Vector2 diff = mousePosition - m_energyAreaPosition;
+
+        foreach (var tile in m_energyAreaTiles)
+        {
+            tile.GetComponent<Transform>().Translate(diff);
+        }
+
+        m_energyAreaPosition = mousePosition;
+    }
+
+    private void HideEnergyArea()
+    {
+        foreach (var tile in m_energyAreaTiles)
+        {
+            Destroy(tile);
+        }
+        m_energyAreaTiles.Clear();
+        m_energySourceSelected = false;
+    }
+
     private void Start()
     {
+        m_logger = new LogUtils.DebugLogger("Builder");
+
         m_tileManager = TileManagerScript.TileManager;
+        m_energyAreaTiles = new List<GameObject>(25);
     }
 
     private void Update()
@@ -213,8 +281,13 @@ public class objectBuilder : MonoBehaviour, IMenu
             {
                 bool bIsPossibleToCreate = IsPossibleToCreate;
 
-                m_shadow.transform.position = TileUtils.MouseCellPosition() + TileUtils.LevelOffset(m_currentZlevel);
+                m_shadow.transform.position = TileUtils.NormalizedMousePosition() + TileUtils.LevelOffset(m_currentZlevel);
                 m_shadow.GetComponent<SpriteRenderer>().color = bIsPossibleToCreate ? ColorUtils.colorTransparentGreen : ColorUtils.colorTransparentRed;
+
+                if (m_energySourceSelected)
+                {
+                    MoveEnergyArea();
+                }
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
@@ -233,7 +306,7 @@ public class objectBuilder : MonoBehaviour, IMenu
             }
             else
             {
-                m_shadow.transform.position = TileUtils.MouseCellPosition();
+                m_shadow.transform.position = TileUtils.NormalizedMousePosition();
 
                 if (Input.GetMouseButton(MouseUtils.PRIMARY_MOUSE_BUTTON))
                 {
@@ -257,7 +330,13 @@ public class objectBuilder : MonoBehaviour, IMenu
     private TileManagerScript m_tileManager;
     private GameObject m_shadow;
 
+    private Vector2 m_energyAreaPosition;
+    private List<GameObject> m_energyAreaTiles;
+    private bool m_energySourceSelected = false;
+
     private bool m_isActive = false;
     private bool m_isRemoverActive = false;
     private int m_currentZlevel = 0;
+
+    private LogUtils.DebugLogger m_logger;
 }

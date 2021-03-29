@@ -1,6 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+
+/*
+ * Tile grid is represented as two-dimensional array with diagonal axis.
+ * Every tile has size (2, 4) in cell metrics.
+ */
 
 public class TileManagerScript : MonoBehaviour
 {
@@ -18,19 +24,27 @@ public class TileManagerScript : MonoBehaviour
     public int Width => m_width;
     public int Height => m_height;
 
-    private class TileHolder
-    {        
-        public GameObject Object { get; set; }
-        public bool IsExist = false;
+    public Vector2 CellSize = new Vector2Int(2, 4);
+
+    public Vector2Int WorldToLocal(Vector2 worldCoords)
+    {
+        return new Vector2Int((int) (worldCoords.x * CellSize.x) - m_worldGridStart.x, (int) (worldCoords.y * CellSize.y) - m_worldGridStart.y);
+    }
+    public Vector2 LocalToWorld(Vector2Int localCoords)
+    {
+        return new Vector2(localCoords.x / (float) CellSize.x, localCoords.y / (float) CellSize.y) + m_worldGridStart;
     }
 
-    private Vector2Int WorldToLocal(Vector2 worldCoords)
+    public Vector2 WorldToCell(Vector2 worldPosition)
     {
-        return new Vector2Int((int) (worldCoords.x * TILES_PER_CELL.x) - m_worldGridStart.x, (int) (worldCoords.y * TILES_PER_CELL.y) - m_worldGridStart.y);
+        var cellPosition = m_layout.WorldToCell(worldPosition);
+        return new Vector2(cellPosition.x * CellSize.x, cellPosition.y * CellSize.y);
     }
-    private Vector2 LocalToWorld(Vector2Int localCoords)
+
+    public Vector2 CellToWorld(Vector2 cellPosition)
     {
-        return new Vector2Int(localCoords.x / TILES_PER_CELL.x, localCoords.y / TILES_PER_CELL.y) + m_worldGridStart;
+        var worldPosition = m_layout.WorldToCell(cellPosition);
+        return new Vector2(worldPosition.x / (float)CellSize.x, worldPosition.y / (float)CellSize.y);
     }
 
     private bool IsValidCoords(Vector2Int position)
@@ -61,7 +75,7 @@ public class TileManagerScript : MonoBehaviour
             throw new System.Exception("Cannot create object in pos " + localPos.x + " : " + localPos.y + ". Tile is not vacant.");
         }
 
-        GameObject createdObject = Instantiate(instance, position, TileUtils.qInitRotation);
+        GameObject createdObject = Instantiate(instance, position, TileUtils.InitRotation);
         m_tiles[localPos.x, localPos.y].Object = createdObject;
         m_tiles[localPos.x, localPos.y].IsExist = true;
 
@@ -86,6 +100,7 @@ public class TileManagerScript : MonoBehaviour
     private void Awake()
     {
         m_worldGrid = GameObject.FindWithTag("grid").GetComponent<Grid>();
+        m_layout = m_worldGrid.GetComponent<GridLayout>();
 
         m_width = BASE_WIDTH;
         m_height = BASE_HEIGHT;
@@ -103,10 +118,16 @@ public class TileManagerScript : MonoBehaviour
         }
     }
 
+    private class TileHolder
+    {
+        public GameObject Object { get; set; }
+        public bool IsExist = false;
+    }
+
     private TileHolder[,] m_tiles;
     private int m_width, m_height;
     private static int BASE_WIDTH = 50, BASE_HEIGHT = 50;
-    private static Vector2Int TILES_PER_CELL = new Vector2Int(2, 4);    // no idea wtf is going on here (something related to Unity Grid cells)
     private Vector2Int m_worldGridStart;
     private Grid m_worldGrid;
+    private GridLayout m_layout;
 }

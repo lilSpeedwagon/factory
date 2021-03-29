@@ -22,41 +22,36 @@ public class PlayerUtils
 
 public class TileUtils
 {
-    private static GridLayout gridLayout = GameObject.FindWithTag("grid").GetComponent<GridLayout>();
+    public static GridLayout GridLayout = GameObject.FindWithTag("grid").GetComponent<GridLayout>();
 
     public enum Direction { UpLeft, UpRight, DownRight, DownLeft };
     public const int DIRECTION_COUNT = 4;
-    public static readonly Quaternion qInitRotation = new Quaternion();
-    // size of tile side
-    public static readonly float tileSize = Mathf.Sqrt(Mathf.Pow(gridLayout.cellSize.x / 2, 2) + Mathf.Pow(gridLayout.cellSize.y / 2, 2));
+    public static readonly Quaternion InitRotation = new Quaternion();
 
-    public static Vector2 MouseCellPosition()
+    public static readonly Vector2 TileSizeRelative = new Vector2(1.0f, 0.5f);
+    public static readonly Vector2 CellSize = GridLayout.cellSize;
+    public static readonly float TileSideSize = Mathf.Sqrt(Mathf.Pow(GridLayout.cellSize.x / 2, 2) + Mathf.Pow(GridLayout.cellSize.y / 2, 2));
+
+    public static Vector2 NormalizedMousePosition()
     {
-        Vector2 vMousePos = Input.mousePosition;
-        if (gridLayout != null)
-        {
-            var vWorldPos = Camera.main.ScreenToWorldPoint(vMousePos);
-            vWorldPos.y += gridLayout.cellSize.y / 2; // some tiles magic
-            var vCellPos = gridLayout.WorldToCell(vWorldPos);
-            return gridLayout.CellToWorld(vCellPos);
-        }
-        return new Vector2();
+        Vector2 mousePos = Input.mousePosition;
+        var worldPos = Camera.main.ScreenToWorldPoint(mousePos);
+        return NormalizedPosition(worldPos);
     }
 
-    public static Vector2 CellPosition(Vector2 worldPosition)
+    public static Vector2 NormalizedPosition(Vector2 worldPosition)
     {
-        if (gridLayout != null)
+        if (GridLayout != null)
         {
-            worldPosition.y += gridLayout.cellSize.y / 2; // some tiles magic
-            var vCellPos = gridLayout.WorldToCell(worldPosition);
-            return gridLayout.CellToWorld(vCellPos);
+            var cellPos = GridLayout.WorldToCell(worldPosition);
+            return GridLayout.CellToWorld(cellPos) + new Vector3(0, CellSize.y / 2);
         }
         return new Vector2();
     }
 
     public static Vector2 LevelOffset(int zLevel)
     {
-        return new Vector2(0, zLevel * gridLayout.cellSize.y / 2);
+        return new Vector2(0, zLevel * GridLayout.cellSize.y / 2);
     }
 
     public static Direction GetReversedDirection(Direction dir)

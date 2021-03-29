@@ -74,7 +74,7 @@ public class OutputProducer : MonoBehaviour, IOutput
             return;
         }
 
-        var obj = Instantiate(m_materialToEmit.gameObject, m_tile.GetPosition(), TileUtils.qInitRotation);
+        var obj = Instantiate(m_materialToEmit.gameObject, m_tile.GetPosition(), TileUtils.InitRotation);
         m_currentMotion = obj.GetComponent<MotionScript>(); // could be null
         Move(m_currentMotion);
     }

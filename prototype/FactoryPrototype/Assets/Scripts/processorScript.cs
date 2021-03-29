@@ -35,7 +35,7 @@ public class processorScript : tileObjectScript, IProcessor, IMover
         }
         catch (Exception e) { Debug.LogWarning(e.Message); }
         
-        GameObject newInstance = Instantiate(toMaterial.gameObject, GetPosition(), TileUtils.qInitRotation);
+        GameObject newInstance = Instantiate(toMaterial.gameObject, GetPosition(), TileUtils.InitRotation);
 
         try
         {

@@ -118,7 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6776ec11b92c9a4a886d2a19f61db52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnergyDistributionCellRadius: 5
+  EnergyDistributionCellRadius: 3
   Power: 50
 --- !u!114 &8585105701218536148
 MonoBehaviour:

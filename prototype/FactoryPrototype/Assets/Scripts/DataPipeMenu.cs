@@ -84,7 +84,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
     {
         if (IsActive && m_mouseEventReady)
         {
-            Vector2 mousePos = TileUtils.MouseCellPosition();
+            Vector2 mousePos = TileUtils.NormalizedMousePosition();
             GameObject obj = TileManagerScript.TileManager.GetGameObject(mousePos);
             DataPublisher publisher = obj?.GetComponent<DataPublisher>();
 

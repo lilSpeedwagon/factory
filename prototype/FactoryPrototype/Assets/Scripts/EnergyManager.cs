@@ -79,6 +79,8 @@ public class EnergyManager : MonoBehaviour
             RemoveConsumerFromSource(m_energySources[consumer.SourceId], consumer);
         }
         catch (KeyNotFoundException) { }
+
+        m_pendingConsumers.Remove(consumer);
     }
 
     private void AddPendingConsumersToSource(EnergySource source)

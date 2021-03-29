@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking.Types;
+using UnityEngine.Tilemaps;
 
 public class EnergySource : MonoBehaviour
 {
@@ -55,13 +57,20 @@ public class EnergySource : MonoBehaviour
 
     public bool IsInArea(EnergyConsumer consumer)
     {
-        Vector2 consumerPosition = TileUtils.CellPosition(consumer.GetComponent<Transform>().position);
-        Vector2 position = TileUtils.CellPosition(gameObject.GetComponent<Transform>().position);
-        Vector2 diff = position - consumerPosition;
-        return diff.magnitude <= EnergyDistributionCellRadius;
+        Vector2 consumerPosition = consumer.GetComponent<Transform>().position;
+        return IsInArea(consumerPosition);
     }
 
-    private int m_id;
+    public bool IsInArea(Vector2 position)
+    {
+        Vector2 cellPosition = TileManagerScript.TileManager.WorldToCell(position);
+        Vector2 sourcePosition = TileManagerScript.TileManager.WorldToCell(GetComponent<Transform>().position);
+        Vector2 diff = sourcePosition - cellPosition;
+        Vector2 radiusRelative = TileManagerScript.TileManager.CellSize * EnergyDistributionCellRadius;
+        return Math.Abs(diff.x) <= radiusRelative.x && Math.Abs(diff.y) <= radiusRelative.y;
+    }
+
+    private readonly int m_id;
     private readonly Dictionary<int, EnergyConsumer> m_consumers;
     private int m_consumption;
 

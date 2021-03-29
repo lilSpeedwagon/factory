@@ -1110,7 +1110,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0.000015258789, y: -73.485}
+  m_AnchoredPosition: {x: 0.000015258789, y: -73.48499}
   m_SizeDelta: {x: 293.95, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &192612508
@@ -3699,7 +3699,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 288065537}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99696714
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6082,6 +6082,8 @@ MonoBehaviour:
   - {fileID: 8585105701218536148, guid: db8aea51518ac8b4f87c7788550f7e8f, type: 3}
   BuilderPanel: {fileID: 68322897}
   ShadowPrefab: {fileID: 4172057517413125286, guid: a320cf30b8029fa4db9b621e22387ed8,
+    type: 3}
+  EnergyAreaPrefab: {fileID: 2967747988703401278, guid: 196cf9e22672ca046a06bd3916319810,
     type: 3}
   PrefabToCreate: {fileID: 0}
   RemoverPrefab: {fileID: 7526012882960554387, guid: 41ef41256fe5c1d46af6769f702c4d96,
