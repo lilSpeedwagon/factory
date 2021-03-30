@@ -81,11 +81,28 @@ public class EnergyManager : MonoBehaviour
     {
         try
         {
-            RemoveConsumerFromSource(m_energySources[consumer.SourceId], consumer);
+            bool isEnergyFreed = RemoveConsumerFromSource(m_energySources[consumer.SourceId], consumer);
+            if (isEnergyFreed)
+            {
+                TryAddPendingConsumers();
+            }
         }
         catch (KeyNotFoundException) { }
 
         m_pendingConsumers.Remove(consumer);
+    }
+
+    private void TryAddPendingConsumers()
+    {
+        if (m_pendingConsumers.Count == 0) return;
+
+        foreach (var source in m_energySources.Values)
+        {
+            if (source.AvailablePower > 0)
+            {
+                AddPendingConsumersToSource(source);
+            }
+        }
     }
 
     private void AddPendingConsumersToSource(EnergySource source)

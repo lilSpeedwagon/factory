@@ -17,6 +17,8 @@ public class EnergySource : MonoBehaviour
     public int CurrentConsumption => m_consumption;
     public Dictionary<int, EnergyConsumer> Consumers => m_consumers;
 
+    public int AvailablePower => Power - m_consumption;
+
     public EnergySource()
     {
         m_id = g_idCounter++;
