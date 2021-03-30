@@ -46,7 +46,7 @@ public class EnergySource : MonoBehaviour
             EnergyConsumer consumer = m_consumers[consumerId];
             m_consumers.Remove(consumerId);
             m_consumption -= consumer.Power;
-            consumer.SourceId = -1;
+            consumer.Reset();
             return true;
         }
         catch (KeyNotFoundException) { }
@@ -54,6 +54,15 @@ public class EnergySource : MonoBehaviour
         return false;
     }
 
+    public void Reset()
+    {
+        foreach (var consumer in m_consumers.Values)
+        {
+            consumer.Reset();
+        }
+        m_consumers.Clear();
+        m_consumption = 0;
+    }
 
     public bool IsInArea(EnergyConsumer consumer)
     {

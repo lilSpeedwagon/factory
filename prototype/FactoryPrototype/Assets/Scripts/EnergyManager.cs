@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -45,8 +46,12 @@ public class EnergyManager : MonoBehaviour
         m_energyStorage -= source.Power;
         m_currentConsumption -= source.CurrentConsumption;
 
+        // make a copy to reset source without loosing consumer list
+        var consumers = new List<EnergyConsumer>(source.Consumers.Values.ToList());
+        source.Reset();
+
         // try to distribute consumers between other sources
-        foreach (var consumer in source.Consumers.Values)
+        foreach (var consumer in consumers)
         {
             AddConsumer(consumer);
         }

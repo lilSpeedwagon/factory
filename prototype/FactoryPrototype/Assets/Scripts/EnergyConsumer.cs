@@ -8,12 +8,19 @@ public class EnergyConsumer : MonoBehaviour
 
     public int SourceId;
     public int Power;
+    public bool IsEnergized => SourceId != EmptySourceId;
+
+    public void Reset()
+    {
+        SourceId = EmptySourceId;
+    }
 
     public EnergyConsumer()
     {
         ConsumerId = g_idCounter++;
-        SourceId = -1;
+        Reset();
     }
 
+    private const int EmptySourceId = -1;
     private static int g_idCounter = 0;
 }
