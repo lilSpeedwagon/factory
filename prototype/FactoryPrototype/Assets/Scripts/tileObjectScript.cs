@@ -67,12 +67,12 @@ public class tileObjectScript : MonoBehaviour
         return (Vector2)transform.position - TileUtils.LevelOffset(ZPosition);
     }
 
-    public Vector2 GetNextPostion()
+    public Vector2 GetNextPosition()
     {
         return GetPosition() + GetVector() * TileUtils.TileSideSize;
     }
 
-    public Vector2 GetPrevPostion()
+    public Vector2 GetPrevPosition()
     {
         return GetPosition() - GetVector() * TileUtils.TileSideSize;
     }

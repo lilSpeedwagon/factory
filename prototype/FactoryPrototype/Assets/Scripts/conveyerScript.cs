@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class conveyerScript : tileObjectScript, IMover
 {
+    public static float ConveyerHeight = 0.12f;
+
     public float BaseSpeed;
     public float Speed
     {
@@ -19,23 +21,27 @@ public class conveyerScript : tileObjectScript, IMover
 
             return BaseSpeed;
         }
+        // TODO animation speed
     }
 
     public IMover Next
     {
         get
         {
-            Vector2 position = IsReversed ? GetPrevPostion() : GetNextPostion();
+            Vector2 position = IsReversed ? GetPrevPosition() : GetNextPosition();
             return TileManagerScript.TileManager.GetGameObject(position)?.GetComponent<IMover>();
         }
     }
 
+    public float Height => ConveyerHeight;
+
     public void Move(MotionScript motionObject)
     {
-        if (motionObject.IsFinished && IsAbleToMove())
+        if (motionObject != null && motionObject.IsFinished && IsAbleToMove())
         {
             m_currentObject = null;
-            Vector2 position = IsReversed ? GetPrevPostion() : GetNextPostion();
+            Vector2 position = IsReversed ? GetPrevPosition() : GetNextPosition();
+            position.y += ConveyerHeight;
             motionObject.StartMotion(position, Speed);
             Next.HoldMotion(motionObject);
         }
@@ -81,9 +87,27 @@ public class conveyerScript : tileObjectScript, IMover
         m_currentObject = obj;
     }
 
+    public bool IsEnabled => m_consumerComponent.IsEnergized;
+
     private void Start()
     {
         m_direction = GetComponent<tileObjectScript>()?.direction ?? new TileUtils.Direction();
+        m_consumerComponent = GetComponent<EnergyConsumer>();
+        if (m_consumerComponent == null)
+        {
+            Debug.LogError("EnergyConsumer component is not found for conveyer.");
+        }
+
+        m_animator = GetComponent<Animator>();
+        if (m_animator != null)
+        {
+            m_animator.enabled = false;
+            m_animationEnabled = false;
+        }
+        else
+        {
+            Debug.LogError("Animator is not found for conveyer.");
+        }
 
         DataPublisher publisher = GetComponent<DataPublisher>();
         if (publisher == null)
@@ -101,8 +125,12 @@ public class conveyerScript : tileObjectScript, IMover
 
     private void FixedUpdate()
     {
-        if (m_currentObject != null)
+        bool isEnabled = IsEnabled;
+        AnimationEnabled = isEnabled;
+        if (isEnabled)
+        {
             Move(m_currentObject);
+        }
     }
 
     private void OnDestroy()
@@ -111,8 +139,26 @@ public class conveyerScript : tileObjectScript, IMover
             Destroy(m_currentObject.gameObject);
     }
 
+    private bool AnimationEnabled
+    {
+        get => m_animationEnabled;
+        set
+        {
+            // do not invoke animator setters if nothing was changed
+            if (m_animationEnabled == value) return;
+
+            m_animator.enabled = value;
+            m_animationEnabled = value;
+        }
+    }
+
     private TileUtils.Direction m_direction;
     private MotionScript m_currentObject;
+
+    private EnergyConsumer m_consumerComponent;
+
+    private bool m_animationEnabled;
+    private Animator m_animator;
     
     private DataPublisher.DataPort m_directionPort;
     private DataPublisher.DataPort m_speedPort;

@@ -5,9 +5,13 @@ using UnityEngine;
 
 public class InputConsumer : MonoBehaviour, IInput, IMover
 {
-    // IMover
+    public float ConveyerHeight = conveyerScript.ConveyerHeight;
 
+    // IMover
     public IMover Next => null;
+
+    public float Height => ConveyerHeight;
+
     public void Move(MotionScript motionObject)
     {
         throw new NotImplementedException();

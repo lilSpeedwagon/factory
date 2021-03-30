@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class processorScript : tileObjectScript, IProcessor, IMover
 {
-    public float ConveerSpeed = 0.2f;
+    public float ConveyerHeight = conveyerScript.ConveyerHeight;
+    public float ConveyerSpeed = 0.2f;
     public float ProcessTriggerOffset = 0.3f;
 
     // IProcessor implementation
@@ -62,14 +63,16 @@ public class processorScript : tileObjectScript, IProcessor, IMover
 
     // IMover implementation
 
-    public IMover Next => TileManagerScript.TileManager.GetGameObject(GetNextPostion())?.GetComponent<IMover>();
+    public IMover Next => TileManagerScript.TileManager.GetGameObject(GetNextPosition())?.GetComponent<IMover>();
+
+    public float Height => ConveyerHeight;
 
     public void Move(MotionScript motionObject)
     {
         if (motionObject.IsFinished && IsAbleToMove())
         {
             m_currentMotion = null;
-            motionObject.StartMotion(GetNextPostion(), ConveerSpeed);
+            motionObject.StartMotion(GetNextPosition(), ConveyerSpeed);
             Next?.HoldMotion(motionObject);
         }
     }

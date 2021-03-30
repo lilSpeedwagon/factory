@@ -4,16 +4,21 @@ using UnityEngine;
 
 public class OutputProducer : MonoBehaviour, IOutput
 {
+    public float ConveyerHeight = conveyerScript.ConveyerHeight;
     public float Speed = 0.2f;
     public float DelayBetweenEmissions = 0.5f;
 
     // IMover
+    public IMover Next => TileManagerScript.TileManager.GetGameObject(m_tile.GetNextPosition())?.GetComponent<IMover>();
+
+    public float Height => ConveyerHeight;
+
     public void Move(MotionScript motionObject)
     {
         if (motionObject.IsFinished && IsAbleToMove())
         {
             m_currentMotion = null;
-            motionObject.StartMotion(m_tile.GetNextPostion(), Speed);
+            motionObject.StartMotion(m_tile.GetNextPosition(), Speed);
             Next.HoldMotion(motionObject);
         }
     }
@@ -79,8 +84,6 @@ public class OutputProducer : MonoBehaviour, IOutput
         Move(m_currentMotion);
     }
     // end IOutput
-
-    public IMover Next => TileManagerScript.TileManager.GetGameObject(m_tile.GetNextPostion())?.GetComponent<IMover>();
 
     private void EmitInternal()
     {
