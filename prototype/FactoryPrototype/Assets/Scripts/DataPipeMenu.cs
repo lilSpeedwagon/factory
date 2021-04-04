@@ -132,59 +132,61 @@ public class DataPipeMenu : MonoBehaviour, IMenu
         
         for (int i = 0; i < portList.Count; i++)
         {
-            var port = portList[i];
-
-            var item = Instantiate(ListItemPrefab, pos, Quaternion.identity, PortList);
-            item.localScale = new Vector3(1.0f, 1.0f, 1.0f); // prevent wrong scaling
-
-            string buttonLabel = port.Name;
-            var toggle = item.GetComponent<Toggle>();
-
-            if (!port.IsConnected)
-            {
-                var index = i;
-                toggle.onValueChanged.AddListener((val) =>
-                {
-                    if (val)
-                    {
-                        OnPortSelected(port);
-                        m_selectedPortIndex = index;
-                    }
-                });
-
-                buttonLabel += " (connect)";
-            }
-            else
-            {
-                if (m_state == State.SelectPortFrom)
-                {
-                    toggle.onValueChanged.AddListener((val) =>
-                    {
-                        if (val)
-                        {
-                            OnPortReleased(port);
-                        }
-                    });
-                }
-                else
-                {
-                    toggle.enabled = false;
-                }
-
-                buttonLabel += " (release)";
-            }
-
-            var text = item.GetComponent<Text>();
-            text.alignment = TextAnchor.MiddleCenter;
-            text.text = buttonLabel;
+            CreatePortListItem(portList[i], pos, i);
         }
 
-        //PortList.gameObject.SetActive(true);
         foreach (RectTransform t in GetComponent<RectTransform>())
         {
             if (t != gameObject)
                 t.gameObject?.SetActive(true);
         }
+    }
+
+    private void CreatePortListItem(DataPublisher.DataPort port, Vector2 pos, int index)
+    {
+        var item = Instantiate(ListItemPrefab, pos, Quaternion.identity, PortList);
+        item.localScale = new Vector3(1.0f, 1.0f, 1.0f); // prevent wrong scaling
+
+        string buttonLabel = port.Name;
+        var toggle = item.GetComponent<Toggle>();
+
+        if (!port.IsConnected)
+        {
+            var i = index; // local var to make a closure
+            toggle.onValueChanged.AddListener((val) =>
+            {
+                if (val)
+                {
+                    OnPortSelected(port);
+                    m_selectedPortIndex = i;
+                }
+            });
+
+            buttonLabel += " (connect)";
+        }
+        else
+        {
+            if (m_state == State.SelectPortFrom)
+            {
+                toggle.onValueChanged.AddListener((val) =>
+                {
+                    if (val)
+                    {
+                        OnPortReleased(port);
+                    }
+                });
+            }
+            else
+            {
+                toggle.enabled = false;
+            }
+
+            buttonLabel += " (release)";
+        }
+
+        var text = item.GetComponent<Text>();
+        text.alignment = TextAnchor.MiddleCenter;
+        text.text = buttonLabel;
     }
 
     private void HidePortList()
@@ -195,8 +197,9 @@ public class DataPipeMenu : MonoBehaviour, IMenu
             if (t != PortList)
                 Destroy(t.gameObject);
         }
-
+        
         GameObjectUtils.SetActiveForChildren(gameObject, false);
+        gameObject.SetActive(true); // do not disable the menu object itself (to avoid update() disabling)
     }
 
     private void DrawLine(Vector2 to)

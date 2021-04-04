@@ -21,7 +21,6 @@ public class conveyerScript : tileObjectScript, IMover
 
             return BaseSpeed;
         }
-        // TODO animation speed
     }
 
     public IMover Next
@@ -127,8 +126,10 @@ public class conveyerScript : tileObjectScript, IMover
     {
         bool isEnabled = IsEnabled;
         AnimationEnabled = isEnabled;
+
         if (isEnabled)
         {
+            AnimationSpeed = Speed;
             Move(m_currentObject);
         }
     }
@@ -150,6 +151,12 @@ public class conveyerScript : tileObjectScript, IMover
             m_animator.enabled = value;
             m_animationEnabled = value;
         }
+    }
+
+    private float AnimationSpeed
+    {
+        set => m_animator.speed = value / BaseSpeed;
+        get => m_animator.speed;
     }
 
     private TileUtils.Direction m_direction;
