@@ -64,6 +64,9 @@ public class DataPipeMenu : MonoBehaviour, IMenu
         return true;
     }
 
+    public string Name => MenuName;
+    // IMenu end
+
     public void Show()
     {
         MenuManager.Manager.SetActive(this);
@@ -300,7 +303,8 @@ public class DataPipeMenu : MonoBehaviour, IMenu
     private DataPublisher.DataPort m_selectedPortTo;
     private DataPublisher m_publisherFrom;
 
-    readonly LogUtils.DebugLogger m_logger = new LogUtils.DebugLogger("DataPipeMenu");
+    private readonly LogUtils.DebugLogger m_logger = new LogUtils.DebugLogger("DataPipeMenu");
 
+    private const string MenuName = "Wire Menu";
     private const string WireLayer = "wires";
 }

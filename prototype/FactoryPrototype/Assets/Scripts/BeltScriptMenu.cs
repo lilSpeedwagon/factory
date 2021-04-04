@@ -107,8 +107,10 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
         return false;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public string Name => MenuName;
+    // IMenu end
+
+    private void Start()
     {
         Hide();
     }
@@ -197,4 +199,6 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
     private List<RectTransform> m_scriptListItems = new List<RectTransform>();
     private string m_currentSelection;
     private static BeltScriptMenu g_instance;
+
+    private const string MenuName = "Belt Script Menu";
 }

@@ -46,6 +46,8 @@ public class ProducerMenu : MonoBehaviour, IMenu
     {
         return true;
     }
+
+    public string Name => MenuName;
     // IMenu end
 
     public void ShowFor(IOutput producer)
@@ -117,5 +119,6 @@ public class ProducerMenu : MonoBehaviour, IMenu
     
     private IOutput m_selectedOutput;
 
+    private const string MenuName = "Select Producer Output";
     private static ProducerMenu g_instance;
 }

@@ -45,6 +45,9 @@ public class StorageMenu : MonoBehaviour, IMenu
         return false;
     }
 
+    public string Name => MenuName;
+    // IMenu end
+
     public void UpdateMaterialsCount()
     {
         foreach (var kv in m_materialCountLabels)
@@ -107,5 +110,6 @@ public class StorageMenu : MonoBehaviour, IMenu
     private bool m_isInitialized;
     private Dictionary<string, Text> m_materialCountLabels;
 
+    private const string MenuName = "Storage Menu";
     private static StorageMenu g_instance;
 }

@@ -75,6 +75,9 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         return false;
     }
 
+    public string Name => MenuName;
+    // IMenu end
+
     // toggle callback
     public void OnRunToggle(bool value)
     {
@@ -256,5 +259,6 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
     private List<RectTransform> m_scriptListItems = new List<RectTransform>();
     private Programmator m_currentProgrammer;
 
+    private const string MenuName = "Programmer Menu";
     private static ProgrammerMenu g_instance;
 }

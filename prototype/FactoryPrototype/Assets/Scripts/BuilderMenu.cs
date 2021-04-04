@@ -28,6 +28,9 @@ public class BuilderMenu : MonoBehaviour, IMenu
         return true;
     }
 
+    public string Name => MenuName;
+    // IMenu end
+
     private void InitButton(BuildableObjectScript obj, ref Vector2 position)
     {
         Sprite img = (obj.Image != null) ? obj.Image : obj.Prefab.GetComponent<SpriteRenderer>().sprite;
@@ -85,10 +88,10 @@ public class BuilderMenu : MonoBehaviour, IMenu
     
     void Start()
     {
-        InitBuilderPanel();  
-        m_menuManager = MenuManager.Manager;
+        InitBuilderPanel();
     }
 
     private GameObject m_builderPanelContent;
-    private MenuManager m_menuManager;
+
+    private const string MenuName = "Ready";
 }

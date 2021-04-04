@@ -19,6 +19,7 @@ public interface IMenu
     void Show();
     void Hide();
     bool IsCameraZoomAllowed();
+    string Name { get; }
 }
 
 // Menu Manager is responsible for holding ref to current active IMenu object
@@ -35,11 +36,9 @@ public class MenuManager : MonoBehaviour
             return g_instance;
         }
     }
-
-    public BeltScriptMenu BeltScriptMenu;
+    
     public BuilderMenu BuilderMenu;
-    public ProgrammerMenu ProgrammerMenu;
-    public DataPipeMenu DataPipeMenu;
+    public TextMeshProUGUI StatusText;
 
     public void SetActive(IMenu activeMenu)
     {
@@ -47,6 +46,8 @@ public class MenuManager : MonoBehaviour
         {
             m_current?.Hide();
             m_current = activeMenu;
+
+            StatusText.text = activeMenu.Name;
         }
     }
 
@@ -65,6 +66,7 @@ public class MenuManager : MonoBehaviour
     {
         m_default = BuilderMenu;
         m_current = m_default;
+        StatusText.text = m_current.Name;
     }
     
     void Update()

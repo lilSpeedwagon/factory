@@ -48,6 +48,9 @@ public class objectBuilder : MonoBehaviour, IMenu
         return false;
     }
 
+    public string Name => MenuName;
+    // IMenu end
+
     // builder
     public void Pick(BuildableObjectScript prefab)
     {
@@ -339,4 +342,6 @@ public class objectBuilder : MonoBehaviour, IMenu
     private int m_currentZlevel = 0;
 
     private LogUtils.DebugLogger m_logger;
+
+    private const string MenuName = "Select placement";
 }
