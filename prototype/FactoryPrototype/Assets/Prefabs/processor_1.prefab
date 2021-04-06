@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6907948641447400956}
   - component: {fileID: -2074310011579821997}
   - component: {fileID: 5928996907258357170}
+  - component: {fileID: -663743013441853536}
   m_Layer: 9
   m_Name: processor_1
   m_TagString: object
@@ -98,10 +99,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03d8f01d4d2421e4dbd7f4ae1628a278, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isShadow: 0
-  ZPosition: 1
-  OnlyXFlip: 1
-  ConveerSpeed: 0.6
+  ConveyerHeight: 0.12
+  ConveyerSpeed: 0.2
   ProcessTriggerOffset: 0.5
   Name: proc1
 --- !u!60 &6907948641447400956
@@ -161,4 +160,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 513ff0fc5e4b73640b14c76e46549b2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SourceId: -1
   Power: 10
+--- !u!114 &-663743013441853536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2533812369414984692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8c6a1974ea5b5d42a67ad3785b06759, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isShadow: 0
+  ZPosition: 1
+  OnlyXFlip: 1
+  AlternativeImage: {fileID: 0}
+  AlternativeAnimation: {fileID: 0}

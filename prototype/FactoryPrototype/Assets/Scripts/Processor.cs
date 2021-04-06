@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class processorScript : tileObjectScript, IProcessor, IMover
+public class Processor : MonoBehaviour, IProcessor, IMover
 {
     public float ConveyerHeight = conveyerScript.ConveyerHeight;
     public float ConveyerSpeed = 0.2f;
@@ -38,7 +38,7 @@ public class processorScript : tileObjectScript, IProcessor, IMover
         }
         catch (Exception e) { Debug.LogWarning(e.Message); }
         
-        GameObject newInstance = Instantiate(toMaterial.gameObject, GetPosition(), TileUtils.InitRotation);
+        GameObject newInstance = Instantiate(toMaterial.gameObject, m_tileComponent.GetPosition(), TileUtils.InitRotation);
 
         try
         {
@@ -64,8 +64,7 @@ public class processorScript : tileObjectScript, IProcessor, IMover
     // IProcessor implementation end
 
     // IMover implementation
-
-    public IMover Next => TileManagerScript.TileManager.GetGameObject(GetNextPosition())?.GetComponent<IMover>();
+    public IMover Next => TileManagerScript.TileManager.GetGameObject(m_tileComponent.GetNextPosition())?.GetComponent<IMover>();
 
     public float Height => ConveyerHeight;
 
@@ -74,7 +73,7 @@ public class processorScript : tileObjectScript, IProcessor, IMover
         if (motionObject.IsFinished && IsAbleToMove())
         {
             m_currentMotion = null;
-            motionObject.StartMotion(GetNextPosition(), ConveyerSpeed);
+            motionObject.StartMotion(m_tileComponent.GetNextPosition(), ConveyerSpeed);
             Next?.HoldMotion(motionObject);
         }
     }
@@ -82,12 +81,12 @@ public class processorScript : tileObjectScript, IProcessor, IMover
     public bool IsAbleToMove()
     {
         var mover = Next;
-        return mover != null && mover.IsDirectionAllowed(m_dir) && mover.IsFree();
+        return mover != null && mover.IsDirectionAllowed(m_tileComponent.Direction) && mover.IsFree();
     }
 
     public bool IsDirectionAllowed(TileUtils.Direction direction)
     {
-        return direction == m_dir;
+        return direction == m_tileComponent.Direction;
     }
 
     public bool IsFree()
@@ -104,6 +103,7 @@ public class processorScript : tileObjectScript, IProcessor, IMover
 
     private void Start()
     {
+        m_tileComponent = GetComponent<tileObjectScript>();
         m_consumerComponent = GetComponent<EnergyConsumer>();
     }
 
@@ -141,4 +141,6 @@ public class processorScript : tileObjectScript, IProcessor, IMover
     private MotionScript m_currentObjectToProcess;
     private MotionScript m_currentMotion;
     private EnergyConsumer m_consumerComponent;
+
+    private tileObjectScript m_tileComponent;
 }
