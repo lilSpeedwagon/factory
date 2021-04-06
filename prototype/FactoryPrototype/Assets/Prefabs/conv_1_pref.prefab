@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: -5453550094219653602}
   - component: {fileID: -9049895946859123150}
   - component: {fileID: 8297873969653637695}
+  - component: {fileID: -3806080304808236593}
   m_Layer: 9
   m_Name: conv_1_pref
   m_TagString: object
@@ -130,10 +131,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a6cb8c217a18354fa266d54f00bf41f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isShadow: 0
-  ZPosition: 1
-  OnlyXFlip: 0
-  ConveyerHeight: 0.15
   BaseSpeed: 0.6
 --- !u!114 &5102762363917646093
 MonoBehaviour:
@@ -197,3 +194,20 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &-3806080304808236593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3306973381142610473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8c6a1974ea5b5d42a67ad3785b06759, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isShadow: 0
+  ZPosition: 1
+  OnlyXFlip: 0
+  AlternativeImage: {fileID: 0}
+  AlternativeAnimation: {fileID: 0}

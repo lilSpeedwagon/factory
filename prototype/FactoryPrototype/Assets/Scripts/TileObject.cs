@@ -1,46 +1,50 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Image = UnityEngine.UI.Image;
 
-public class tileObjectScript : MonoBehaviour
+public class TileObject : MonoBehaviour
 {
     public bool isShadow = false;
     public int ZPosition = 1;
     public bool OnlyXFlip = false;
 
-    public TileUtils.Direction direction
+    public Sprite AlternativeImage;
+    public AnimatorOverrideController AlternativeAnimation;
+
+    public TileUtils.Direction Direction
     {
         get => m_dir;
         set
         {
             m_dir = value;
-            SpriteRenderer sprite = GetComponent<SpriteRenderer>();
 
-            if (!OnlyXFlip)
+            if (!OnlyXFlip && (AlternativeImage == null || AlternativeAnimation == null))
             {
                 switch (m_dir)
                 {
                     case TileUtils.Direction.DownLeft:
-                        sprite.flipX = true;
-                        sprite.flipY = false;
+                        m_sprite.flipX = true;
+                        m_sprite.flipY = false;
                         break;
                     case TileUtils.Direction.DownRight:
-                        sprite.flipX = false;
-                        sprite.flipY = false;
+                        m_sprite.flipX = false;
+                        m_sprite.flipY = false;
                         break;
                     case TileUtils.Direction.UpLeft:
-                        sprite.flipX = true;
-                        sprite.flipY = true;
+                        m_sprite.flipX = true;
+                        m_sprite.flipY = true;
                         break;
                     case TileUtils.Direction.UpRight:
-                        sprite.flipX = false;
-                        sprite.flipY = true;
+                        m_sprite.flipX = false;
+                        m_sprite.flipY = true;
                         break;
                 }
             }
             else
             {
-                sprite.flipX = m_dir == TileUtils.Direction.DownLeft || m_dir == TileUtils.Direction.UpRight;                
+                m_sprite.flipX = m_dir == TileUtils.Direction.DownLeft || m_dir == TileUtils.Direction.UpRight;
+                ChangeSprite();
             }
         }
     }
@@ -94,9 +98,46 @@ public class tileObjectScript : MonoBehaviour
                 newDir = TileUtils.Direction.DownLeft;
         }
 
-        direction = newDir;
+        Direction = newDir;
+    }
+
+    private bool IsAlternativeSpriteNeeded()
+    {
+        return m_dir == TileUtils.Direction.UpLeft || m_dir == TileUtils.Direction.UpRight;
+    }
+
+    private void ChangeSprite()
+    {
+        if (AlternativeAnimation != null || AlternativeImage != null)
+        {
+            var animator = GetComponent<Animator>();
+            if (animator != null)
+            {
+                animator.runtimeAnimatorController = m_isAlternative ? m_originalController : AlternativeAnimation;
+            }
+
+            GetComponent<SpriteRenderer>().sprite = m_isAlternative ? m_originalImage : AlternativeImage;
+        }
+    }
+
+    private void Awake()
+    {
+        m_isAlternative = false;
+        m_originalImage = GetComponent<SpriteRenderer>().sprite;
+        m_sprite = GetComponent<SpriteRenderer>();
+
+        var animator = GetComponent<Animator>();
+        if (AlternativeAnimation != null && animator != null)
+        {
+            m_originalController = animator.runtimeAnimatorController;
+        }
     }
 
     protected TileUtils.Direction m_dir = TileUtils.Direction.DownRight;
     protected ContactFilter2D m_filter = new ContactFilter2D();
+
+    protected SpriteRenderer m_sprite;
+    protected bool m_isAlternative;
+    protected Sprite m_originalImage;
+    protected RuntimeAnimatorController m_originalController;
 }

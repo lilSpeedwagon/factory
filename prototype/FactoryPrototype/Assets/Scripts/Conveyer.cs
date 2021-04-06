@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using TMPro;
 using UnityEngine;
 
-public class conveyerScript : tileObjectScript, IMover
+public class Conveyer : MonoBehaviour, IMover
 {
     public static float ConveyerHeight = 0.12f;
 
@@ -27,7 +27,7 @@ public class conveyerScript : tileObjectScript, IMover
     {
         get
         {
-            Vector2 position = IsReversed ? GetPrevPosition() : GetNextPosition();
+            Vector2 position = IsReversed ? m_tileComponent.GetPrevPosition() : m_tileComponent.GetNextPosition();
             return TileManagerScript.TileManager.GetGameObject(position)?.GetComponent<IMover>();
         }
     }
@@ -39,7 +39,7 @@ public class conveyerScript : tileObjectScript, IMover
         if (motionObject != null && motionObject.IsFinished && IsAbleToMove())
         {
             m_currentObject = null;
-            Vector2 position = IsReversed ? GetPrevPosition() : GetNextPosition();
+            Vector2 position = IsReversed ? m_tileComponent.GetPrevPosition() : m_tileComponent.GetNextPosition();
             position.y += ConveyerHeight;
             motionObject.StartMotion(position, Speed);
             Next.HoldMotion(motionObject);
@@ -90,12 +90,10 @@ public class conveyerScript : tileObjectScript, IMover
 
     private void Start()
     {
-        m_direction = GetComponent<tileObjectScript>()?.direction ?? new TileUtils.Direction();
+        m_tileComponent = GetComponent<TileObject>();
+        m_direction = m_tileComponent.Direction;
+
         m_consumerComponent = GetComponent<EnergyConsumer>();
-        if (m_consumerComponent == null)
-        {
-            Debug.LogError("EnergyConsumer component is not found for conveyer.");
-        }
 
         m_animator = GetComponent<Animator>();
         if (m_animator != null)
@@ -159,6 +157,7 @@ public class conveyerScript : tileObjectScript, IMover
         get => m_animator.speed;
     }
 
+    private TileObject m_tileComponent;
     private TileUtils.Direction m_direction;
     private MotionScript m_currentObject;
 
