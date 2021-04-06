@@ -9,6 +9,8 @@ public class processorScript : tileObjectScript, IProcessor, IMover
     public float ConveyerSpeed = 0.2f;
     public float ProcessTriggerOffset = 0.3f;
 
+    public bool IsActive => m_consumerComponent?.IsEnergized ?? false;
+
     // IProcessor implementation
     public string Name;
 
@@ -99,10 +101,15 @@ public class processorScript : tileObjectScript, IProcessor, IMover
     }
     // IMover implementation end
 
-    // Update is called once per frame
+
+    private void Start()
+    {
+        m_consumerComponent = GetComponent<EnergyConsumer>();
+    }
+
     private void FixedUpdate()
     {
-        if (m_currentObjectToProcess != null && m_currentObjectToProcess.IsFinished)
+        if (IsActive && m_currentObjectToProcess != null && m_currentObjectToProcess.IsFinished)
         {
             var material = m_currentObjectToProcess.GetComponent<Material>();
             if (material != null && CanProcess(material.Name))
@@ -133,4 +140,5 @@ public class processorScript : tileObjectScript, IProcessor, IMover
     // current movable object on belt
     private MotionScript m_currentObjectToProcess;
     private MotionScript m_currentMotion;
+    private EnergyConsumer m_consumerComponent;
 }
