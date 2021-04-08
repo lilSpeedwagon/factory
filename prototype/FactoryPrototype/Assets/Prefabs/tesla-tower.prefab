@@ -150,4 +150,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isShadow: 0
   ZPosition: 1
-  OnlyXFlip: 1
+  FlipType: 0

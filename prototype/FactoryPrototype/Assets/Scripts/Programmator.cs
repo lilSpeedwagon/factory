@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Programmator : tileObjectScript
+public class Programmator : MonoBehaviour
 {
     public static float MinFreq = 0.1f;
     public static float MaxFreq = 10f;

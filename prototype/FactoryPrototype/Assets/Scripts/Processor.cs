@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Processor : MonoBehaviour, IProcessor, IMover
 {
-    public float ConveyerHeight = conveyerScript.ConveyerHeight;
+    public float ConveyerHeight = Conveyer.ConveyerHeight;
     public float ConveyerSpeed = 0.2f;
     public float ProcessTriggerOffset = 0.3f;
 
@@ -103,7 +103,7 @@ public class Processor : MonoBehaviour, IProcessor, IMover
 
     private void Start()
     {
-        m_tileComponent = GetComponent<tileObjectScript>();
+        m_tileComponent = GetComponent<TileObject>();
         m_consumerComponent = GetComponent<EnergyConsumer>();
     }
 
@@ -142,5 +142,5 @@ public class Processor : MonoBehaviour, IProcessor, IMover
     private MotionScript m_currentMotion;
     private EnergyConsumer m_consumerComponent;
 
-    private tileObjectScript m_tileComponent;
+    private TileObject m_tileComponent;
 }

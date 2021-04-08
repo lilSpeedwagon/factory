@@ -1,16 +1,23 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Image = UnityEngine.UI.Image;
 
 public class TileObject : MonoBehaviour
 {
-    public bool isShadow = false;
-    public int ZPosition = 1;
-    public bool OnlyXFlip = false;
+    public enum TileFlipType
+    {
+        NoFlip = 0,
+        FlipXY = 1,
+        FlipX = 2,
+        FlipAlternativeAnimationX = 3
+    }
 
-    public Sprite AlternativeImage;
-    public AnimatorOverrideController AlternativeAnimation;
+    public bool IsShadow = false;
+    public int ZPosition = 1;
+    public TileFlipType FlipType = TileFlipType.NoFlip;
+    public Sprite AlternativeSprite; // only for FlipAlternativeAnimationX
 
     public TileUtils.Direction Direction
     {
@@ -18,33 +25,58 @@ public class TileObject : MonoBehaviour
         set
         {
             m_dir = value;
+            var sprite = GetComponent<SpriteRenderer>();
 
-            if (!OnlyXFlip && (AlternativeImage == null || AlternativeAnimation == null))
+            switch (FlipType)
             {
-                switch (m_dir)
+                case TileFlipType.NoFlip:
+                    break;
+                case TileFlipType.FlipXY:
                 {
-                    case TileUtils.Direction.DownLeft:
-                        m_sprite.flipX = true;
-                        m_sprite.flipY = false;
-                        break;
-                    case TileUtils.Direction.DownRight:
-                        m_sprite.flipX = false;
-                        m_sprite.flipY = false;
-                        break;
-                    case TileUtils.Direction.UpLeft:
-                        m_sprite.flipX = true;
-                        m_sprite.flipY = true;
-                        break;
-                    case TileUtils.Direction.UpRight:
-                        m_sprite.flipX = false;
-                        m_sprite.flipY = true;
-                        break;
+                    FlipX_Y();
+                    break;
                 }
-            }
-            else
-            {
-                m_sprite.flipX = m_dir == TileUtils.Direction.DownLeft || m_dir == TileUtils.Direction.UpRight;
-                ChangeSprite();
+                case TileFlipType.FlipX:
+                {
+                    sprite.flipX = m_dir == TileUtils.Direction.DownLeft || m_dir == TileUtils.Direction.UpRight;
+                    break;
+                }
+                case TileFlipType.FlipAlternativeAnimationX:
+                {
+                    sprite.flipX = m_dir == TileUtils.Direction.DownLeft || m_dir == TileUtils.Direction.UpRight;
+                    // used for changing animations in objects like conveyer
+                    bool alternative = IsAlternativeSpriteNeeded;
+
+                    try
+                    {
+                        GetComponent<Animator>()?.SetBool("UseAlternative", alternative);
+                    }
+                    catch (MissingComponentException) { }
+
+                    var spriteRenderer = GetComponent<SpriteRenderer>();
+                    if (!m_isAlternativeSpriteUsed && alternative)
+                    {
+                        m_isAlternativeSpriteUsed = true;
+
+                        if (m_originalSprite == null)
+                        {
+                            m_originalSprite = spriteRenderer.sprite;
+                        }
+                        spriteRenderer.sprite = AlternativeSprite;
+                    }
+                    else if (m_isAlternativeSpriteUsed && !alternative)
+                    {
+                        m_isAlternativeSpriteUsed = false;
+
+                        spriteRenderer.sprite = m_originalSprite;
+                    }
+                    break;
+                }
+                default:
+                {
+                    Debug.LogWarning("Tile: Undefined flip type");
+                    break;
+                }
             }
         }
     }
@@ -101,43 +133,35 @@ public class TileObject : MonoBehaviour
         Direction = newDir;
     }
 
-    private bool IsAlternativeSpriteNeeded()
-    {
-        return m_dir == TileUtils.Direction.UpLeft || m_dir == TileUtils.Direction.UpRight;
-    }
 
-    private void ChangeSprite()
+    protected void FlipX_Y()
     {
-        if (AlternativeAnimation != null || AlternativeImage != null)
+        var sprite = GetComponent<SpriteRenderer>();
+        switch (m_dir)
         {
-            var animator = GetComponent<Animator>();
-            if (animator != null)
-            {
-                animator.runtimeAnimatorController = m_isAlternative ? m_originalController : AlternativeAnimation;
-            }
-
-            GetComponent<SpriteRenderer>().sprite = m_isAlternative ? m_originalImage : AlternativeImage;
+            case TileUtils.Direction.DownLeft:
+                sprite.flipX = true;
+                sprite.flipY = false;
+                break;
+            case TileUtils.Direction.DownRight:
+                sprite.flipX = false;
+                sprite.flipY = false;
+                break;
+            case TileUtils.Direction.UpLeft:
+                sprite.flipX = true;
+                sprite.flipY = true;
+                break;
+            case TileUtils.Direction.UpRight:
+                sprite.flipX = false;
+                sprite.flipY = true;
+                break;
         }
     }
 
-    private void Awake()
-    {
-        m_isAlternative = false;
-        m_originalImage = GetComponent<SpriteRenderer>().sprite;
-        m_sprite = GetComponent<SpriteRenderer>();
-
-        var animator = GetComponent<Animator>();
-        if (AlternativeAnimation != null && animator != null)
-        {
-            m_originalController = animator.runtimeAnimatorController;
-        }
-    }
+    protected bool IsAlternativeSpriteNeeded => m_dir == TileUtils.Direction.UpLeft || m_dir == TileUtils.Direction.UpRight;
 
     protected TileUtils.Direction m_dir = TileUtils.Direction.DownRight;
-    protected ContactFilter2D m_filter = new ContactFilter2D();
-
-    protected SpriteRenderer m_sprite;
-    protected bool m_isAlternative;
-    protected Sprite m_originalImage;
-    protected RuntimeAnimatorController m_originalController;
+    private bool m_isAlternativeSpriteUsed = false;
+    private Sprite m_originalSprite;
+    //protected ContactFilter2D m_filter = new ContactFilter2D();
 }

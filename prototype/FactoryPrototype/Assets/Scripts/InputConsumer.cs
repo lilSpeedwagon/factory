@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class InputConsumer : MonoBehaviour, IInput, IMover
 {
-    public float ConveyerHeight = conveyerScript.ConveyerHeight;
+    public float ConveyerHeight = Conveyer.ConveyerHeight;
 
     // IMover
     public IMover Next => null;
@@ -24,7 +24,7 @@ public class InputConsumer : MonoBehaviour, IInput, IMover
 
     public bool IsDirectionAllowed(TileUtils.Direction direction)
     {
-        return GetComponent<tileObjectScript>().direction == direction;
+        return GetComponent<TileObject>().Direction == direction;
     }
 
     public bool IsFree()

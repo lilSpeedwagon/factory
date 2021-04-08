@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba8594401deac8d40a6a9074fdedd24e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ConveyerHeight: 0.12
 --- !u!1001 &8871812393102213815
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -92,6 +93,11 @@ PrefabInstance:
     - target: {fileID: 2596727320512995921, guid: a1c7f09646e534346bd90698f1230bc9,
         type: 3}
       propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5958811838742630764, guid: a1c7f09646e534346bd90698f1230bc9,
+        type: 3}
+      propertyPath: FlipType
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:

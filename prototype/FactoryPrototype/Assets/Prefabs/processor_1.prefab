@@ -176,6 +176,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isShadow: 0
   ZPosition: 1
-  OnlyXFlip: 1
-  AlternativeImage: {fileID: 0}
-  AlternativeAnimation: {fileID: 0}
+  FlipType: 2

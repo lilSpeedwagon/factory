@@ -208,6 +208,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isShadow: 0
   ZPosition: 1
-  OnlyXFlip: 0
-  AlternativeImage: {fileID: 0}
-  AlternativeAnimation: {fileID: 0}
+  FlipType: 3
+  AlternativeSprite: {fileID: -1165303875031477986, guid: 6d8c56231ec4c4d418900293201539c2,
+    type: 3}

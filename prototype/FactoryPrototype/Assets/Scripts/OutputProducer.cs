@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class OutputProducer : MonoBehaviour, IOutput
 {
-    public float ConveyerHeight = conveyerScript.ConveyerHeight;
+    public float ConveyerHeight = Conveyer.ConveyerHeight;
     public float Speed = 0.2f;
     public float DelayBetweenEmissions = 0.5f;
 
@@ -26,7 +26,7 @@ public class OutputProducer : MonoBehaviour, IOutput
     public bool IsAbleToMove()
     {
         var mover = Next;
-        return mover != null && mover.IsDirectionAllowed(m_tile.direction) && mover.IsFree();
+        return mover != null && mover.IsDirectionAllowed(m_tile.Direction) && mover.IsFree();
     }
 
     public bool IsDirectionAllowed(TileUtils.Direction direction)
@@ -94,14 +94,14 @@ public class OutputProducer : MonoBehaviour, IOutput
     // Start is called before the first frame update
     private void Start()
     {
-        m_tile = GetComponent<tileObjectScript>();
+        m_tile = GetComponent<TileObject>();
         InvokeRepeating("EmitInternal", DelayBetweenEmissions, DelayBetweenEmissions);
         m_isEnabled = false;
     }
 
     private void FixedUpdate()
     {
-        if (GetComponent<tileObjectScript>().isShadow) return;
+        if (GetComponent<TileObject>().IsShadow) return;
 
         if (m_currentMotion != null)
             Move(m_currentMotion);
@@ -123,6 +123,6 @@ public class OutputProducer : MonoBehaviour, IOutput
 
     private bool m_isEnabled;
     private Material m_materialToEmit;
-    private tileObjectScript m_tile;
+    private TileObject m_tile;
     private MotionScript m_currentMotion;
 }

@@ -101,7 +101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isShadow: 0
   ZPosition: 1
-  OnlyXFlip: 1
+  FlipType: 1
 --- !u!114 &4372548973974454222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,6 +161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6433856cf2c708d4e9dbcdfdef23512e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ConveyerHeight: 0.12
   Speed: 0.6
   DelayBetweenEmissions: 3
 --- !u!114 &7715493245482316388

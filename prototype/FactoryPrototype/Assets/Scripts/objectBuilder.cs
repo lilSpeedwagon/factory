@@ -57,7 +57,7 @@ public class objectBuilder : MonoBehaviour, IMenu
         ChangePrefab(prefab);
         try
         {
-            m_currentZlevel = prefab.GetComponent<tileObjectScript>().ZPosition;
+            m_currentZlevel = prefab.GetComponent<TileObject>().ZPosition;
         }
         catch (NullReferenceException e)
         {
@@ -82,7 +82,7 @@ public class objectBuilder : MonoBehaviour, IMenu
         if (m_shadow == null)
             return;
 
-        m_shadow.GetComponent<tileObjectScript>().Rotate(bClockwise);
+        m_shadow.GetComponent<TileObject>().Rotate(bClockwise);
     }
 
     private void CreateShadow()
@@ -95,11 +95,18 @@ public class objectBuilder : MonoBehaviour, IMenu
             }
 
             m_shadow = Instantiate(ShadowPrefab, TileUtils.NormalizedMousePosition() + TileUtils.LevelOffset(m_currentZlevel), TileUtils.InitRotation);
-            m_shadow.GetComponent<SpriteRenderer>().sprite = PrefabToCreate.GetComponent<SpriteRenderer>().sprite;
-            m_shadow.GetComponent<SpriteRenderer>().color = ColorUtils.colorTransparentGreen;
-            m_shadow.GetComponent<SpriteRenderer>().sortingLayerName = "shadow";
-            m_shadow.GetComponent<tileObjectScript>().isShadow = true;
-            m_shadow.GetComponent<tileObjectScript>().OnlyXFlip = PrefabToCreate.GetComponent<tileObjectScript>().OnlyXFlip;
+
+            var spriteRenderer = m_shadow.GetComponent<SpriteRenderer>();
+            spriteRenderer.sprite = PrefabToCreate.GetComponent<SpriteRenderer>().sprite;
+            spriteRenderer.color = ColorUtils.colorTransparentGreen;
+            spriteRenderer.sortingLayerName = "shadow";
+
+            var tileComponent = m_shadow.GetComponent<TileObject>();
+            var prefabTileComponent = PrefabToCreate.GetComponent<TileObject>();
+            tileComponent.IsShadow = true;
+            tileComponent.FlipType = prefabTileComponent.FlipType;
+            tileComponent.AlternativeSprite = prefabTileComponent.AlternativeSprite;
+            tileComponent.ZPosition = prefabTileComponent.ZPosition;
         }
     }
 
@@ -123,12 +130,12 @@ public class objectBuilder : MonoBehaviour, IMenu
             }
             catch (ArgumentException e)
             {
-                m_logger.Error($"Cannot build. Error: {e.Message}.");
+                m_logger.Log($"Cannot build. Error: {e.Message}.");
                 return;
             }
 
             GameObject newObj = m_tileManager.InstantiateObject(PrefabToCreate.gameObject, TileUtils.NormalizedMousePosition());
-            newObj.GetComponent<tileObjectScript>().direction = m_shadow.GetComponent<tileObjectScript>().direction;
+            newObj.GetComponent<TileObject>().Direction = m_shadow.GetComponent<TileObject>().Direction;
             newObj.transform.position += (Vector3) TileUtils.LevelOffset(m_currentZlevel);
 
             TryAddEnergyObject(newObj);

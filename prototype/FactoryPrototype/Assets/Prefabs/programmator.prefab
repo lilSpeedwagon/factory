@@ -119,7 +119,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isShadow: 0
   ZPosition: 1
-  OnlyXFlip: 1
+  FlipType: 0
 --- !u!60 &6524838035053906607
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -163,7 +163,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isShadow: 0
   ZPosition: 1
-  OnlyXFlip: 1
+  FlipType: 0
 --- !u!114 &-9126141973758652429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,4 +245,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 513ff0fc5e4b73640b14c76e46549b2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SourceId: -1
   Power: 2
