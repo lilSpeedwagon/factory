@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,7 +19,9 @@ public class OutputProducer : MonoBehaviour, IOutput
         if (motionObject.IsFinished && IsAbleToMove())
         {
             m_currentMotion = null;
-            motionObject.StartMotion(m_tile.GetNextPosition(), Speed);
+            var toPosition = m_tile.GetNextPosition();
+            toPosition.y += Next.Height;
+            motionObject.StartMotion(toPosition, Speed);
             Next.HoldMotion(motionObject);
         }
     }
@@ -79,7 +82,10 @@ public class OutputProducer : MonoBehaviour, IOutput
             return;
         }
 
-        var obj = Instantiate(m_materialToEmit.gameObject, m_tile.GetPosition(), TileUtils.InitRotation);
+        var position = m_tile.GetPosition();
+        position.y += ConveyerHeight;
+
+        var obj = Instantiate(m_materialToEmit.gameObject, position, TileUtils.InitRotation);
         m_currentMotion = obj.GetComponent<MotionScript>(); // could be null
         Move(m_currentMotion);
     }

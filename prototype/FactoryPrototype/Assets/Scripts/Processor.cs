@@ -37,8 +37,10 @@ public class Processor : MonoBehaviour, IProcessor, IMover
             TimeUtils.Delay(recipe.ProcessingTime);
         }
         catch (Exception e) { Debug.LogWarning(e.Message); }
-        
-        GameObject newInstance = Instantiate(toMaterial.gameObject, m_tileComponent.GetPosition(), TileUtils.InitRotation);
+
+        var position = m_tileComponent.GetPosition();
+        position.y += Height;
+        GameObject newInstance = Instantiate(toMaterial.gameObject, position, TileUtils.InitRotation);
 
         try
         {
@@ -73,7 +75,7 @@ public class Processor : MonoBehaviour, IProcessor, IMover
         if (motionObject.IsFinished && IsAbleToMove())
         {
             m_currentMotion = null;
-            motionObject.StartMotion(m_tileComponent.GetNextPosition(), ConveyerSpeed);
+            motionObject.StartMotion(m_tileComponent.GetNextPosition() + new Vector2(0.0f, Next.Height), ConveyerSpeed);
             Next?.HoldMotion(motionObject);
         }
     }

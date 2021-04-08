@@ -40,7 +40,7 @@ public class Conveyer : MonoBehaviour, IMover
         {
             m_currentObject = null;
             Vector2 position = IsReversed ? m_tileComponent.GetPrevPosition() : m_tileComponent.GetNextPosition();
-            position.y += ConveyerHeight;
+            position.y += Next.Height;
             motionObject.StartMotion(position, Speed);
             Next.HoldMotion(motionObject);
         }
