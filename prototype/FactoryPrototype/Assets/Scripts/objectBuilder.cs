@@ -31,6 +31,7 @@ public class objectBuilder : MonoBehaviour, IMenu
     public GameObject EnergyAreaPrefab;
     public BuildableObjectScript PrefabToCreate;
     public GameObject RemoverPrefab;
+    public GameObject BuiltEffectPrefab;
 
     // IMenu implementation
     public void Hide()
@@ -134,12 +135,27 @@ public class objectBuilder : MonoBehaviour, IMenu
                 return;
             }
 
-            GameObject newObj = m_tileManager.InstantiateObject(PrefabToCreate.gameObject, TileUtils.NormalizedMousePosition());
+            var position = TileUtils.NormalizedMousePosition();
+
+            GameObject newObj = m_tileManager.InstantiateObject(PrefabToCreate.gameObject, position);
             newObj.GetComponent<TileObject>().Direction = m_shadow.GetComponent<TileObject>().Direction;
             newObj.transform.position += (Vector3) TileUtils.LevelOffset(m_currentZlevel);
 
             TryAddEnergyObject(newObj);
+
+            CreateBuiltEffect(position);
         }
+    }
+
+    private void CreateBuiltEffect(Vector2 position)
+    {
+        if (BuiltEffectPrefab != null)
+        {
+            var effect = Instantiate(BuiltEffectPrefab, position, Quaternion.identity);
+            Destroy(effect, 2.0f); // postponed destruction
+        }
+
+        // TODO sound
     }
 
     private int GetSellCost(GameObject removable)
