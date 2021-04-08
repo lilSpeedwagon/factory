@@ -60,6 +60,9 @@ TagManager:
   - name: wires
     uniqueID: 558403989
     locked: 0
+  - name: effects
+    uniqueID: 3058780485
+    locked: 0
   - name: UI
     uniqueID: 3241108617
     locked: 0
