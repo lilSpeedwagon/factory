@@ -147,7 +147,8 @@ MonoBehaviour:
   Cost: 5
   SellCost: 2
   Prefab: {fileID: 3306973381142610473}
-  Image: {fileID: 21300000, guid: 41f60935f5c4205468ccbc8d1408bef8, type: 3}
+  Image: {fileID: 21300000, guid: 971658baf8a555848afb2e766043aa2d, type: 3}
+  Name: Conveyer
 --- !u!114 &-5453550094219653602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -206,7 +207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8c6a1974ea5b5d42a67ad3785b06759, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isShadow: 0
+  IsShadow: 0
   ZPosition: 1
   FlipType: 3
   AlternativeSprite: {fileID: -1165303875031477986, guid: 6d8c56231ec4c4d418900293201539c2,

@@ -8,4 +8,5 @@ public class BuildableObjectScript : MonoBehaviour
     public int SellCost;
     public GameObject Prefab;
     public Sprite Image;
+    public string Name;
 }

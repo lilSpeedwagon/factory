@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class BuilderMenu : MonoBehaviour, IMenu
 {
+    public Texture RemoverIcon;
     public GameObject ButtonPrefab;
-    public int ButtonsMargin = 10;
 
     // IMenu implementation
     public void Show()
@@ -31,21 +32,29 @@ public class BuilderMenu : MonoBehaviour, IMenu
     public string Name => MenuName;
     // IMenu end
 
-    private void InitButton(BuildableObjectScript obj, ref Vector2 position)
+    private void InitButton(BuildableObjectScript obj)
     {
         Sprite img = (obj.Image != null) ? obj.Image : obj.Prefab.GetComponent<SpriteRenderer>().sprite;
         GameObject button = Instantiate(ButtonPrefab, m_builderPanelContent.transform);
-        RectTransform rectTransform = button.GetComponent<RectTransform>();
-        rectTransform.localPosition = position;
-        rectTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        button.GetComponent<RectTransform>().localScale = new Vector3(1.0f, 1.0f, 1.0f);
         button.GetComponent<RawImage>().texture = img.texture;
         button.GetComponent<Button>().onClick.AddListener(call: delegate { Pick(obj.Prefab); });
-        position -= new Vector2(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height);
+        button.transform.Find("costLabel").GetComponent<TextMeshProUGUI>().text = obj.Cost.ToString();
+        button.transform.Find("nameLabel").GetComponent<TextMeshProUGUI>().text = obj.Name;
+    }
+
+    private void InitRemoverButton()
+    {
+        GameObject button = Instantiate(ButtonPrefab, m_builderPanelContent.transform);
+        RectTransform rectTransform = button.GetComponent<RectTransform>();
+        rectTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        button.GetComponent<RawImage>().texture = RemoverIcon;
+        button.GetComponent<Button>().onClick.AddListener(call: PickRemover);
+        button.transform.Find("nameLabel").GetComponent<TextMeshProUGUI>().text = "Remover";
     }
 
     private void InitBuilderPanel()
     {
-        Vector2 localPos = new Vector3(GetComponent<RectTransform>().rect.width / 2, 0.0f);
         GameObject viewPort = transform.Find("Viewport").gameObject;
         m_builderPanelContent = viewPort.transform.Find("Content").gameObject;
 
@@ -56,23 +65,10 @@ public class BuilderMenu : MonoBehaviour, IMenu
         }
 
         List<BuildableObjectScript> objects = objectBuilder.Builder.Objects;
-
-        float buttonHeight = ButtonPrefab.GetComponent<RectTransform>().rect.height;
-        float height = (ButtonsMargin + buttonHeight) * (objects.Count + 1) + ButtonsMargin;
-        m_builderPanelContent.GetComponent<RectTransform>().sizeDelta = new Vector2(m_builderPanelContent.GetComponent<RectTransform>().sizeDelta.x, height);
-
-        GameObject button = Instantiate(ButtonPrefab, m_builderPanelContent.transform);
-        localPos -= new Vector2(0, ButtonsMargin + button.GetComponent<RectTransform>().rect.height / 2);
-        RectTransform rectTransform = button.GetComponent<RectTransform>();
-        rectTransform.localPosition = localPos;
-        rectTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-        button.GetComponent<RawImage>().texture = objectBuilder.Builder.RemoverPrefab.GetComponent<SpriteRenderer>().sprite.texture;
-        button.GetComponent<Button>().onClick.AddListener(call: PickRemover);
-
-        localPos -= new Vector2(0, ButtonsMargin + buttonHeight);
+        InitRemoverButton();
         foreach (var obj in objects)
         {
-            InitButton(obj, ref localPos);
+            InitButton(obj);
         }
     }
 

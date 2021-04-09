@@ -95,6 +95,11 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4372548973974454222, guid: a1c7f09646e534346bd90698f1230bc9,
+        type: 3}
+      propertyPath: Name
+      value: Storage transporter (in)
+      objectReference: {fileID: 0}
     - target: {fileID: 5958811838742630764, guid: a1c7f09646e534346bd90698f1230bc9,
         type: 3}
       propertyPath: FlipType
