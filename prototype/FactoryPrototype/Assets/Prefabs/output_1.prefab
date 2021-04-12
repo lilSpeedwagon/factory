@@ -74,14 +74,14 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1221789239
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: a91bd28a363df9d48b41540f506b6f93, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6447662d022cecf4a8c45ca38c9e5e36, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 5.12, y: 5.12}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -101,8 +101,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsShadow: 0
   ZPosition: 1
-  FlipType: 1
-  AlternativeSprite: {fileID: 0}
+  FlipType: 3
+  AlternativeSprite: {fileID: 21300000, guid: ed61314b38e541042a5d354d22b5d01c, type: 3}
 --- !u!114 &4372548973974454222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -118,7 +118,7 @@ MonoBehaviour:
   Cost: 50
   SellCost: 15
   Prefab: {fileID: 1205611058772889948}
-  Image: {fileID: 21300000, guid: a91bd28a363df9d48b41540f506b6f93, type: 3}
+  Image: {fileID: 21300000, guid: 6447662d022cecf4a8c45ca38c9e5e36, type: 3}
   Name: Storage transporter (out)
 --- !u!60 &3940211286026458273
 PolygonCollider2D:
@@ -138,7 +138,7 @@ PolygonCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
+    newSize: {x: 5.12, y: 5.12}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
