@@ -1,7 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Tilemaps;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 /*
  * Tile grid is represented as two-dimensional array with diagonal axis.
@@ -21,6 +26,8 @@ public class TileManagerScript : MonoBehaviour
         }
     }
 
+    public List<Tile> TilePalette;
+
     public int Width => m_width;
     public int Height => m_height;
 
@@ -32,7 +39,7 @@ public class TileManagerScript : MonoBehaviour
     }
     public Vector2 LocalToWorld(Vector2Int localCoords)
     {
-        return new Vector2(localCoords.x / (float) CellSize.x, localCoords.y / (float) CellSize.y) + m_worldGridStart;
+        return new Vector2((localCoords.x + m_worldGridStart.x) / (float) CellSize.x, (localCoords.y + m_worldGridStart.y) / (float) CellSize.y);
     }
 
     public Vector2 WorldToCell(Vector2 worldPosition)
@@ -97,13 +104,42 @@ public class TileManagerScript : MonoBehaviour
         return  m_tiles[localPos.x, localPos.y].Object;
     }
 
-    private void Awake()
+    public void SetTile(Vector2 worldPosition, Tile tile = null)
+    {
+        Vector3Int cellPosition = m_tileMap.WorldToCell(worldPosition);
+        if (tile == null)
+        {
+            tile = GetRandomTileFromPalette();
+        }
+        m_tileMap.SetTile(cellPosition, tile);
+    }
+
+    private Tile GetRandomTileFromPalette()
+    {
+        int randomIndex = (int) (Random.value * TilePalette.Count);
+        return TilePalette[randomIndex];
+    }
+
+    private void BuildTileField()
+    {
+        for (int i = 0; i < Height; i++)
+        {
+            for (int j = 0; j < Width; j++)
+            {
+                Vector2 worldPosition = LocalToWorld(new Vector2Int(j, i));
+                SetTile(worldPosition);
+            }
+        }
+    }
+
+    private void Start()
     {
         m_worldGrid = GameObject.FindWithTag("grid").GetComponent<Grid>();
         m_layout = m_worldGrid.GetComponent<GridLayout>();
+        m_tileMap = GameObject.Find("baseTilemap").GetComponent<Tilemap>();
 
-        m_width = BASE_WIDTH;
-        m_height = BASE_HEIGHT;
+        m_width = BaseWidth;
+        m_height = BaseHeight;
 
         m_worldGridStart = new Vector2Int(-m_width / 2, -m_height / 2);
 
@@ -116,6 +152,8 @@ public class TileManagerScript : MonoBehaviour
                 m_tiles[i, j] = new TileHolder();
             }
         }
+
+        BuildTileField();
     }
 
     private class TileHolder
@@ -126,8 +164,11 @@ public class TileManagerScript : MonoBehaviour
 
     private TileHolder[,] m_tiles;
     private int m_width, m_height;
-    private static int BASE_WIDTH = 50, BASE_HEIGHT = 50;
     private Vector2Int m_worldGridStart;
     private Grid m_worldGrid;
     private GridLayout m_layout;
+    private Tilemap m_tileMap;
+
+    private const int BaseWidth = 50;
+    private const int BaseHeight = 50;
 }
