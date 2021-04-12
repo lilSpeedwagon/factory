@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class cameraScript : MonoBehaviour
+public class camera : MonoBehaviour
 {
     public float MaxCameraSize = 7.5f;
     public float MinCameraSize = 1.0f;
@@ -37,28 +37,34 @@ public class cameraScript : MonoBehaviour
     void FixedUpdate()
     {
         Vector3 mousePos = Input.mousePosition;
+        Vector3 newPosition = gameObject.transform.position;
         
         if (mousePos.x <= CursorOffsetToMoveScreen)
         {
-            gameObject.transform.position -= m_currentSpeed;
+            newPosition -= m_currentSpeed;
         }
         if (mousePos.x >= Screen.width - CursorOffsetToMoveScreen)
         {
-            gameObject.transform.position += m_currentSpeed;
+            newPosition += m_currentSpeed;
         }
         if (mousePos.y <= CursorOffsetToMoveScreen)
         {
-            gameObject.transform.position -= QuaternionUtils.qRotate90 * m_currentSpeed;
+            newPosition -= QuaternionUtils.qRotate90 * m_currentSpeed;
         }
         if (mousePos.y >= Screen.height - CursorOffsetToMoveScreen)
         {
-            gameObject.transform.position += QuaternionUtils.qRotate90 * m_currentSpeed;
+            newPosition += QuaternionUtils.qRotate90 * m_currentSpeed;
         }
 
         if (Input.GetKey(KeyCode.Mouse2))
         {
-            var mouseMovement = mousePos - m_prevMousePos;
-            gameObject.transform.position -= mouseMovement * m_currentSpeed.magnitude;
+            Vector3 mouseMovement = mousePos - m_prevMousePos;
+            newPosition -= mouseMovement * m_currentSpeed.magnitude;
+        }
+
+        if (TileManagerScript.TileManager.IsValidCoords(newPosition))
+        {
+            gameObject.transform.position = newPosition;
         }
         m_prevMousePos = mousePos;
     }
@@ -98,4 +104,5 @@ public class cameraScript : MonoBehaviour
     private Vector3 m_currentSpeed;
     private Range m_zoomRange;
     private Vector3 m_prevMousePos;
+    private Range m_horizontalLimit, m_verticalLimit;
 }

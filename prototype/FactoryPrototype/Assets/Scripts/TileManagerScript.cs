@@ -54,6 +54,11 @@ public class TileManagerScript : MonoBehaviour
         return new Vector2(worldPosition.x / (float)CellSize.x, worldPosition.y / (float)CellSize.y);
     }
 
+    public bool IsValidCoords(Vector2 worldPosition)
+    {
+        return IsValidCoords(WorldToLocal(worldPosition));
+    }
+
     private bool IsValidCoords(Vector2Int position)
     {
         return new Range(Width).In(position.x) && new Range(Height).In(position.y);

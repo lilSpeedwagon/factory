@@ -54,7 +54,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
     {
         HidePortList();
         Reset();
-        cameraScript.SetLayerVisibility(WireLayer, false);
+        global::camera.SetLayerVisibility(WireLayer, false);
 
         m_state = State.Inactive;
     }
@@ -70,7 +70,7 @@ public class DataPipeMenu : MonoBehaviour, IMenu
     public void Show()
     {
         MenuManager.Manager.SetActive(this);
-        cameraScript.SetLayerVisibility(WireLayer, true);
+        global::camera.SetLayerVisibility(WireLayer, true);
 
         m_state = State.Idle;
     }
