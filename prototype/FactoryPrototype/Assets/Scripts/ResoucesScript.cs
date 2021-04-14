@@ -53,7 +53,7 @@ public class ResoucesScript : MonoBehaviour
 
     private void UpdateValue()
     {
-        MoneyText.text = Money.ToString();
+        MoneyText.text = Money.ToString() + '$';
     }
 
     private RecipeManager m_recipeManager;

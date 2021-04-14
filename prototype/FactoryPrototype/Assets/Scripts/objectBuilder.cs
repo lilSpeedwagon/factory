@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -32,6 +33,7 @@ public class objectBuilder : MonoBehaviour, IMenu
     public BuildableObjectScript PrefabToCreate;
     public GameObject RemoverPrefab;
     public GameObject BuiltEffectPrefab;
+    public GameObject MoneyTextPrefab;
 
     // IMenu implementation
     public void Hide()
@@ -131,7 +133,7 @@ public class objectBuilder : MonoBehaviour, IMenu
             }
             catch (ArgumentException e)
             {
-                m_logger.Log($"Cannot build. Error: {e.Message}.");
+                m_logger.Log($"Cannot build. Reason: {e.Message}.");
                 return;
             }
 
@@ -144,6 +146,7 @@ public class objectBuilder : MonoBehaviour, IMenu
             TryAddEnergyObject(newObj);
 
             CreateBuiltEffect(position);
+            CreateRisingMoneyAnimation(position, -PrefabToCreate.Cost);
         }
     }
 
@@ -152,10 +155,23 @@ public class objectBuilder : MonoBehaviour, IMenu
         if (BuiltEffectPrefab != null)
         {
             var effect = Instantiate(BuiltEffectPrefab, position, Quaternion.identity);
-            Destroy(effect, 2.0f); // postponed destruction
+            const float lifetime = 2.0f;
+            Destroy(effect, lifetime); // postponed destruction
         }
 
         // TODO sound
+    }
+
+    private void CreateRisingMoneyAnimation(Vector2 position, int value)
+    {
+        if (MoneyTextPrefab == null) return;
+        
+        var moneyAnimation = Instantiate(MoneyTextPrefab, m_canvas.transform);
+        moneyAnimation.transform.position = position;
+        moneyAnimation.GetComponent<TextMeshProUGUI>().text = (value >= 0 ? "+" : "") + value + '$';
+
+        float lifetime = (float) moneyAnimation.GetComponent<RisingMoneyText>().Lifetime;
+        Destroy(moneyAnimation, lifetime); // postponed destruction
     }
 
     private int GetSellCost(GameObject removable)
@@ -169,10 +185,13 @@ public class objectBuilder : MonoBehaviour, IMenu
         {
             var pos = m_shadow.transform.position;
             var removableObject = m_tileManager.GetGameObject(pos);
-            TryRemoveEnergyObject(removableObject);
             int cost = GetSellCost(removableObject);
+
+            TryRemoveEnergyObject(removableObject);
             ResoucesScript.instance.Earn(cost);
             m_tileManager.RemoveObject(pos);
+
+            CreateRisingMoneyAnimation(pos, cost);
         }
         catch (NullReferenceException) { }
     }
@@ -290,6 +309,7 @@ public class objectBuilder : MonoBehaviour, IMenu
         m_logger = new LogUtils.DebugLogger("Builder");
 
         m_tileManager = TileManagerScript.TileManager;
+        m_canvas = GameObject.Find("Canvas");
         m_energyAreaTiles = new List<GameObject>(25);
     }
 
@@ -353,6 +373,7 @@ public class objectBuilder : MonoBehaviour, IMenu
         BuilderPanel.Show();
     }
 
+    private GameObject m_canvas;
     private TileManagerScript m_tileManager;
     private GameObject m_shadow;
 
