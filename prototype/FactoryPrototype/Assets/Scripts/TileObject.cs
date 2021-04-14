@@ -17,6 +17,7 @@ public class TileObject : MonoBehaviour
     public int ZPosition = 1;
     public TileFlipType FlipType = TileFlipType.NoFlip;
     public Sprite AlternativeSprite; // only for FlipAlternativeAnimationX
+    public Sprite AlternativeMask; // only for FlipAlternativeAnimationX
 
     public TileUtils.Direction Direction
     {
@@ -24,7 +25,6 @@ public class TileObject : MonoBehaviour
         set
         {
             m_dir = value;
-            var sprite = GetComponent<SpriteRenderer>();
 
             switch (FlipType)
             {
@@ -37,38 +37,20 @@ public class TileObject : MonoBehaviour
                 }
                 case TileFlipType.FlipX:
                 {
-                    sprite.flipX = m_dir == TileUtils.Direction.DownLeft || m_dir == TileUtils.Direction.UpRight;
+                    bool flipped = m_dir == TileUtils.Direction.DownLeft || m_dir == TileUtils.Direction.UpRight;
+                    m_spriteRenderer.flipX = flipped;
+                    FlipMask = flipped;
                     break;
                 }
                 case TileFlipType.FlipAlternativeAnimationX:
                 {
-                    sprite.flipX = m_dir == TileUtils.Direction.DownLeft || m_dir == TileUtils.Direction.UpRight;
-                    // used for changing animations in objects like conveyer
+                    bool flipped = m_dir == TileUtils.Direction.DownLeft || m_dir == TileUtils.Direction.UpRight;
+                    m_spriteRenderer.flipX = flipped;
+                    FlipMask = flipped;
+
+                    // use alternative sprite (and animation) for Y flip
                     bool alternative = IsAlternativeSpriteNeeded;
-
-                    try
-                    {
-                        GetComponent<Animator>()?.SetBool("UseAlternative", alternative);
-                    }
-                    catch (MissingComponentException) { }
-
-                    var spriteRenderer = GetComponent<SpriteRenderer>();
-                    if (!m_isAlternativeSpriteUsed && alternative)
-                    {
-                        m_isAlternativeSpriteUsed = true;
-
-                        if (m_originalSprite == null)
-                        {
-                            m_originalSprite = spriteRenderer.sprite;
-                        }
-                        spriteRenderer.sprite = AlternativeSprite;
-                    }
-                    else if (m_isAlternativeSpriteUsed && !alternative)
-                    {
-                        m_isAlternativeSpriteUsed = false;
-
-                        spriteRenderer.sprite = m_originalSprite;
-                    }
+                    UseAlternativeSprite = alternative;
                     break;
                 }
                 default:
@@ -135,26 +117,78 @@ public class TileObject : MonoBehaviour
 
     protected void FlipX_Y()
     {
-        var sprite = GetComponent<SpriteRenderer>();
         switch (m_dir)
         {
             case TileUtils.Direction.DownLeft:
-                sprite.flipX = true;
-                sprite.flipY = false;
+                m_spriteRenderer.flipX = true;
+                m_spriteRenderer.flipY = false;
                 break;
             case TileUtils.Direction.DownRight:
-                sprite.flipX = false;
-                sprite.flipY = false;
+                m_spriteRenderer.flipX = false;
+                m_spriteRenderer.flipY = false;
                 break;
             case TileUtils.Direction.UpLeft:
-                sprite.flipX = true;
-                sprite.flipY = true;
+                m_spriteRenderer.flipX = true;
+                m_spriteRenderer.flipY = true;
                 break;
             case TileUtils.Direction.UpRight:
-                sprite.flipX = false;
-                sprite.flipY = true;
+                m_spriteRenderer.flipX = false;
+                m_spriteRenderer.flipY = true;
                 break;
         }
+    }
+
+    protected bool FlipMask
+    {
+        set
+        {
+            if (m_mask == null)
+                return;
+
+            const float reversedScale = -1.0f;
+            const float directScale = 1.0f;
+
+            var scale = m_mask.transform.localScale;
+            scale.x = value ? reversedScale : directScale;
+            m_mask.transform.localScale = scale;
+        }
+    }
+
+    protected bool UseAlternativeSprite
+    {
+        set
+        {
+            if (!m_isAlternativeSpriteUsed && value)
+            {
+                m_isAlternativeSpriteUsed = true;
+
+                if (m_originalSprite == null)
+                {
+                    m_originalSprite = m_spriteRenderer.sprite;
+                    m_originalMask = m_mask?.sprite;
+                }
+                m_spriteRenderer.sprite = AlternativeSprite;
+                if (m_mask != null) m_mask.sprite = AlternativeMask;
+            }
+            else if (m_isAlternativeSpriteUsed && !value)
+            {
+                m_isAlternativeSpriteUsed = false;
+                m_spriteRenderer.sprite = m_originalSprite;
+                if (m_mask != null) m_mask.sprite = m_originalMask;
+            }
+
+            try
+            {
+                GetComponent<Animator>()?.SetBool("UseAlternative", value);
+            }
+            catch (MissingComponentException) { }
+        }
+    }
+
+    private void Awake()
+    {
+        m_spriteRenderer = GetComponent<SpriteRenderer>();
+        m_mask = GetComponentInChildren<SpriteMask>();
     }
 
     protected bool IsAlternativeSpriteNeeded => m_dir == TileUtils.Direction.UpLeft || m_dir == TileUtils.Direction.UpRight;
@@ -162,5 +196,9 @@ public class TileObject : MonoBehaviour
     protected TileUtils.Direction m_dir = TileUtils.Direction.DownRight;
     private bool m_isAlternativeSpriteUsed = false;
     private Sprite m_originalSprite;
+    private Sprite m_originalMask;
+
+    private SpriteRenderer m_spriteRenderer;
+    private SpriteMask m_mask;
     //protected ContactFilter2D m_filter = new ContactFilter2D();
 }
