@@ -131,7 +131,11 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
             LogText.text += message + '\n';
 
             // move scroll handler to the bottom
-            LogScrollbar.value = 1.0f;
+            // take a value lower than 0 because the content
+            // rectangle is not expanded yet, so after
+            // its expansion current position will no be in the
+            // very end of the log
+            LogScrollbar.value = -1.0f;
         }
     }
 
