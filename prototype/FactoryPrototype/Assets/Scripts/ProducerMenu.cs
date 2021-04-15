@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Quaternion = UnityEngine.Quaternion;
@@ -86,8 +87,8 @@ public class ProducerMenu : MonoBehaviour, IMenu
 
         bool isNothing = string.IsNullOrEmpty(material);
         
-        var text = item.GetComponent<Text>();
-        text.alignment = TextAnchor.MiddleCenter;
+        var text = item.GetComponent<TextMeshProUGUI>();
+        text.alignment = TextAlignmentOptions.Center;
         text.text = !isNothing ? $"{material} ({quantity})" : "Nothing";
 
         var toggle = item.GetComponent<Toggle>();

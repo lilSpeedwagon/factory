@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Xml.Xsl;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -187,8 +188,8 @@ public class DataPipeMenu : MonoBehaviour, IMenu
             buttonLabel += " (release)";
         }
 
-        var text = item.GetComponent<Text>();
-        text.alignment = TextAnchor.MiddleCenter;
+        var text = item.GetComponent<TextMeshProUGUI>();
+        text.alignment = TextAlignmentOptions.Center;
         text.text = buttonLabel;
     }
 

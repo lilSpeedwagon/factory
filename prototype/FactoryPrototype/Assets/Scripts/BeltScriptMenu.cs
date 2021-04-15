@@ -30,7 +30,7 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
     public VerticalLayoutGroup ScriptListContent;
     public Button RemoveButton;
     public Scrollbar LogScrollbar;
-    public Text LogText;
+    public TextMeshProUGUI LogText;
 
     public RectTransform ScriptListItemPrefab;
 
@@ -163,7 +163,7 @@ public class BeltScriptMenu : MonoBehaviour, IMenu
         var newElement = Instantiate(ScriptListItemPrefab, position, Quaternion.identity, ScriptListContent.transform);
 
         newElement.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1); // for some reasons it scales to big sizes
-        newElement.GetComponent<Text>().text = scriptName;
+        newElement.GetComponent<TextMeshProUGUI>().text = scriptName;
 
         Toggle itemToggle = newElement.GetComponent<Toggle>();
 

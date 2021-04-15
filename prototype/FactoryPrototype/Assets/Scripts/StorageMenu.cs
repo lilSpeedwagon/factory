@@ -64,7 +64,7 @@ public class StorageMenu : MonoBehaviour, IMenu
         Image img = item.GetChild(0).GetComponent<Image>();
         img.sprite = material.Image;
 
-        Text text = img.GetComponent<RectTransform>().GetChild(0).GetComponent<Text>();
+        TextMeshProUGUI text = img.GetComponent<RectTransform>().GetChild(0).GetComponent<TextMeshProUGUI>();
         text.text = "0";
         m_materialCountLabels[material.Name] = text;
 
@@ -74,8 +74,8 @@ public class StorageMenu : MonoBehaviour, IMenu
             StorageManager.Instance.BuyMaterial(material.Name, 1);
         });
 
-        Text buyButtonLabel = buyButton.GetComponent<RectTransform>().GetChild(0).GetComponent<Text>();
-        buyButtonLabel.text = material.Cost.ToString();
+        TextMeshProUGUI buyButtonLabel = buyButton.GetComponent<RectTransform>().GetChild(0).GetComponent<TextMeshProUGUI>();
+        buyButtonLabel.text = material.Cost.ToString() + '$';
 
         Button sellButton = item.GetChild(2).GetComponent<Button>();
         sellButton.onClick.AddListener(delegate
@@ -83,8 +83,8 @@ public class StorageMenu : MonoBehaviour, IMenu
             StorageManager.Instance.SellMaterial(material.Name, 1);
         });
 
-        Text sellButtonLabel = sellButton.GetComponent<RectTransform>().GetChild(0).GetComponent<Text>();
-        sellButtonLabel.text = material.SellCost.ToString();
+        TextMeshProUGUI sellButtonLabel = sellButton.GetComponent<RectTransform>().GetChild(0).GetComponent<TextMeshProUGUI>();
+        sellButtonLabel.text = material.SellCost.ToString() + '$';
     }
 
     private void InitGrid()
@@ -103,12 +103,12 @@ public class StorageMenu : MonoBehaviour, IMenu
     private void Start()
     {
         Hide();
-        m_materialCountLabels = new Dictionary<string, Text>();
+        m_materialCountLabels = new Dictionary<string, TextMeshProUGUI>();
         m_isInitialized = false;
     }
 
     private bool m_isInitialized;
-    private Dictionary<string, Text> m_materialCountLabels;
+    private Dictionary<string, TextMeshProUGUI> m_materialCountLabels;
 
     private const string MenuName = "Storage Menu";
     private static StorageMenu g_instance;

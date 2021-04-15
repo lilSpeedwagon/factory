@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class ResoucesScript : MonoBehaviour
@@ -18,7 +19,7 @@ public class ResoucesScript : MonoBehaviour
     }
 
     public int StartMoney = 0;
-    public UnityEngine.UI.Text MoneyText;
+    public TextMeshProUGUI MoneyText;
 
     public void Earn(int cost)
     {

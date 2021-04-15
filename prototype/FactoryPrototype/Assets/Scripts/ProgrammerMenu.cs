@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,13 +20,13 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         }
     }
 
-    public Text ProgrammerIdLabel;
-    public Text CurrentScriptLabel;
+    public TextMeshProUGUI ProgrammerIdLabel;
+    public TextMeshProUGUI CurrentScriptLabel;
     public Slider ExecFreqSlider;
-    public Text ExecFreqLabel;
+    public TextMeshProUGUI ExecFreqLabel;
     public Toggle RunToggle;
     public VerticalLayoutGroup ScriptListContent;
-    public Text LogText;
+    public TextMeshProUGUI LogText;
     public Scrollbar LogScrollbar;
 
     public RectTransform ScriptListItemPrefab;
@@ -226,7 +227,7 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         var newElement = Instantiate(ScriptListItemPrefab, position, Quaternion.identity, ScriptListContent.transform);
 
         newElement.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1); // for some reasons it scales to big sizes
-        newElement.GetComponent<Text>().text = scriptName;
+        newElement.GetComponent<TextMeshProUGUI>().text = scriptName;
 
         Toggle itemToggle = newElement.GetComponent<Toggle>();
 

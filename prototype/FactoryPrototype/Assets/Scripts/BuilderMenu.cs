@@ -39,7 +39,7 @@ public class BuilderMenu : MonoBehaviour, IMenu
         button.GetComponent<RectTransform>().localScale = new Vector3(1.0f, 1.0f, 1.0f);
         button.GetComponent<RawImage>().texture = img.texture;
         button.GetComponent<Button>().onClick.AddListener(call: delegate { Pick(obj.Prefab); });
-        button.transform.Find("costLabel").GetComponent<TextMeshProUGUI>().text = obj.Cost.ToString();
+        button.transform.Find("costLabel").GetComponent<TextMeshProUGUI>().text = obj.Cost.ToString() + '$';
         button.transform.Find("nameLabel").GetComponent<TextMeshProUGUI>().text = obj.Name;
     }
 
