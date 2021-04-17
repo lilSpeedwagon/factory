@@ -62,6 +62,9 @@ public class TileObject : MonoBehaviour
         }
     }
 
+    public bool IsAlternativeSpriteUsed =>
+        FlipType == TileFlipType.FlipAlternativeAnimationX && m_isAlternativeSpriteUsed;
+
     public Vector2 GetVector()
     {
         switch (m_dir)
