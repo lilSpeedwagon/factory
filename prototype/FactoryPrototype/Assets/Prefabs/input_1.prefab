@@ -82,13 +82,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2596727320512995921, guid: a1c7f09646e534346bd90698f1230bc9,
         type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 70fb69a5c3ba12a4d94f0e6a47d2f264,
+        type: 3}
+    - target: {fileID: 2596727320512995921, guid: a1c7f09646e534346bd90698f1230bc9,
+        type: 3}
       propertyPath: m_Color.b
-      value: 0.99361604
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2596727320512995921, guid: a1c7f09646e534346bd90698f1230bc9,
         type: 3}
       propertyPath: m_Color.g
-      value: 0.3066038
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2596727320512995921, guid: a1c7f09646e534346bd90698f1230bc9,
         type: 3}
@@ -100,11 +106,23 @@ PrefabInstance:
       propertyPath: Name
       value: Storage transporter (in)
       objectReference: {fileID: 0}
+    - target: {fileID: 4372548973974454222, guid: a1c7f09646e534346bd90698f1230bc9,
+        type: 3}
+      propertyPath: Image
+      value: 
+      objectReference: {fileID: 21300000, guid: 70fb69a5c3ba12a4d94f0e6a47d2f264,
+        type: 3}
     - target: {fileID: 5958811838742630764, guid: a1c7f09646e534346bd90698f1230bc9,
         type: 3}
       propertyPath: FlipType
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 5958811838742630764, guid: a1c7f09646e534346bd90698f1230bc9,
+        type: 3}
+      propertyPath: AlternativeSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: bc801d99354ea4f40be80f03abdeff9d,
+        type: 3}
     m_RemovedComponents:
     - {fileID: 8662245390015776693, guid: a1c7f09646e534346bd90698f1230bc9, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a1c7f09646e534346bd90698f1230bc9, type: 3}

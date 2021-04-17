@@ -24,7 +24,7 @@ public class InputConsumer : MonoBehaviour, IInput, IMover
 
     public bool IsDirectionAllowed(TileUtils.Direction direction)
     {
-        return GetComponent<TileObject>().Direction == direction;
+        return TileUtils.GetReversedDirection(GetComponent<TileObject>().Direction) == direction;
     }
 
     public bool IsFree()
