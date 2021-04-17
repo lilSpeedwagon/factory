@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -99,8 +100,15 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         // write log only if menu is visible and only for selected programmer
         if (m_isVisible && LogText != null && prog == m_currentProgrammer)
         {
-            LogText.text += '\n' + message;
-            LogScrollbar.value = 0.0f;
+            var time = DateTime.Now.TimeOfDay;
+            LogText.text += $"\n{time:HH:mm:ss}: {message}";
+
+            // move scroll handler to the bottom
+            // take a value lower than 0 because the content
+            // rectangle is not expanded yet, so after
+            // its expansion current position will no be in the
+            // very end of the log
+            LogScrollbar.value = -1.0f;
         }
     }
 
