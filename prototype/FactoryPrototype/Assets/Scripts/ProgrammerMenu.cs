@@ -26,6 +26,7 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
     public Slider ExecFreqSlider;
     public TextMeshProUGUI ExecFreqLabel;
     public Toggle RunToggle;
+    public TextMeshProUGUI RunToggleText;
     public VerticalLayoutGroup ScriptListContent;
     public TextMeshProUGUI LogText;
     public Scrollbar LogScrollbar;
@@ -93,6 +94,12 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         {
             m_currentProgrammer.Stop();
         }
+        SetToggleStateText(value);
+    }
+
+    public void OnExecutionStopped()
+    {
+        SetToggleState(false);
     }
 
     public void Log(Programmator prog, string message)
@@ -100,9 +107,8 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         // write log only if menu is visible and only for selected programmer
         if (m_isVisible && LogText != null && prog == m_currentProgrammer)
         {
-            var time = DateTime.Now.TimeOfDay;
-            LogText.text += $"\n{time:HH:mm:ss}: {message}";
-
+            LogText.text += '\n' + message;
+            
             // move scroll handler to the bottom
             // take a value lower than 0 because the content
             // rectangle is not expanded yet, so after
@@ -161,11 +167,20 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         }
     }
 
-    private void SetToggleState(bool value)
+    private void SetToggleState(bool isRunning)
     {
         if (RunToggle != null)
         {
-            RunToggle.isOn = value;
+            RunToggle.SetIsOnWithoutNotify(isRunning);
+            SetToggleStateText(isRunning);
+        }
+    }
+
+    private void SetToggleStateText(bool isRunning)
+    {
+        if (RunToggleText != null)
+        {
+            RunToggleText.text = isRunning ? RunButtonTextRunning : RunButtonTextStopped;
         }
     }
 
@@ -187,7 +202,7 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         SetCurrentScriptLabel(scriptName);
     }
     
-    void Start()
+    private void Start()
     {
         Hide();
 
@@ -269,5 +284,7 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
     private Programmator m_currentProgrammer;
 
     private const string MenuName = "Programmer Menu";
+    private const string RunButtonTextStopped = "Run";
+    private const string RunButtonTextRunning = "Stop";
     private static ProgrammerMenu g_instance;
 }

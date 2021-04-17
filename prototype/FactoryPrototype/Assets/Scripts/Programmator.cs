@@ -55,6 +55,8 @@ public class Programmator : MonoBehaviour
         // force init of BeltScript DLLs in Main Thread
         BeltScriptCodeManager.ForceInit();
 
+        Log($"Running {m_currentScript}...");
+
         m_state = ProgrammerState.Runnable;
         ReconfigureTimer();
         m_execTimer.Start();
@@ -65,6 +67,8 @@ public class Programmator : MonoBehaviour
         m_debugLogger.Log("Stop");
         m_execTimer.Stop();
         m_state = ProgrammerState.Idle;
+
+        Log($"Stopping {m_currentScript}...");
     }
 
     private bool ExecuteScript()
@@ -90,8 +94,20 @@ public class Programmator : MonoBehaviour
 
     private void Log(string message)
     {
-        m_logContainer.AppendLine(message);
-        ProgrammerMenu.Menu.Log(this, message);
+        // suppress all exceptions to prevent its transferring between binary
+        // modules boundaries
+        try
+        {
+            var time = DateTime.Now;
+            var messageWithTimestamp = $"{time:HH:mm:ss}: {message}";
+
+            m_logContainer.AppendLine(messageWithTimestamp);
+            ProgrammerMenu.Menu.Log(this, messageWithTimestamp);
+        }
+        catch (Exception e)
+        {
+            m_debugLogger.Warn($"Log exception. {e}");
+        }
     }
 
     private void ReconfigureTimer()
@@ -180,6 +196,9 @@ public class Programmator : MonoBehaviour
                     Log("Failure execution limit exceeded.");
                     m_failedExecutionInRow = 0;
                     Stop();
+
+                    // notify menu to change running indication
+                    ProgrammerMenu.Menu.OnExecutionStopped();
                 }
             }
             else

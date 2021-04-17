@@ -1275,7 +1275,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -73.48501}
+  m_AnchoredPosition: {x: 0, y: -73.48498}
   m_SizeDelta: {x: -18.049988, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &192612508
@@ -4084,8 +4084,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 288065538}
   m_HandleRect: {fileID: 288065537}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.99998444
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7317,6 +7317,7 @@ MonoBehaviour:
   ExecFreqSlider: {fileID: 627480510}
   ExecFreqLabel: {fileID: 1867387764}
   RunToggle: {fileID: 1729025693}
+  RunToggleText: {fileID: 1113707369}
   ScriptListContent: {fileID: 1878074235}
   LogText: {fileID: 2073832598}
   LogScrollbar: {fileID: 330307478}
