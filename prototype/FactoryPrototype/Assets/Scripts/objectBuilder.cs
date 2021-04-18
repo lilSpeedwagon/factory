@@ -33,7 +33,6 @@ public class objectBuilder : MonoBehaviour, IMenu
     public BuildableObjectScript PrefabToCreate;
     public GameObject RemoverPrefab;
     public GameObject BuiltEffectPrefab;
-    public GameObject MoneyTextPrefab;
 
     // IMenu implementation
     public void Hide()
@@ -146,7 +145,7 @@ public class objectBuilder : MonoBehaviour, IMenu
             TryAddEnergyObject(newObj);
 
             CreateBuiltEffect(position);
-            CreateRisingMoneyAnimation(position, -PrefabToCreate.Cost);
+            RisingMoneyText.CreateRisingMoneyAnimation(position, -PrefabToCreate.Cost);
         }
     }
 
@@ -160,18 +159,6 @@ public class objectBuilder : MonoBehaviour, IMenu
         }
 
         // TODO sound
-    }
-
-    private void CreateRisingMoneyAnimation(Vector2 position, int value)
-    {
-        if (MoneyTextPrefab == null) return;
-        
-        var moneyAnimation = Instantiate(MoneyTextPrefab, m_canvas.transform);
-        moneyAnimation.transform.position = position;
-        moneyAnimation.GetComponent<TextMeshProUGUI>().text = (value >= 0 ? "+" : "") + value + '$';
-
-        float lifetime = (float) moneyAnimation.GetComponent<RisingMoneyText>().Lifetime;
-        Destroy(moneyAnimation, lifetime); // postponed destruction
     }
 
     private int GetSellCost(GameObject removable)
@@ -191,7 +178,7 @@ public class objectBuilder : MonoBehaviour, IMenu
             ResoucesScript.instance.Earn(cost);
             m_tileManager.RemoveObject(pos);
 
-            CreateRisingMoneyAnimation(pos, cost);
+            RisingMoneyText.CreateRisingMoneyAnimation(pos, cost);
         }
         catch (NullReferenceException) { }
     }
@@ -309,7 +296,6 @@ public class objectBuilder : MonoBehaviour, IMenu
         m_logger = new LogUtils.DebugLogger("Builder");
 
         m_tileManager = TileManagerScript.TileManager;
-        m_canvas = GameObject.Find("Canvas");
         m_energyAreaTiles = new List<GameObject>(25);
     }
 
@@ -372,8 +358,7 @@ public class objectBuilder : MonoBehaviour, IMenu
         MenuManager.Manager.SetActive(BuilderPanel);
         BuilderPanel.Show();
     }
-
-    private GameObject m_canvas;
+    
     private TileManagerScript m_tileManager;
     private GameObject m_shadow;
 
