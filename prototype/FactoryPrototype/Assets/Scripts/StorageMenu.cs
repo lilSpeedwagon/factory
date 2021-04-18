@@ -64,9 +64,14 @@ public class StorageMenu : MonoBehaviour, IMenu
         Image img = item.GetChild(0).GetComponent<Image>();
         img.sprite = material.Image;
 
-        TextMeshProUGUI text = img.GetComponent<RectTransform>().GetChild(0).GetComponent<TextMeshProUGUI>();
-        text.text = "0";
-        m_materialCountLabels[material.Name] = text;
+        var layoutGroup = img.GetComponent<RectTransform>().GetChild(0).GetComponent<RectTransform>();
+
+        TextMeshProUGUI countLabel = layoutGroup.GetChild(0).GetComponent<TextMeshProUGUI>();
+        countLabel.text = "0";
+        m_materialCountLabels[material.Name] = countLabel;
+
+        TextMeshProUGUI nameLabel = layoutGroup.GetChild(1).GetComponent<TextMeshProUGUI>();
+        nameLabel.text = material.Name;
 
         Button buyButton = item.GetChild(1).GetComponent<Button>();
         buyButton.onClick.AddListener(delegate
