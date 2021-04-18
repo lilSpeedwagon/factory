@@ -1275,7 +1275,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -73.48501}
+  m_AnchoredPosition: {x: 0, y: -73.485}
   m_SizeDelta: {x: -18.049988, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &192612508
@@ -1595,7 +1595,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1068623294}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.96797204
+  m_Size: 0.9683325
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4084,8 +4084,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 288065538}
   m_HandleRect: {fileID: 288065537}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.9999889
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6533,6 +6533,7 @@ MonoBehaviour:
   Materials:
   - {fileID: 8407128057362650997, guid: c1cd9257ad5a72340a384ade06dbe868, type: 3}
   - {fileID: 6344197140984926014, guid: 85f1e9a04b46de74982f4cb246d30737, type: 3}
+  - {fileID: 8373873310808190120, guid: 9ab5d631c6074cd40b79bbeaa7a5f9fd, type: 3}
 --- !u!1 &1182150442
 GameObject:
   m_ObjectHideFlags: 0
@@ -6804,8 +6805,6 @@ MonoBehaviour:
   RemoverPrefab: {fileID: 7526012882960554387, guid: 41ef41256fe5c1d46af6769f702c4d96,
     type: 3}
   BuiltEffectPrefab: {fileID: 6827698066613072276, guid: e966277606ac9644dbe2c51652aadd79,
-    type: 3}
-  MoneyTextPrefab: {fileID: 1924148903060399563, guid: a0f9be29027846749af5c1946441905c,
     type: 3}
 --- !u!4 &1272473179
 Transform:

@@ -86,7 +86,7 @@ public class OutputProducer : MonoBehaviour, IOutput
         position.y += ConveyerHeight;
 
         var obj = Instantiate(m_materialToEmit.gameObject, position, TileUtils.InitRotation);
-        m_currentMotion = obj.GetComponent<MotionScript>(); // could be null
+        m_currentMotion = obj.GetComponent<MotionScript>();
         Move(m_currentMotion);
     }
     // end IOutput
