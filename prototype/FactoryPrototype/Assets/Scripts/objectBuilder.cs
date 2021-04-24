@@ -96,20 +96,42 @@ public class objectBuilder : MonoBehaviour, IMenu
                 Destroy(m_shadow);
             }
 
-            m_shadow = Instantiate(ShadowPrefab, TileUtils.NormalizedMousePosition() + TileUtils.LevelOffset(m_currentZlevel), TileUtils.InitRotation);
+            m_shadow = CreateShadowObject(PrefabToCreate.Prefab);
+        }
+    }
 
-            var spriteRenderer = m_shadow.GetComponent<SpriteRenderer>();
-            spriteRenderer.sprite = PrefabToCreate.GetComponent<SpriteRenderer>().sprite;
-            spriteRenderer.color = ColorUtils.colorTransparentGreen;
-            spriteRenderer.sortingLayerName = "shadow";
+    // recursively creates shadows for all objects in the prefab
+    private GameObject CreateShadowObject(GameObject prefab, Transform parent = null)
+    {
+        var shadowObject = Instantiate(ShadowPrefab, TileUtils.NormalizedMousePosition() + TileUtils.LevelOffset(m_currentZlevel), TileUtils.InitRotation);
 
-            var tileComponent = m_shadow.GetComponent<TileObject>();
-            var prefabTileComponent = PrefabToCreate.GetComponent<TileObject>();
+        if (parent != null)
+        {
+            shadowObject.transform.parent = parent;
+        }
+
+        var spriteRenderer = shadowObject.GetComponent<SpriteRenderer>();
+        spriteRenderer.sprite = prefab.GetComponent<SpriteRenderer>().sprite;
+        spriteRenderer.color = ColorUtils.colorTransparentGreen;
+        spriteRenderer.sortingLayerName = "shadow";
+
+        var prefabTileComponent = prefab.GetComponent<TileObject>();
+        if (prefabTileComponent != null) // child objects could not contain tile component
+        {
+            var tileComponent = shadowObject.GetComponent<TileObject>();
             tileComponent.IsShadow = true;
             tileComponent.FlipType = prefabTileComponent.FlipType;
             tileComponent.AlternativeSprite = prefabTileComponent.AlternativeSprite;
             tileComponent.ZPosition = prefabTileComponent.ZPosition;
         }
+
+        for (int i = 0; i < prefab.transform.childCount; i++)
+        {
+            var child = prefab.transform.GetChild(i);
+            CreateShadowObject(child.gameObject, shadowObject.transform);
+        }
+
+        return shadowObject;
     }
 
     private void CreateRemoverShadow()
