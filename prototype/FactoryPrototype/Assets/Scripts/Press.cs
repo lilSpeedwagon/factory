@@ -74,15 +74,24 @@ public class Press : MonoBehaviour, IProcessor, IMover
     }
     // IMover end
 
-    private void FireAnimation()
+    private void PressDown()
     {
-        const string trigger = "pressTrigger";
-        m_animator.ResetTrigger(trigger);
-        m_animator.SetTrigger(trigger);
+        m_state = PressState.Down;
+        m_animator.SetBool("pressDown", true);
+
+        TryProcessMaterial();
+    }
+
+    private void PressUp()
+    {
+        m_state = PressState.Up;
+        m_animator.SetBool("pressDown", false);
     }
 
     private void TryProcessMaterial()
     {
+        if (!IsActive) return;
+        
         if (m_currentMotion?.IsFinished ?? false)
         {
             var material = m_currentMotion.GetComponent<Material>();
@@ -98,10 +107,14 @@ public class Press : MonoBehaviour, IProcessor, IMover
 
     private void OnMouseDown()
     {
-        if (IsActive)
+        switch (m_state)
         {
-            FireAnimation();
-            TryProcessMaterial();
+            case PressState.Down:
+                PressUp();
+                break;
+            case PressState.Up:
+                PressDown();
+                break;
         }
     }
 
@@ -109,6 +122,7 @@ public class Press : MonoBehaviour, IProcessor, IMover
     {
         m_logger = new LogUtils.DebugLogger("Press");
 
+        m_state = PressState.Up;
         m_consumer = GetComponent<EnergyConsumer>();
         m_animator = GetComponent<Animator>();
     }
@@ -118,6 +132,13 @@ public class Press : MonoBehaviour, IProcessor, IMover
         
     }
 
+    private enum PressState
+    {
+        Up,
+        Down
+    }
+
+    private PressState m_state;
     private MotionScript m_currentMotion;
 
     private EnergyConsumer m_consumer;
