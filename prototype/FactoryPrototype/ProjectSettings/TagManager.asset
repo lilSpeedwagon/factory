@@ -57,6 +57,9 @@ TagManager:
   - name: details
     uniqueID: 3545020615
     locked: 0
+  - name: object_top
+    uniqueID: 1122992591
+    locked: 0
   - name: shadow
     uniqueID: 573397833
     locked: 0
