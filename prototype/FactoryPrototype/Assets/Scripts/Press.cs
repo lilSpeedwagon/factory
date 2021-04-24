@@ -107,6 +107,8 @@ public class Press : MonoBehaviour, IProcessor, IMover
 
     private void OnMouseDown()
     {
+        if (!IsActive) return;
+            
         switch (m_state)
         {
             case PressState.Down:
@@ -125,11 +127,26 @@ public class Press : MonoBehaviour, IProcessor, IMover
         m_state = PressState.Up;
         m_consumer = GetComponent<EnergyConsumer>();
         m_animator = GetComponent<Animator>();
+
+        DataPublisher publisher = GetComponent<DataPublisher>();
+        m_pressPort = new DataPublisher.DataPort("IsPressed");
+        publisher.SetPort(m_pressPort);
     }
     
     private void FixedUpdate()
     {
-        
+        if (IsActive && m_pressPort.IsConnected)
+        {
+            bool isPressed = m_pressPort.CurrentValue.GetBool();
+            if (m_state == PressState.Down && !isPressed)
+            {
+                PressUp();
+            }
+            if (m_state == PressState.Up && isPressed)
+            {
+                PressDown();
+            }
+        }
     }
 
     private enum PressState
@@ -140,6 +157,7 @@ public class Press : MonoBehaviour, IProcessor, IMover
 
     private PressState m_state;
     private MotionScript m_currentMotion;
+    private DataPublisher.DataPort m_pressPort;
 
     private EnergyConsumer m_consumer;
     private Animator m_animator;
