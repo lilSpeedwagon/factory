@@ -72,6 +72,7 @@
     <Compile Include="Assets\Scripts\BuilderMenu.cs" />
     <Compile Include="Assets\Scripts\DataPipeMenu.cs" />
     <Compile Include="Assets\Scripts\OutputProducer.cs" />
+    <Compile Include="Assets\Scripts\Sensor.cs" />
     <Compile Include="Assets\Scripts\TileObject.cs" />
     <Compile Include="Assets\Scripts\EnergyConsumer.cs" />
     <Compile Include="Assets\Scripts\TileManagerScript.cs" />
@@ -92,7 +93,7 @@
     <Compile Include="Assets\Scripts\MotionScript.cs" />
     <Compile Include="Assets\Scripts\RisingMoneyText.cs" />
     <Compile Include="Assets\Scripts\Conveyer.cs" />
-    <Compile Include="Assets\Scripts\Sensor.cs" />
+    <Compile Include="Assets\Scripts\Press.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

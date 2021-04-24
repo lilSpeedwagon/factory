@@ -12,7 +12,7 @@ public class Processor : MonoBehaviour, IProcessor, IMover
     public bool IsActive => m_consumerComponent?.IsEnergized ?? false;
 
     // IProcessor implementation
-    public string Name;
+    public string Name => "processor";
 
     public Material Process(Material processable)
     {

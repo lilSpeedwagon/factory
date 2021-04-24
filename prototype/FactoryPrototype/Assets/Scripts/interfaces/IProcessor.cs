@@ -4,6 +4,7 @@ using UnityEngine;
 
 public interface IProcessor
 {
+    public string Name { get; }
     bool CanProcess(string material);
     Material Process(Material obj);
 }
