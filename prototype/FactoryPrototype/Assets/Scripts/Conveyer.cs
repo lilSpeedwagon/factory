@@ -34,6 +34,19 @@ public class Conveyer : MonoBehaviour, IMover
 
     public float Height => ConveyerHeight;
 
+    public MotionScript ReleaseMotion()
+    {
+        const float halfFinished = 0.5f;
+        if (m_currentObject?.Progress >= halfFinished)
+        {
+            var motion = m_currentObject;
+            m_currentObject = null;
+            return motion;
+        }
+
+        return null;
+    }
+
     public void Move(MotionScript motionObject)
     {
         if (motionObject != null && motionObject.IsFinished && IsAbleToMove())

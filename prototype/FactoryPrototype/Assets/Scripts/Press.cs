@@ -48,6 +48,19 @@ public class Press : MonoBehaviour, IProcessor, IMover
 
     public float Height => ConveyerHeight;
 
+    public MotionScript ReleaseMotion()
+    {
+        const float halfFinished = 0.5f;
+        if (m_currentMotion?.Progress >= halfFinished)
+        {
+            var motion = m_currentMotion;
+            m_currentMotion = null;
+            return motion;
+        }
+
+        return null;
+    }
+
     public void Move(MotionScript motionObject)
     {
         throw new NotImplementedException();
@@ -55,7 +68,7 @@ public class Press : MonoBehaviour, IProcessor, IMover
 
     public bool IsAbleToMove()
     {
-        throw new NotImplementedException();
+        return false;
     }
 
     public bool IsDirectionAllowed(TileUtils.Direction direction)

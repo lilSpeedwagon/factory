@@ -7,6 +7,7 @@ public interface IMover
 {
     IMover Next { get; }
     float Height { get; }
+    MotionScript ReleaseMotion();
     void Move(MotionScript motionObject);
     bool IsAbleToMove();
     bool IsDirectionAllowed(TileUtils.Direction direction);

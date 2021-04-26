@@ -94,6 +94,7 @@
     <Compile Include="Assets\Scripts\RisingMoneyText.cs" />
     <Compile Include="Assets\Scripts\Conveyer.cs" />
     <Compile Include="Assets\Scripts\Press.cs" />
+    <Compile Include="Assets\Scripts\HandManipulator.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

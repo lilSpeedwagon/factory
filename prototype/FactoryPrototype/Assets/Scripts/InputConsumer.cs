@@ -12,6 +12,11 @@ public class InputConsumer : MonoBehaviour, IInput, IMover
 
     public float Height => ConveyerHeight;
 
+    public MotionScript ReleaseMotion()
+    {
+        return null;
+    }
+
     public void Move(MotionScript motionObject)
     {
         throw new NotImplementedException();
@@ -36,7 +41,6 @@ public class InputConsumer : MonoBehaviour, IInput, IMover
     {
         m_currentMotion = obj;
     }
-
     // IMover end
 
     // IConsumer

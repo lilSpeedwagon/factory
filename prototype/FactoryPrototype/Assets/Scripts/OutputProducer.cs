@@ -14,6 +14,11 @@ public class OutputProducer : MonoBehaviour, IOutput
 
     public float Height => ConveyerHeight;
 
+    public MotionScript ReleaseMotion()
+    {
+        return null;
+    }
+
     public void Move(MotionScript motionObject)
     {
         if (motionObject.IsFinished && IsAbleToMove())

@@ -116,9 +116,9 @@ public class objectBuilder : MonoBehaviour, IMenu
         spriteRenderer.sortingLayerName = "shadow";
 
         var prefabTileComponent = prefab.GetComponent<TileObject>();
-        if (prefabTileComponent != null) // child objects could not contain tile component
+        var tileComponent = shadowObject.GetComponent<TileObject>();
+        if (prefabTileComponent != null)
         {
-            var tileComponent = shadowObject.GetComponent<TileObject>();
             tileComponent.IsShadow = true;
             tileComponent.FlipType = prefabTileComponent.FlipType;
             tileComponent.AlternativeSprite = prefabTileComponent.AlternativeSprite;
@@ -128,7 +128,10 @@ public class objectBuilder : MonoBehaviour, IMenu
         for (int i = 0; i < prefab.transform.childCount; i++)
         {
             var child = prefab.transform.GetChild(i);
-            CreateShadowObject(child.gameObject, shadowObject.transform);
+            if (child.GetComponent<SpriteRenderer>() != null)
+            {
+                CreateShadowObject(child.gameObject, shadowObject.transform);
+            }
         }
 
         return shadowObject;
