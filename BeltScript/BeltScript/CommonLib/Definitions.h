@@ -11,7 +11,7 @@ namespace Tokens
 {
 	static const std::string Delimiters = " \r\n\t";
 	static const std::string AdditionToIdentifiers = "_.";
-	static const std::string Operators = "+-/*%><=!";
+	static const std::string Operators = "+-/*%><=!&|";
 	static const std::string Commas = ",";
 	static const std::string Brackets = "()";
 	static const std::string QBrackets = "[]";

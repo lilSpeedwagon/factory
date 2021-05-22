@@ -40,6 +40,8 @@ namespace runtime
 		{ "<", [](Value const& l_arg, Value const& r_arg) { return l_arg < r_arg; } },
 		{ ">=", [](Value const& l_arg, Value const& r_arg) { return l_arg >= r_arg; } },
 		{ "<=", [](Value const& l_arg, Value const& r_arg) { return l_arg <= r_arg; } },
+		{ "&&", [](Value const& l_arg, Value const& r_arg) { return l_arg && r_arg; } },
+		{ "||", [](Value const& l_arg, Value const& r_arg) { return l_arg || r_arg; } }
 	};
 
 	Value func_print(Value const& val);
