@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &9060607058700593280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6624532916374811775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 867140ba88eddad49a52902fbf243683, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ActiveSprite: {fileID: 21300000, guid: 59836e85f7e8901489aaec50549c8fe6, type: 3}
+--- !u!1001 &8697142005291547606
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2548304039966199721, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_Name
+      value: temp sensor
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448104937953139509, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448104937953139509, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.2039723
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448104937953139509, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -4.1789565
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448104937953139509, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448104937953139509, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448104937953139509, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448104937953139509, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448104937953139509, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448104937953139509, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448104937953139509, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4448104937953139509, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7146056370951904841, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: Name
+      value: Temperature sensor
+      objectReference: {fileID: 0}
+    - target: {fileID: 8531705238567301204, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0.56037736
+      objectReference: {fileID: 0}
+    - target: {fileID: 8531705238567301204, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0.56037736
+      objectReference: {fileID: 0}
+    - target: {fileID: 8531705238567301204, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: -6591871277902692669, guid: 9bf6a0c0112108148a6fd51de5fd5f46, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: 9bf6a0c0112108148a6fd51de5fd5f46, type: 3}
+--- !u!1 &6624532916374811775 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2548304039966199721, guid: 9bf6a0c0112108148a6fd51de5fd5f46,
+    type: 3}
+  m_PrefabInstance: {fileID: 8697142005291547606}
+  m_PrefabAsset: {fileID: 0}

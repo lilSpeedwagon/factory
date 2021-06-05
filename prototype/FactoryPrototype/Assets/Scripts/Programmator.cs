@@ -14,6 +14,8 @@ public class Programmator : MonoBehaviour
     public static float MinFreq = 0.1f;
     public static float MaxFreq = 10f;
 
+    public const int DataPortsCount = 4;
+
     public int Id => m_id;
 
     public bool IsActive => m_state != ProgrammerState.Idle;
@@ -138,8 +140,9 @@ public class Programmator : MonoBehaviour
     {
         float[] values = new float[DataPortsCount];
 
-        foreach (var (port, i) in m_publisher.PortList.Select((port, i) => (port, i)))
+        for (int i = 0; i < DataPortsCount; i++)
         {
+            var port = m_publisher.PortList[i];
             values[i] = port.IsPublisher ? port.CurrentValue.GetNumber() : 0.0f;
         }
 
@@ -261,7 +264,6 @@ public class Programmator : MonoBehaviour
     private float m_frequency = 1.0f;
 
     private DataPublisher m_publisher;
-    private const int DataPortsCount = 4;
 
     private const int LogCapacity = 10000;
     private readonly StringBuilder m_logContainer = new StringBuilder(LogCapacity);

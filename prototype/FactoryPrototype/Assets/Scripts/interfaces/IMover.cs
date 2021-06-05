@@ -5,6 +5,7 @@ using UnityEngine;
 
 public interface IMover
 {
+    MotionScript Motion { get; }
     IMover Next { get; }
     float Height { get; }
     MotionScript ReleaseMotion();

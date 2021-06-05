@@ -54,7 +54,7 @@ public class HandManipulator : MonoBehaviour
             if (m_currentMotion.IsFinished)
             {
                 var getter = GetterObject;
-                IMover getterMover = getter.GetComponent<IMover>();
+                IMover getterMover = getter?.GetComponent<IMover>();
                 if (getterMover?.IsFree() ?? false)
                 {
                     getterMover.HoldMotion(m_currentMotion);

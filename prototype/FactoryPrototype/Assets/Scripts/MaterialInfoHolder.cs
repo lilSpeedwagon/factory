@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,16 +20,21 @@ public class MaterialInfoHolder : MonoBehaviour
 
     public List<Material> Materials;
 
-    public Material GetMaterialPrefab(string name)
+    public Material GetMaterialPrefab(string materialName)
     {
         try
         {
-            return m_materials[name];
+            return m_materials[materialName];
         }
         catch (KeyNotFoundException)
         {
             return null;
         }
+    }
+
+    public Material GetTrashPrefab()
+    {
+        return GetMaterialPrefab(TrashMaterialName);
     }
 
     public bool Exist(string name)
@@ -47,6 +53,7 @@ public class MaterialInfoHolder : MonoBehaviour
     }
 
     private Dictionary<string, Material> m_materials;
+    private const string TrashMaterialName = "Charcoal";
 
     private static MaterialInfoHolder g_instance;
 }

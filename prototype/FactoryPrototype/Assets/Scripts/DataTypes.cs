@@ -83,12 +83,30 @@ public class DataValue
         }
     }
 
+    public void SetValue(string value)
+    {
+        Type = DataType.String;
+        m_value = value;
+    }
+
+    public void SetValue(float value)
+    {
+        Type = DataType.Number;
+        m_value = value;
+    }
+
+    public void SetValue(bool value)
+    {
+        Type = DataType.Bool;
+        m_value = value;
+    }
+
     private DataValue()
     {
         Type = DataType.Undefined;
     }
 
-    private readonly object m_value;
+    private object m_value;
 }
 
 /*class DataValueNumber : DataValue

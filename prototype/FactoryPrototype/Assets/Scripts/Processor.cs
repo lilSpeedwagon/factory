@@ -66,6 +66,7 @@ public class Processor : MonoBehaviour, IProcessor, IMover
     // IProcessor implementation end
 
     // IMover implementation
+    public MotionScript Motion => m_currentMotion;
     public IMover Next => TileManagerScript.TileManager.GetGameObject(m_tileComponent.GetNextPosition())?.GetComponent<IMover>();
 
     public float Height => ConveyerHeight;

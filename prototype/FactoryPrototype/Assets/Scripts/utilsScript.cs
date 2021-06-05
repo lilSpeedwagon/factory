@@ -97,7 +97,7 @@ public class ColorUtils
     public static Color colorTransparentGreen = new Color(0.5f, 1.0f, 0.5f, 0.3f);
     public static Color GetRandomColor()
     {
-        const int colorsCount = 10;
+        const int colorsCount = 9;
         int r = (int) (Random.value * colorsCount);
 
         switch (r)
@@ -107,7 +107,7 @@ public class ColorUtils
             case 1:
                 return Color.black;
             case 2:
-                return Color.clear;
+                return Color.yellow;
             case 3:
                 return Color.cyan;
             case 4:
@@ -120,8 +120,6 @@ public class ColorUtils
                 return Color.magenta;
             case 8:
                 return Color.red;
-            case 9:
-                return Color.yellow;
             default:
                 return Color.white;
         }

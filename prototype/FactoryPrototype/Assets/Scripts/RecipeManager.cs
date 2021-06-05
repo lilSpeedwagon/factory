@@ -26,7 +26,6 @@ public class RecipeManager : MonoBehaviour
         try
         {
             return m_recipesByFrom[from]?.Find(recipe => recipe.Processor == processor);
-
         }
         catch (KeyNotFoundException)
         {
@@ -34,9 +33,14 @@ public class RecipeManager : MonoBehaviour
         }
     }
 
-    public bool CanBeProcessed(string from, string processor)
+    public bool CanBeProcessed(string from, string processor, int temperature = 0)
     {
-        return FindRecipe(from, processor) != null;
+        var recipe = FindRecipe(from, processor);
+        if (recipe?.Temperature != 0)
+        {
+            return temperature >= recipe?.Temperature;
+        }
+        return false;
     }
 
     private void Start()
@@ -63,4 +67,5 @@ public class Recipe
     public string From, To;
     public string Processor;
     public float ProcessingTime;
+    public int Temperature;
 }

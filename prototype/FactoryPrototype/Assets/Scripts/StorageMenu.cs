@@ -74,10 +74,18 @@ public class StorageMenu : MonoBehaviour, IMenu
         nameLabel.text = material.Name;
 
         Button buyButton = item.GetChild(1).GetComponent<Button>();
-        buyButton.onClick.AddListener(delegate
+        // this item can not be bought
+        if (material.Name == "charcoal")
         {
-            StorageManager.Instance.BuyMaterial(material.Name, 1);
-        });
+            Destroy(buyButton);
+        }
+        else
+        {
+            buyButton.onClick.AddListener(delegate
+            {
+                StorageManager.Instance.BuyMaterial(material.Name, 1);
+            });
+        }
 
         TextMeshProUGUI buyButtonLabel = buyButton.GetComponent<RectTransform>().GetChild(0).GetComponent<TextMeshProUGUI>();
         buyButtonLabel.text = material.Cost.ToString() + '$';

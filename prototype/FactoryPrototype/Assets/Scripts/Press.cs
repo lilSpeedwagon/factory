@@ -44,6 +44,8 @@ public class Press : MonoBehaviour, IProcessor, IMover
     // IProcessor end
 
     // IMover
+    public MotionScript Motion => m_currentMotion;
+
     public IMover Next => null;
 
     public float Height => ConveyerHeight;

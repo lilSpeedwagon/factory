@@ -76,9 +76,9 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1221789239
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 07dccc2c6b8d8da40b30ea9f6fee89a9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: fe417b642e1e7054ca5d4baad4ae0a72, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -104,7 +104,7 @@ MonoBehaviour:
   Cost: 100
   SellCost: 40
   Prefab: {fileID: 2153529958082496891}
-  Image: {fileID: 21300000, guid: 07dccc2c6b8d8da40b30ea9f6fee89a9, type: 3}
+  Image: {fileID: 21300000, guid: fe417b642e1e7054ca5d4baad4ae0a72, type: 3}
   Name: Programmer
 --- !u!114 &3780603105910516266
 MonoBehaviour:
@@ -120,8 +120,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsShadow: 0
   ZPosition: 1
-  FlipType: 0
+  FlipType: 2
   AlternativeSprite: {fileID: 0}
+  AlternativeMask: {fileID: 0}
 --- !u!60 &6524838035053906607
 PolygonCollider2D:
   m_ObjectHideFlags: 0

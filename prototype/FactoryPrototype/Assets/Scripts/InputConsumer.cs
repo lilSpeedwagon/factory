@@ -12,6 +12,8 @@ public class InputConsumer : MonoBehaviour, IInput, IMover
 
     public float Height => ConveyerHeight;
 
+    public MotionScript Motion => m_currentMotion;
+
     public MotionScript ReleaseMotion()
     {
         return null;

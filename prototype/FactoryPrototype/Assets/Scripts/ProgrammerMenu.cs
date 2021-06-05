@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,11 +28,13 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
     public TextMeshProUGUI ExecFreqLabel;
     public Toggle RunToggle;
     public TextMeshProUGUI RunToggleText;
+    public VerticalLayoutGroup PortList;
     public VerticalLayoutGroup ScriptListContent;
     public TextMeshProUGUI LogText;
     public Scrollbar LogScrollbar;
 
     public RectTransform ScriptListItemPrefab;
+    public RectTransform PortListItemPrefab;
 
     public void ShowFor(Programmator prog)
     {
@@ -48,6 +51,7 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         SetToggleActive(programmerHasScript);
 
         UpdateScriptList();
+        UpdatePortListData();
 
         Show();
 
@@ -204,7 +208,10 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
     
     private void Start()
     {
+        m_logger = new LogUtils.DebugLogger("Programmer Menu");
+
         Hide();
+        InitPortList();
 
         if (ExecFreqSlider != null)
         {
@@ -279,9 +286,70 @@ public class ProgrammerMenu : MonoBehaviour, IMenu
         m_scriptListItems.Clear();
     }
 
+    private void InitPortList()
+    {
+        if (PortList == null || !PortListItemPrefab)
+        {
+            m_logger.Warn("Cannot init port list. Missing required data.");
+            return;
+        }
+
+        m_portLabelsList = new List<TextMeshProUGUI>(Programmator.DataPortsCount);
+
+        var transform = PortList.GetComponent<RectTransform>();
+        Vector3 position = transform.position;
+        for (int i = 0; i < Programmator.DataPortsCount; i++)
+        {
+            var item = Instantiate(PortListItemPrefab, position, Quaternion.identity, transform);
+            item.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1); // for some reasons it scales to big sizes
+            m_portLabelsList.Add(item.GetComponent<TextMeshProUGUI>());
+        }
+    }
+
+    private void UpdatePortListData()
+    {
+        if (m_currentProgrammer != null)
+        {
+            var publisher = m_currentProgrammer.GetComponent<DataPublisher>();
+            var portList = publisher.PortList;
+            for (int i = 0; i < Programmator.DataPortsCount; i++)
+            {
+                var port = portList[i];
+                const string outLabel = "out";
+                const string inLabel = "in";
+                const string notConnectedLabel = "N/A";
+                string typeLabel = port.IsConnected ? (port.IsSource ? outLabel : inLabel) : notConnectedLabel;
+
+                var value = port.CurrentValue;
+                string valueLabel;
+                switch (value.Type)
+                {
+                    case DataValue.DataType.String:
+                        valueLabel = value.GetString();
+                        break;
+                    case DataValue.DataType.Number:
+                        valueLabel = value.GetNumber().ToString();
+                        break;
+                    case DataValue.DataType.Bool:
+                        valueLabel = value.GetBool().ToString();
+                        break;
+                    default:
+                        valueLabel = "undefined";
+                        break;
+                }
+
+                string text = $"Port{i} {typeLabel} value: {valueLabel}";
+                m_portLabelsList[i].text = text;
+            }
+        }
+    }
+
     private bool m_isVisible;
     private List<RectTransform> m_scriptListItems = new List<RectTransform>();
     private Programmator m_currentProgrammer;
+    private List<TextMeshProUGUI> m_portLabelsList;
+
+    private LogUtils.DebugLogger m_logger;
 
     private const string MenuName = "Programmer Menu";
     private const string RunButtonTextStopped = "Run";

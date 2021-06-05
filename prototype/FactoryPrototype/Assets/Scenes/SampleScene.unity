@@ -1275,7 +1275,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -73.48499}
+  m_AnchoredPosition: {x: 0, y: -73.485}
   m_SizeDelta: {x: -18.049988, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &192612508
@@ -1498,10 +1498,17 @@ MonoBehaviour:
     To: gear2
     Processor: proc1
     ProcessingTime: 1
+    Temperature: 0
   - From: Iron Bar
     To: Iron Plate
     Processor: press
     ProcessingTime: 1
+    Temperature: 0
+  - From: Iron Ore
+    To: Iron Bar
+    Processor: smelter
+    ProcessingTime: 1
+    Temperature: 1500
 --- !u!4 &302059260
 Transform:
   m_ObjectHideFlags: 0
@@ -4104,7 +4111,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 288065537}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.99996823
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4411,7 +4418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: 60
+  m_MinWidth: 100
   m_MinHeight: -1
   m_PreferredWidth: 1
   m_PreferredHeight: -1
@@ -4597,7 +4604,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 156536394}
   m_HandleRect: {fileID: 156536393}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -6556,6 +6563,7 @@ MonoBehaviour:
   - {fileID: 3411714660984208430, guid: bf69b5d8f3beee84bb62d55755e4b307, type: 3}
   - {fileID: 7467468914446916097, guid: f8b450645c554ce40bec0b88dea387f3, type: 3}
   - {fileID: 7764158953838062615, guid: 4b784239d5c6966449d6c9d0542a9873, type: 3}
+  - {fileID: 4565131806020973955, guid: ac3603c7857eb6743afe176b7e42653d, type: 3}
 --- !u!1 &1182150442
 GameObject:
   m_ObjectHideFlags: 0
@@ -6812,14 +6820,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Objects:
   - {fileID: 5102762363917646093, guid: e05605714a303964580bd64a23a579fe, type: 3}
-  - {fileID: -2074310011579821997, guid: 8da74bb665f373c48bf2d2b3e074d294, type: 3}
+  - {fileID: 6877845210891359967, guid: 1f4a945328819eb42875d925fc98bddb, type: 3}
   - {fileID: 4372548973974454222, guid: a1c7f09646e534346bd90698f1230bc9, type: 3}
   - {fileID: 5166025137282809209, guid: eb9a5b1d228a6654b80415fbb38a0075, type: 3}
   - {fileID: 8905209571401361151, guid: 653aa16d1e149ae4ba2e7b01fe39f774, type: 3}
   - {fileID: 8585105701218536148, guid: db8aea51518ac8b4f87c7788550f7e8f, type: 3}
-  - {fileID: 7146056370951904841, guid: 9bf6a0c0112108148a6fd51de5fd5f46, type: 3}
   - {fileID: 8675064084627144306, guid: 575050e5e1e5bf24bab01a2eb1ea2fde, type: 3}
-  - {fileID: 6877845210891359967, guid: 1f4a945328819eb42875d925fc98bddb, type: 3}
+  - {fileID: 6245240081836272411, guid: 1a6c5313005b9a8439c06f6179ce6089, type: 3}
+  - {fileID: 658285833646344777, guid: a1e9bdf066897d54fbb75f5a82c85d1d, type: 3}
+  - {fileID: 7146056370951904841, guid: 9bf6a0c0112108148a6fd51de5fd5f46, type: 3}
+  - {fileID: 1988780119866910111, guid: 7f4d9121a83f8ec4fb6cf867f1b23527, type: 3}
   BuilderPanel: {fileID: 68322897}
   ShadowPrefab: {fileID: 4172057517413125286, guid: a320cf30b8029fa4db9b621e22387ed8,
     type: 3}
@@ -6856,7 +6866,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7823f446d1cf05429ab3ffaeb9c053c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartMoney: 1000
+  StartMoney: 5000
   MoneyText: {fileID: 62829161}
 --- !u!1 &1284160954
 GameObject:
@@ -7342,10 +7352,13 @@ MonoBehaviour:
   ExecFreqLabel: {fileID: 1867387764}
   RunToggle: {fileID: 1729025693}
   RunToggleText: {fileID: 1113707369}
+  PortList: {fileID: 834006583}
   ScriptListContent: {fileID: 1878074235}
   LogText: {fileID: 2073832598}
   LogScrollbar: {fileID: 330307478}
   ScriptListItemPrefab: {fileID: 6409466013755867600, guid: dc37ac613af526544a1cffc2a183973d,
+    type: 3}
+  PortListItemPrefab: {fileID: 12575204002962096, guid: 0168b49e6e9811248bff0a157736a84e,
     type: 3}
 --- !u!1 &1412948189
 GameObject:
@@ -9190,30 +9203,30 @@ Tilemap:
   m_TileMatrixArray:
   - m_RefCount: 0
     m_Data:
-      e00: -1.084227e-19
-      e01: -5.1405995e+18
-      e02: -5.1400937e+18
-      e03: -5.1400937e+18
-      e10: 4.05e-43
-      e11: 3.9e-44
-      e12: 3.9e-44
-      e13: 3.9e-44
-      e20: 3.807644e+28
-      e21: -1.7597154e+29
-      e22: 6.769779
-      e23: -1.7597154e+29
-      e30: 4.5904e-41
-      e31: 4.06e-43
-      e32: 4.05e-43
-      e33: 4.06e-43
+      e00: 1.084227e-19
+      e01: 4.6169373e+27
+      e02: 4.6166658e+27
+      e03: 4.6166658e+27
+      e10: 5.77e-43
+      e11: 1.67e-43
+      e12: 1.67e-43
+      e13: 1.67e-43
+      e20: 5.064766e+24
+      e21: -1.212583e-39
+      e22: -6.776539
+      e23: -1.212583e-39
+      e30: 4.5905e-41
+      e31: 5.79e-43
+      e32: 5.76e-43
+      e33: 5.79e-43
   m_TileColorArray:
   - m_RefCount: 0
-    m_Data: {r: -1.759649e+29, g: -1.759649e+29, b: -1.759649e+29, a: -1.759649e+29}
+    m_Data: {r: -1.21209e-39, g: -1.21209e-39, b: -1.21209e-39, a: -1.21209e-39}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Origin: {x: -10, y: -14, z: 0}
-  m_Size: {x: 16, y: 17, z: 1}
+  m_Origin: {x: -11, y: -14, z: 0}
+  m_Size: {x: 17, y: 17, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:

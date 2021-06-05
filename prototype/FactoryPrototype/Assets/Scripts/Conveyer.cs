@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using TMPro;
+using UnityEditor.U2D.Sprites;
 using UnityEngine;
 
 public class Conveyer : MonoBehaviour, IMover
@@ -14,7 +16,7 @@ public class Conveyer : MonoBehaviour, IMover
     {
         get
         {
-            if (m_speedPort != null && m_speedPort.IsPublisher)
+            if (m_speedPort.IsPublisher)
             {
                 return m_speedPort.CurrentValue.GetNumber();
             }
@@ -22,6 +24,32 @@ public class Conveyer : MonoBehaviour, IMover
             return BaseSpeed;
         }
     }
+
+    public bool IsReversed
+    {
+        get
+        {
+            if (m_directionPort != null && m_directionPort.IsPublisher)
+            {
+                return m_directionPort.CurrentValue.GetBool();
+            }
+
+            return false;
+        }
+    }
+
+    public bool IsStopped
+    {
+        get
+        {
+            const float speedThreshold = 0.05f;
+            return Math.Abs(Speed) < speedThreshold;
+        }
+    }
+    public bool IsEnabled => m_consumerComponent.IsEnergized;
+
+    // IMover
+    public MotionScript Motion => m_currentObject;
 
     public IMover Next
     {
@@ -49,26 +77,14 @@ public class Conveyer : MonoBehaviour, IMover
 
     public void Move(MotionScript motionObject)
     {
-        if (motionObject != null && motionObject.IsFinished && IsAbleToMove())
+        if (motionObject != null && motionObject.IsFinished && IsAbleToMove() && !IsStopped)
         {
-            m_currentObject = null;
             Vector2 position = IsReversed ? m_tileComponent.GetPrevPosition() : m_tileComponent.GetNextPosition();
-            position.y += Next.Height;
+            var next = Next;
+            position.y += next.Height;
             motionObject.StartMotion(position, Speed);
-            Next.HoldMotion(motionObject);
-        }
-    }
-
-    public bool IsReversed
-    {
-        get
-        {
-            if (m_directionPort != null && m_directionPort.IsPublisher)
-            {
-                return m_directionPort.CurrentValue.GetBool();
-            }
-
-            return false;
+            next.HoldMotion(motionObject);
+            m_currentObject = null;
         }
     }
 
@@ -98,8 +114,7 @@ public class Conveyer : MonoBehaviour, IMover
     {
         m_currentObject = obj;
     }
-
-    public bool IsEnabled => m_consumerComponent.IsEnergized;
+    // IMover end
 
     private void Start()
     {
@@ -140,8 +155,14 @@ public class Conveyer : MonoBehaviour, IMover
 
         if (isEnabled)
         {
-            AnimationSpeed = Speed;
+            var speed = Speed;
+            AnimationSpeed = speed;
             Move(m_currentObject);
+
+            if (m_speedPort.IsSource)
+            {
+                m_speedPort.CurrentValue.SetValue(speed);
+            }
         }
     }
 

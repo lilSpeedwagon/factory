@@ -52,7 +52,7 @@ public class Sensor : MonoBehaviour
         publisher.SetPort(m_presencePort);
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         bool isMaterialDetected = IsEnabled && IsMaterialDetected;
         m_presencePort.CurrentValue = new DataValue(isMaterialDetected);

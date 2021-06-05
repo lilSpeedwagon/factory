@@ -45,6 +45,7 @@ namespace runtime
 	};
 
 	Value func_print(Value const& val);
+	Value fibonacci(Value const& val);
 
 	const std::map<std::string, FunctionZeroArgs> mapZeroArgsFunctions = {
 		{ "pi", []() { return Value(static_cast<float>(M_PI)); } },
@@ -58,6 +59,7 @@ namespace runtime
 		{ "tan", [](Value const& arg) { return Value(tan(arg.toFloat().getValue<float>())); } },
 		{ "abs", [](Value const& arg) { return Value(abs(arg.toFloat().getValue<float>())); } },
 		{ "sqrt", [](Value const& arg) { return Value(sqrt(arg.toFloat().getValue<float>())); } },
+		{ "fib", fibonacci },
 	};
 
 	const std::map<std::string, FunctionBinary> mapBinaryFunctions = {

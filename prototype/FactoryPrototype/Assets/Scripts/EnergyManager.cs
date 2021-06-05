@@ -148,7 +148,7 @@ public class EnergyManager : MonoBehaviour
     {
         if (EnergyValueLabel != null)
         {
-            EnergyValueLabel.text = $"{m_currentConsumption} / {m_energyStorage}";
+            EnergyValueLabel.text = $"{m_currentConsumption} / {m_energyStorage} kWh";
         }
     }
 

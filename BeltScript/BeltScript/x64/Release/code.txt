@@ -1,0 +1,10 @@
+print("start");
+N = 10000;
+i = 0;
+print("start");
+while (i < N)
+{
+	v = fib(25);
+	i = i + 1;
+}
+print("end");
